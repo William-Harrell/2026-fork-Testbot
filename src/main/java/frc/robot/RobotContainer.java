@@ -410,6 +410,17 @@ public class RobotContainer {
         .toggleSpeed()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
+    driverJoystick.toggleIntakeOutake().onTrue(intake.toggleDirection());
+
+    /*
+    How intake is going to work:
+    > Hold right trigger to deploy
+      - Retract when you release
+    > While deployed, click left bumper to toggle intake/outake (motor spin direction)
+    */
+
+    driverJoystick.orientAndShoot().onTrue();
+
     // ----------------------------------------------------------------
     // INTAKE CONTROLS - DISABLED (Spark Max ID 9 not connected)
     // ----------------------------------------------------------------

@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.pathplanner.lib.events.TriggerEvent;
+
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -52,15 +54,12 @@ public final class OI {
      */
     boolean isMovementCommanded();
 
-    // ================================================================
-    // INTAKE CONTROLS
-    // ================================================================
-
-    /** Hold to deploy intake and run rollers */
-    Trigger intake();
-
-    /** Hold to run outtake (eject FUEL) */
-    Trigger outtake();
+    // TODO implement these Triggers in the main code
+    Trigger toggleIntakeOutake();
+    Trigger maintainDeployed();
+    Trigger climbUp();
+    Trigger climbDown();
+    Trigger orientAndShoot();
   }
 
   public static class XboxDriver implements DriverActionSet {
@@ -90,7 +89,7 @@ public final class OI {
 
     @Override
     public Trigger toggleSpeed() {
-      return stick.x();
+      return stick.b();
     }
 
     @Override
@@ -105,7 +104,7 @@ public final class OI {
 
     @Override
     public Trigger skiStop() {
-      return stick.y();
+      return stick.rightBumper();
     }
 
     @Override
@@ -118,13 +117,28 @@ public final class OI {
     // ================================================================
 
     @Override
-    public Trigger intake() {
-      return stick.rightBumper();
+    public Trigger toggleIntakeOutake() {
+      return stick.leftBumper();
     }
 
     @Override
-    public Trigger outtake() {
-      return stick.leftBumper();
+    public Trigger maintainDeployed() {
+      return stick.rightTrigger();
+    }
+
+    @Override
+    public Trigger climbUp() {
+      return stick.povUp();
+    }
+
+    @Override
+    public Trigger climbDown() {
+      return stick.povDown();
+    }
+
+    @Override
+    public Trigger orientAndShoot() {
+      return stick.x();
     }
   }
 }

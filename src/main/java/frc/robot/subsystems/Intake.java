@@ -167,9 +167,19 @@ public class Intake extends SubsystemBase {
     }
   }
 
+  public void toggleIntakeOutake() {
+    if (isDeployed() == false) return;
+
+    state = (state == IntakeState.INTAKING) ? IntakeState.OUTTAKING : IntakeState.INTAKING;
+  }
+
   // ================================================================
   // COMMAND FACTORIES
   // ================================================================
+
+  public Command toggleDirection() {
+    return Commands.runOnce(this::toggleIntakeOutake);
+  }
 
   /** Command to deploy intake and run rollers */
   public Command intakeCommand() {

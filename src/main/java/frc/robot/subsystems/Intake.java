@@ -108,6 +108,8 @@ public class Intake extends SubsystemBase {
 
   /** Deploy the intake to collect FUEL */
   public void deploy() {
+    if (state == IntakeState.DEPLOYING || state == IntakeState.DEPLOYED) return;
+
     targetPosition = IntakeConstants.DEPLOYED_POSITION;
     deployController.setSetpoint(targetPosition, SparkMax.ControlType.kPosition);
     state = IntakeState.DEPLOYING;
@@ -115,6 +117,7 @@ public class Intake extends SubsystemBase {
 
   /** Retract the intake to stowed position */
   public void retract() {
+    if (state == IntakeState.RETRACTING || state == IntakeState.STOWED) return;
     stopRollers();
     targetPosition = IntakeConstants.STOWED_POSITION;
     deployController.setSetpoint(targetPosition, SparkMax.ControlType.kPosition);
@@ -170,7 +173,11 @@ public class Intake extends SubsystemBase {
   public void toggleIntakeOutake() {
     if (isDeployed() == false) return;
 
-    state = (state == IntakeState.INTAKING) ? IntakeState.OUTTAKING : IntakeState.INTAKING;
+    if (state == IntakeState.INTAKING) {
+      runOuttake();
+    } else {
+      runIntake();
+    }
   }
 
   // ================================================================

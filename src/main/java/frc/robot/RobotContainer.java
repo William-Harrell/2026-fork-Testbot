@@ -419,7 +419,11 @@ public class RobotContainer {
     > While deployed, click left bumper to toggle intake/outake (motor spin direction)
     */
 
-    driverJoystick.orientAndShoot().onTrue();
+    // driverJoystick.orientAndShoot().onTrue();
+    // driverJoystick.climbUp().whileTrue();
+    // driverJoystick.climbUp().whileTrue();
+
+    driverJoystick.maintainDeployed().whileTrue(intake.holdToIntakeCommand());
 
     // ----------------------------------------------------------------
     // INTAKE CONTROLS - DISABLED (Spark Max ID 9 not connected)

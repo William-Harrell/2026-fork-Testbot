@@ -1,7 +1,5 @@
 package frc.robot;
 
-import com.pathplanner.lib.events.TriggerEvent;
-
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -56,9 +54,13 @@ public final class OI {
 
     // TODO implement these Triggers in the main code
     Trigger toggleIntakeOutake();
+
     Trigger maintainDeployed();
+
     Trigger climbUp();
+
     Trigger climbDown();
+
     Trigger orientAndShoot();
   }
 

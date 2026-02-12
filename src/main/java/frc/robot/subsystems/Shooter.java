@@ -26,9 +26,7 @@ import java.util.Optional;
 /**
  * Shooter subsystem for launching FUEL into the HUB.
  *
- * <p>
- * Features: - Pitch servo to adjust up/down angle - Flywheel motor to launch
- * FUEL - Trajectory
+ * <p>Features: - Pitch servo to adjust up/down angle - Flywheel motor to launch FUEL - Trajectory
  * calculations for automated shooting
  */
 public class Shooter extends SubsystemBase {
@@ -123,10 +121,12 @@ public class Shooter extends SubsystemBase {
         .idleMode(IdleMode.kCoast)
         .smartCurrentLimit(ShooterConstants.FLYWHEEL_CURRENT_LIMIT);
 
-    flywheelConfig.closedLoop
+    flywheelConfig
+        .closedLoop
         .p(ShooterConstants.FLYWHEEL_kP)
         .i(ShooterConstants.FLYWHEEL_kI)
-        .d(ShooterConstants.FLYWHEEL_kD).feedForward
+        .d(ShooterConstants.FLYWHEEL_kD)
+        .feedForward
         .kV(ShooterConstants.FLYWHEEL_kFF);
 
     flywheelMotor.configure(
@@ -144,13 +144,15 @@ public class Shooter extends SubsystemBase {
    */
   public void setPitchAngle(double angleDegrees) {
     // Clamp to valid range
-    targetPitchAngle = Math.max(
-        ShooterConstants.PITCH_MIN_ANGLE,
-        Math.min(ShooterConstants.PITCH_MAX_ANGLE, angleDegrees));
+    targetPitchAngle =
+        Math.max(
+            ShooterConstants.PITCH_MIN_ANGLE,
+            Math.min(ShooterConstants.PITCH_MAX_ANGLE, angleDegrees));
 
     // Convert angle to servo position (0.0 to 1.0)
-    double servoPosition = (targetPitchAngle - ShooterConstants.PITCH_MIN_ANGLE)
-        / (ShooterConstants.PITCH_MAX_ANGLE - ShooterConstants.PITCH_MIN_ANGLE);
+    double servoPosition =
+        (targetPitchAngle - ShooterConstants.PITCH_MIN_ANGLE)
+            / (ShooterConstants.PITCH_MAX_ANGLE - ShooterConstants.PITCH_MIN_ANGLE);
 
     pitchServo.set(servoPosition);
   }
@@ -165,10 +167,8 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Check if the pitch servo is approximately at the target angle. Note: Standard
-   * servos don't
-   * provide position feedback, so this assumes the servo reaches position after a
-   * brief delay.
+   * Check if the pitch servo is approximately at the target angle. Note: Standard servos don't
+   * provide position feedback, so this assumes the servo reaches position after a brief delay.
    *
    * @return true if servo should be at target
    */
@@ -255,7 +255,7 @@ public class Shooter extends SubsystemBase {
    * Prepare shooter for a shot at a specific angle and speed.
    *
    * @param pitchDegrees Pitch angle in degrees
-   * @param flywheelRPM  Flywheel speed in RPM
+   * @param flywheelRPM Flywheel speed in RPM
    */
   public void prepareShot(double pitchDegrees, double flywheelRPM) {
     setPitchAngle(pitchDegrees);
@@ -281,87 +281,83 @@ public class Shooter extends SubsystemBase {
   /** Command to spin up flywheel and wait until ready. */
   public Command spinUpCommand() {
     return Commands.sequence(
-        Commands.runOnce(this::spinUp, this), Commands.waitUntil(this::isFlywheelAtSpeed))
+            Commands.runOnce(this::spinUp, this), Commands.waitUntil(this::isFlywheelAtSpeed))
         .withName("Spin Up Shooter");
   }
 
   /**
-   * Command to prepare shooter with automatic pitch calculation. Uses trajectory
-   * calculation to
+   * Command to prepare shooter with automatic pitch calculation. Uses trajectory calculation to
    * determine optimal pitch angle.
    */
   public Command prepareAutoShotCommand() {
     return Commands.sequence(
-        Commands.runOnce(
-            () -> {
-              double calculatedPitch = calculateOptimalPitch();
-              prepareShot(calculatedPitch, ShooterConstants.FLYWHEEL_SHOOT_RPM);
-            },
-            this),
-        Commands.waitUntil(this::isReadyToShoot))
+            Commands.runOnce(
+                () -> {
+                  double calculatedPitch = calculateOptimalPitch();
+                  prepareShot(calculatedPitch, ShooterConstants.FLYWHEEL_SHOOT_RPM);
+                },
+                this),
+            Commands.waitUntil(this::isReadyToShoot))
         .withName("Prepare Auto Shot");
   }
 
   /**
-   * Command to prepare shooter using vision-assisted targeting. Uses AprilTags
-   * for more precise
+   * Command to prepare shooter using vision-assisted targeting. Uses AprilTags for more precise
    * distance/angle calculation. Falls back to odometry if no tags visible.
    */
   public Command prepareVisionShotCommand() {
     return Commands.sequence(
-        Commands.runOnce(
-            () -> {
-              VisionAimedShot shot = calculateOptimalPitchWithVision();
-              prepareShot(shot.pitchAngle(), ShooterConstants.FLYWHEEL_SHOOT_RPM);
+            Commands.runOnce(
+                () -> {
+                  VisionAimedShot shot = calculateOptimalPitchWithVision();
+                  prepareShot(shot.pitchAngle(), ShooterConstants.FLYWHEEL_SHOOT_RPM);
 
-              // Log the shot info for driver feedback
-              SmartDashboard.putBoolean("Shooter/VisionAssisted", shot.visionAssisted());
-              SmartDashboard.putString("Shooter/ShotConfidence", shot.confidenceDescription());
-              SmartDashboard.putNumber("Shooter/VisionDistance", shot.distanceToHub());
-            },
-            this),
-        Commands.waitUntil(this::isReadyToShoot))
+                  // Log the shot info for driver feedback
+                  SmartDashboard.putBoolean("Shooter/VisionAssisted", shot.visionAssisted());
+                  SmartDashboard.putString("Shooter/ShotConfidence", shot.confidenceDescription());
+                  SmartDashboard.putNumber("Shooter/VisionDistance", shot.distanceToHub());
+                },
+                this),
+            Commands.waitUntil(this::isReadyToShoot))
         .withName("Prepare Vision Shot");
   }
 
   /**
-   * Command to continuously track hub with vision and update pitch. Run this
-   * while waiting for a
+   * Command to continuously track hub with vision and update pitch. Run this while waiting for a
    * shot opportunity.
    */
   public Command trackHubCommand() {
     return Commands.run(
-        () -> {
-          if (hasReliableVisionTarget()) {
-            VisionAimedShot shot = calculateOptimalPitchWithVision();
-            setPitchAngle(shot.pitchAngle());
-          }
-        },
-        this)
+            () -> {
+              if (hasReliableVisionTarget()) {
+                VisionAimedShot shot = calculateOptimalPitchWithVision();
+                setPitchAngle(shot.pitchAngle());
+              }
+            },
+            this)
         .withName("Track Hub");
   }
 
   /**
-   * Command to spin up and aim using vision, then wait for driver trigger.
-   * Continuously updates
+   * Command to spin up and aim using vision, then wait for driver trigger. Continuously updates
    * pitch based on AprilTag data.
    */
   public Command aimAndSpinUpCommand() {
     return Commands.parallel(
-        // Keep flywheel spinning
-        Commands.run(this::spinUp, this),
-        // Continuously track the hub
-        Commands.run(
-            () -> {
-              VisionAimedShot shot = calculateOptimalPitchWithVision();
-              setPitchAngle(shot.pitchAngle());
+            // Keep flywheel spinning
+            Commands.run(this::spinUp, this),
+            // Continuously track the hub
+            Commands.run(
+                () -> {
+                  VisionAimedShot shot = calculateOptimalPitchWithVision();
+                  setPitchAngle(shot.pitchAngle());
 
-              // Update dashboard
-              SmartDashboard.putBoolean("Shooter/VisionAssisted", shot.visionAssisted());
-              SmartDashboard.putBoolean("Shooter/HighConfidence", shot.isHighConfidence());
-              SmartDashboard.putNumber("Shooter/AimPitch", shot.pitchAngle());
-            },
-            this))
+                  // Update dashboard
+                  SmartDashboard.putBoolean("Shooter/VisionAssisted", shot.visionAssisted());
+                  SmartDashboard.putBoolean("Shooter/HighConfidence", shot.isHighConfidence());
+                  SmartDashboard.putNumber("Shooter/AimPitch", shot.pitchAngle());
+                },
+                this))
         .withName("Aim and Spin Up");
   }
 
@@ -389,11 +385,12 @@ public class Shooter extends SubsystemBase {
   private void UpdateHubLocation() {
     hub[1] = ShooterConstants.UNIV_Y;
 
-    hub[0] = ((DriverStation.getAlliance().equals(Alliance.Blue))
-        ? ShooterConstants.BLUE_X
-        : ((DriverStation.getAlliance().equals(Alliance.Red))
-            ? ShooterConstants.RED_X
-            : -180.0));
+    hub[0] =
+        ((DriverStation.getAlliance().equals(Alliance.Blue))
+            ? ShooterConstants.BLUE_X
+            : ((DriverStation.getAlliance().equals(Alliance.Red))
+                ? ShooterConstants.RED_X
+                : -180.0));
   }
 
   /** Check if scoring is allowed based on game state and position. */
@@ -491,8 +488,7 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Calculate optimal pitch angle for current position. This is a simplified
-   * calculation - adjust
+   * Calculate optimal pitch angle for current position. This is a simplified calculation - adjust
    * based on testing.
    *
    * @return Optimal pitch angle in degrees
@@ -511,11 +507,8 @@ public class Shooter extends SubsystemBase {
   /**
    * Calculate optimal pitch angle using AprilTag vision for precise targeting.
    *
-   * <p>
-   * This method uses the vision system to get a more accurate position estimate
-   * when AprilTags
-   * are visible. Falls back to odometry-based calculation if vision data is
-   * unavailable or
+   * <p>This method uses the vision system to get a more accurate position estimate when AprilTags
+   * are visible. Falls back to odometry-based calculation if vision data is unavailable or
    * unreliable.
    *
    * @return VisionAimedShot containing pitch angle and confidence metrics
@@ -598,8 +591,7 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Calculate pitch angle from horizontal distance using interpolation. Tune
-   * these values based on
+   * Calculate pitch angle from horizontal distance using interpolation. Tune these values based on
    * testing.
    *
    * @param distance Horizontal distance to hub in meters
@@ -624,13 +616,11 @@ public class Shooter extends SubsystemBase {
   }
 
   /**
-   * Calculate pitch angle using physics-based projectile motion. Used when we
-   * have high-confidence
+   * Calculate pitch angle using physics-based projectile motion. Used when we have high-confidence
    * vision data.
    *
    * @param horizontalDistance Distance to target (meters)
-   * @param verticalDistance   Height difference to target (meters, positive =
-   *                           target higher)
+   * @param verticalDistance Height difference to target (meters, positive = target higher)
    * @return Optimal pitch angle in degrees
    */
   private double calculatePitchPhysics(double horizontalDistance, double verticalDistance) {
@@ -642,7 +632,8 @@ public class Shooter extends SubsystemBase {
 
     // Estimate launch velocity from flywheel RPM (this needs calibration)
     // Assuming linear relationship between RPM and ball exit velocity
-    double estimatedVelocity = ShooterConstants.FLYWHEEL_SHOOT_RPM * 0.001; // (placeholder TODO - calibrate)
+    double estimatedVelocity =
+        ShooterConstants.FLYWHEEL_SHOOT_RPM * 0.001; // (placeholder TODO - calibrate)
 
     // Use high arc solution (+ sqrt term) for better accuracy
     double v2 = estimatedVelocity * estimatedVelocity;
@@ -674,7 +665,7 @@ public class Shooter extends SubsystemBase {
       double ambiguity, // Vision ambiguity (0 = perfect, 1 = bad)
       double distanceToHub, // Calculated distance to hub in meters
       String confidenceDescription // Human-readable confidence level
-  ) {
+      ) {
     /** Check if this shot has high confidence. */
     public boolean isHighConfidence() {
       return visionAssisted && tagCount >= 2 && ambiguity < 0.2;

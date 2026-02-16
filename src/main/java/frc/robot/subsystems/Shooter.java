@@ -51,7 +51,7 @@ public class Shooter extends SubsystemBase {
   // DEPENDENCIES
   // ================================================================
 
-  private final Vision vision;
+  // private final Vision vision;
   private final SwerveDrive swerve;
 
   // ================================================================

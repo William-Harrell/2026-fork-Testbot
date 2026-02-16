@@ -1056,4 +1056,5 @@ public class Vision extends SubsystemBase {
   //     }
   // }
 
-} // End of Vision class
+// End of Vision class
+}

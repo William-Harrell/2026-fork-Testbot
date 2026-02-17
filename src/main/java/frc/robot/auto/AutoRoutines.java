@@ -131,14 +131,14 @@ public final class AutoRoutines {
             Commands.parallel(
                     AutoCommands.driveForward(swerve, 2.0, AutoConstants.AUTO_INTAKE_DRIVE_SPEED),
                     Commands.sequence(
-                        Commands.runOnce(intake::deploy, intake),
-                        Commands.waitUntil(intake::isDeployed),
-                        Commands.run(intake::runIntake, intake)))
+                        Commands.runOnce(intake::deployIntakeMechanism, intake),
+                        Commands.waitUntil(intake.getD()::isDeployed),
+                        Commands.run(intake.getR()::runIntake, intake)))
                 .withTimeout(AutoConstants.INTAKE_TIMEOUT),
 
             // Phase 4: Stop intake and retract
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
 
             // Phase 5: Return and score
             AutoCommands.driveToPose(swerve, getShootingPose()),
@@ -161,16 +161,16 @@ public final class AutoRoutines {
             AutoCommands.driveToPose(swerve, getDepotPose()),
 
             // Phase 2: Collect from depot
-            Commands.runOnce(intake::deploy, intake),
-            Commands.waitUntil(intake::isDeployed),
+            Commands.runOnce(intake::deployIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isDeployed),
             Commands.parallel(
-                    Commands.run(intake::runIntake, intake),
+                    Commands.run(intake.getR()::runIntake, intake),
                     Commands.sequence(
                         AutoCommands.driveForward(swerve, 0.5, 0.5),
                         AutoCommands.driveBackward(swerve, 0.5, 0.5)))
                 .withTimeout(AutoConstants.DEPOT_COLLECTION_TIME),
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
 
             // Phase 3: Drive to scoring position and score
             AutoCommands.driveToPose(swerve, getShootingPose()),
@@ -199,14 +199,14 @@ public final class AutoRoutines {
             AutoCommands.driveToPose(swerve, getNeutralPose(true)),
 
             // Phase 3: Collect FUEL
-            Commands.runOnce(intake::deploy, intake),
-            Commands.waitUntil(intake::isDeployed),
+            Commands.runOnce(intake::deployIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isDeployed),
             Commands.parallel(
-                    Commands.run(intake::runIntake, intake),
+                    Commands.run(intake.getR()::runIntake, intake),
                     AutoCommands.driveForward(swerve, 1.5, AutoConstants.AUTO_SLOW_DRIVE_SPEED))
                 .withTimeout(3.0),
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
 
             // Phase 4: Return and score
             AutoCommands.driveToPose(swerve, getShootingPose()),
@@ -248,12 +248,12 @@ public final class AutoRoutines {
             Commands.parallel(
                     AutoCommands.driveForward(swerve, 2.0, AutoConstants.AUTO_INTAKE_DRIVE_SPEED),
                     Commands.sequence(
-                        Commands.runOnce(intake::deploy, intake),
-                        Commands.waitUntil(intake::isDeployed),
-                        Commands.run(intake::runIntake, intake)))
+                        Commands.runOnce(intake::deployIntakeMechanism, intake),
+                        Commands.waitUntil(intake.getD()::isDeployed),
+                        Commands.run(intake.getR()::runIntake, intake)))
                 .withTimeout(AutoConstants.INTAKE_TIMEOUT),
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
             AutoCommands.driveToPose(swerve, getShootingPose()),
             AutoCommands.shootAllFuel(shooter, intake),
             AutoCommands.stopDriving(swerve),
@@ -301,12 +301,12 @@ public final class AutoRoutines {
             Commands.parallel(
                     AutoCommands.driveForward(swerve, 1.0, AutoConstants.AUTO_FAST_DRIVE_SPEED),
                     Commands.sequence(
-                        Commands.runOnce(intake::deploy, intake),
-                        Commands.waitUntil(intake::isDeployed),
-                        Commands.run(intake::runIntake, intake)))
+                        Commands.runOnce(intake::deployIntakeMechanism, intake),
+                        Commands.waitUntil(intake.getD()::isDeployed),
+                        Commands.run(intake.getR()::runIntake, intake)))
                 .withTimeout(2.0),
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
 
             // Quick score
             AutoCommands.driveToPose(swerve, getShootingPose()),
@@ -333,12 +333,12 @@ public final class AutoRoutines {
             Commands.parallel(
                     AutoCommands.driveForward(swerve, 1.5, AutoConstants.AUTO_INTAKE_DRIVE_SPEED),
                     Commands.sequence(
-                        Commands.runOnce(intake::deploy, intake),
-                        Commands.waitUntil(intake::isDeployed),
-                        Commands.run(intake::runIntake, intake)))
+                        Commands.runOnce(intake::deployIntakeMechanism, intake),
+                        Commands.waitUntil(intake.getD()::isDeployed),
+                        Commands.run(intake.getR()::runIntake, intake)))
                 .withTimeout(3.0),
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
 
             // Score cycle 1
             AutoCommands.driveToPose(swerve, getShootingPose()),
@@ -349,12 +349,12 @@ public final class AutoRoutines {
             Commands.parallel(
                     AutoCommands.driveForward(swerve, 1.0, AutoConstants.AUTO_INTAKE_DRIVE_SPEED),
                     Commands.sequence(
-                        Commands.runOnce(intake::deploy, intake),
-                        Commands.waitUntil(intake::isDeployed),
-                        Commands.run(intake::runIntake, intake)))
+                        Commands.runOnce(intake::deployIntakeMechanism, intake),
+                        Commands.waitUntil(intake.getD()::isDeployed),
+                        Commands.run(intake.getR()::runIntake, intake)))
                 .withTimeout(2.0),
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
 
             // Score cycle 2
             AutoCommands.driveToPose(swerve, getShootingPose()),
@@ -378,10 +378,10 @@ public final class AutoRoutines {
 
             // Collect as much FUEL as possible from neutral zone
             AutoCommands.driveToPose(swerve, getNeutralPose(false)),
-            Commands.runOnce(intake::deploy, intake),
-            Commands.waitUntil(intake::isDeployed),
+            Commands.runOnce(intake::deployIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isDeployed),
             Commands.parallel(
-                    Commands.run(intake::runIntake, intake),
+                    Commands.run(intake.getR()::runIntake, intake),
                     Commands.sequence(
                         AutoCommands.driveForward(
                             swerve, 3.0, AutoConstants.AUTO_INTAKE_DRIVE_SPEED),
@@ -389,8 +389,8 @@ public final class AutoRoutines {
                         AutoCommands.driveBackward(
                             swerve, 2.0, AutoConstants.AUTO_INTAKE_DRIVE_SPEED)))
                 .withTimeout(8.0),
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
 
             // Score collected FUEL
             AutoCommands.driveToPose(swerve, getShootingPose()),
@@ -419,17 +419,17 @@ public final class AutoRoutines {
                     FieldConstants.CENTER_X, FieldConstants.CENTER_Y, Rotation2d.fromDegrees(0))),
 
             // Collect while patrolling center
-            Commands.runOnce(intake::deploy, intake),
-            Commands.waitUntil(intake::isDeployed),
+            Commands.runOnce(intake::deployIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isDeployed),
             Commands.parallel(
-                    Commands.run(intake::runIntake, intake),
+                    Commands.run(intake.getR()::runIntake, intake),
                     Commands.sequence(
                         AutoCommands.strafeLeft(swerve, 2.0, AutoConstants.AUTO_SLOW_DRIVE_SPEED),
                         AutoCommands.strafeRight(swerve, 4.0, AutoConstants.AUTO_SLOW_DRIVE_SPEED),
                         AutoCommands.strafeLeft(swerve, 2.0, AutoConstants.AUTO_SLOW_DRIVE_SPEED)))
                 .withTimeout(6.0),
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
 
             // Score collected
             AutoCommands.driveToPose(swerve, getShootingPose()),
@@ -455,14 +455,14 @@ public final class AutoRoutines {
             AutoCommands.driveToPose(swerve, getNeutralPose(false)),
 
             // Collect and position FUEL
-            Commands.runOnce(intake::deploy, intake),
-            Commands.waitUntil(intake::isDeployed),
+            Commands.runOnce(intake::deployIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isDeployed),
             Commands.parallel(
-                    Commands.run(intake::runIntake, intake),
+                    Commands.run(intake.getR()::runIntake, intake),
                     AutoCommands.driveForward(swerve, 2.0, AutoConstants.AUTO_INTAKE_DRIVE_SPEED))
                 .withTimeout(4.0),
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
 
             // Score to contribute to alliance total
             AutoCommands.driveToPose(swerve, getShootingPose()),
@@ -500,11 +500,11 @@ public final class AutoRoutines {
   public static Command driveAndIntakeAuto(SwerveDrive swerve, Intake intake) {
     return Commands.sequence(
             AutoCommands.logMessage("Test: Drive and Intake"),
-            Commands.runOnce(intake::deploy, intake),
-            Commands.waitUntil(intake::isDeployed),
+            Commands.runOnce(intake::deployIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isDeployed),
             AutoCommands.intakeWhileDriving(intake, swerve, 3.0, 1.0),
-            Commands.runOnce(intake::stopRollers, intake),
-            Commands.runOnce(intake::retract, intake),
+            Commands.runOnce(intake.getR()::stopRollers, intake),
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
             AutoCommands.stopDriving(swerve))
         .withName("Drive and Intake Auto");
   }

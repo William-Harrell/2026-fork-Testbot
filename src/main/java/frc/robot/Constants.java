@@ -6,6 +6,7 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
+// richard was here
 public final class Constants {
   public static final class ShooterConstants {
     public static final Alliance DEFAULT_ALLIANCE = Alliance.Blue; // Default alliance

@@ -1,9 +1,11 @@
 # Contributing Guide
 
+pleaaaaase
+
 > Work in progress
 >
 
-- If you plan on pushing AI-generated code/edits, please consider opening a pull request so the team can review your changes.
+- If you plan on pushing AI-generated code/edits, please consider opening a pull request so the team can review your changes. we prefer not to use ai-generated code at all, though.
 
 - Before working in a local IDE, make sure to fetch the most recent changes. 
 

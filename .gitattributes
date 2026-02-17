@@ -3,7 +3,7 @@
 *.pdb filter=lfs diff=lfs merge=lfs -text
 
 # Excluding the web stuff
-simulator/** linguist-generated
+extras/** linguist-generated
 
 # Vendored stuff
 vendordeps/** linguist-vendored

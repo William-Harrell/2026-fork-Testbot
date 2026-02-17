@@ -32,6 +32,9 @@ simulator/.gradle/
 simulator/build/
 simulator/tmp/
 
+# Anything in extras
+extras/
+
 # Python
 .venv/
 __pycache__/

@@ -97,8 +97,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.OI.DriverActionSet;
 import frc.robot.OI.XboxDriver;
 import frc.robot.auto.AutoRoutines;
+import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.SwerveCommands;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -411,7 +412,7 @@ public class RobotContainer {
         .toggleSpeed()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    driverJoystick.toggleIntakeOutake().onTrue(intake.toggleDirection());
+    driverJoystick.toggleIntakeOutake().onTrue(IntakeCommands.toggleDirection(superstructure.getIntake()));
 
     /*
     How intake is going to work:
@@ -424,7 +425,7 @@ public class RobotContainer {
     // driverJoystick.climbUp().whileTrue();
     // driverJoystick.climbUp().whileTrue();
 
-    driverJoystick.maintainDeployed().whileTrue(intake.holdToIntakeCommand());
+    driverJoystick.maintainDeployed().whileTrue(IntakeCommands.holdToIntakeCommand(superstructure.getIntake()));
 
     // ----------------------------------------------------------------
     // INTAKE CONTROLS - DISABLED (Spark Max ID 9 not connected)

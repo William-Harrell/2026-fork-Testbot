@@ -2,23 +2,37 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.intake.Intake;
 
-/**
- * Command factory for intake-related commands.
- *
- * <p>Provides reusable command compositions for intake operations: - Deploy and intake FUEL -
- * Retract to stowed position - Outtake FUEL - Feed FUEL to shooter - Continuous intake sequences
- */
 public final class IntakeCommands {
-
   private IntakeCommands() {
-    // Utility class - prevent instantiation
   }
 
-  // ================================================================
-  // BASIC OPERATIONS
-  // ================================================================
+  public static Command toggleDirection(Intake intake) {
+    return Commands.runOnce(intake.getR()::toggleIntakeOutake);
+  }
+
+  // /** Command to run outtake while button held */
+  // private Command outtakeCommand(Intake intake) {
+  // return Commands.startEnd(intake.getR()::runOuttake,
+  // intake.getR()::stopRollers, intake)
+  // .withName("Outtake FUEL");
+  // }
+
+  /** Command to deploy and continuously intake (hold to run) */
+  public static Command holdToIntakeCommand(Intake intake) {
+    return Commands.sequence(
+        Commands.runOnce(intake::deployIntakeMechanism, intake),
+        Commands.waitUntil(intake.getD()::isDeployed),
+        Commands.run(intake.getR()::runIntake, intake))
+        .finallyDo(
+            interrupted -> {
+              intake.getR().stopRollers();
+              intake.retractIntakeMechanism();
+            })
+        .withName("Hold to Intake");
+  }
+  // End of primary commands
 
   /**
    * Deploy intake, run rollers until FUEL detected, then retract.
@@ -27,7 +41,20 @@ public final class IntakeCommands {
    * @return Command that completes a full intake cycle
    */
   public static Command intakeFuelCommand(Intake intake) {
-    return Commands.sequence(intake.intakeCommand(), intake.retractCommand())
+    return Commands.sequence(
+        // Deploy command
+        Commands.sequence(
+            Commands.runOnce(intake::deployIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isDeployed),
+            Commands.runOnce(intake.getR()::runIntake, intake))
+            .withName("Intake FUEL"),
+
+        // Retract command
+        Commands.sequence(
+            Commands.runOnce(intake::retractIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isStowed))
+            .withName("Retract Intake"))
+
         .withName("Intake and Retract");
   }
 
@@ -39,13 +66,13 @@ public final class IntakeCommands {
    */
   public static Command continuousIntakeCommand(Intake intake) {
     return Commands.sequence(
-            Commands.runOnce(intake::deploy, intake),
-            Commands.waitUntil(intake::isDeployed),
-            Commands.run(intake::runIntake, intake))
+        Commands.runOnce(intake::deployIntakeMechanism, intake),
+        Commands.waitUntil(intake.getD()::isDeployed),
+        Commands.run(intake.getR()::runIntake, intake))
         .finallyDo(
             interrupted -> {
-              intake.stopRollers();
-              intake.retract();
+              intake.getR().stopRollers();
+              intake.retractIntakeMechanism();
             })
         .withName("Continuous Intake");
   }
@@ -58,13 +85,13 @@ public final class IntakeCommands {
    */
   public static Command outtakeCommand(Intake intake) {
     return Commands.sequence(
-            Commands.runOnce(intake::deploy, intake),
-            Commands.waitUntil(intake::isDeployed),
-            Commands.run(intake::runOuttake, intake))
+        Commands.runOnce(intake::deployIntakeMechanism, intake),
+        Commands.waitUntil(intake.getD()::isDeployed),
+        Commands.run(intake.getR()::runOuttake, intake))
         .finallyDo(
             interrupted -> {
-              intake.stopRollers();
-              intake.retract();
+              intake.getR().stopRollers();
+              intake.retractIntakeMechanism();
             })
         .withName("Outtake");
   }
@@ -80,7 +107,7 @@ public final class IntakeCommands {
    * @return Command that feeds FUEL
    */
   public static Command feedCommand(Intake intake) {
-    return Commands.startEnd(intake::feedToShooter, intake::stopRollers, intake)
+    return Commands.startEnd(intake.getR()::feedToShooter, intake.getR()::stopRollers, intake)
         .withName("Feed FUEL");
   }
 
@@ -96,11 +123,11 @@ public final class IntakeCommands {
    */
   public static Command emergencyStopCommand(Intake intake) {
     return Commands.runOnce(
-            () -> {
-              intake.stopRollers();
-              intake.retract();
-            },
-            intake)
+        () -> {
+          intake.getR().stopRollers();
+          intake.retractIntakeMechanism();
+        },
+        intake)
         .withName("Intake Emergency Stop");
   }
 }

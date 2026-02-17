@@ -6,7 +6,6 @@ import frc.robot.Constants.ShooterConstants;
 public class Orientation {
     private final Servo pitchServo;
     private double targetPitchAngle;
-    private double[] hub = new double[2];
 
     public Orientation(Servo motor) {
         pitchServo = motor;
@@ -19,7 +18,7 @@ public class Orientation {
         targetPitchAngle = start_angle;
         setPitchAngle(targetPitchAngle);
     }
-    
+
     /**
      * Set the pitch angle of the shooter.
      *

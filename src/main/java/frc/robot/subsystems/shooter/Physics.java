@@ -8,7 +8,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.Servo;
 import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -174,7 +173,7 @@ public class Physics {
         UpdateHubLocation();
 
         // Try to get vision-based pose
-        Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getBestVisionUpdate(getRobotPose());
+        Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
 
         if (visionUpdateOpt.isEmpty()) {
             // No vision data - fall back to odometry
@@ -237,7 +236,7 @@ public class Physics {
      * @return true if AprilTags are visible with acceptable ambiguity
      */
     public boolean hasReliableVisionTarget() {
-        Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getBestVisionUpdate(getRobotPose());
+        Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
 
         if (visionUpdateOpt.isEmpty()) {
             return false;

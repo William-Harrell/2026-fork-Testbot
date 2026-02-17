@@ -1,18 +1,45 @@
 package frc.robot.subsystems.shooter;
 
+import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ShooterConstants;
 
 public class Flywheel {
-    private double targetPitchAngle = ShooterConstants.PITCH_STOW_ANGLE;
-    private double targetFlywheelRPM = 0.0;
-
+    // Motor stuff
     private final SparkMax flywheelMotor;
     private final RelativeEncoder flywheelEncoder;
     private final SparkClosedLoopController flywheelController;
+
+    // other
+    private double targetFlywheelRPM = 0.0;
+
+    public Flywheel(SparkMax motor) {
+        // Instance vars
+        flywheelMotor = motor;
+        flywheelEncoder = flywheelMotor.getEncoder();
+        flywheelController = flywheelMotor.getClosedLoopController();
+
+        // Personal config
+        SparkMaxConfig flywheelConfig = new SparkMaxConfig();
+        flywheelConfig
+                .idleMode(IdleMode.kCoast)
+                .smartCurrentLimit(ShooterConstants.FLYWHEEL_CURRENT_LIMIT);
+
+        flywheelConfig.closedLoop
+                .p(ShooterConstants.FLYWHEEL_kP)
+                .i(ShooterConstants.FLYWHEEL_kI)
+                .d(ShooterConstants.FLYWHEEL_kD).feedForward
+                .kV(ShooterConstants.FLYWHEEL_kFF);
+
+        flywheelMotor.configure(
+                flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }
 
     /**
      * Set the flywheel to a target velocity.

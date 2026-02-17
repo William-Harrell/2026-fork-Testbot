@@ -1,14 +1,16 @@
 package frc.robot;
 
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
 /**
  * Superstructure holds references to all robot subsystems.
  *
- * <p>This provides a centralized way to access subsystems for coordination and complex sequences
+ * <p>
+ * This provides a centralized way to access subsystems for coordination and
+ * complex sequences
  * that span multiple mechanisms.
  */
 public class Superstructure {
@@ -22,6 +24,10 @@ public class Superstructure {
     this.shooter = shooter;
     this.vision = vision;
     this.intake = intake;
+  }
+
+  public void doNothing() { // lol
+    return;
   }
 
   public SwerveDrive getSwerve() {

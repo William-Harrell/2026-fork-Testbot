@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
 /**
@@ -187,7 +187,7 @@ public final class AutoCommands {
   public static Command shootAllFuel(Shooter shooter, Intake intake) {
     return Commands.sequence(
             // Spin up shooter
-            Commands.runOnce(shooter::spinUp, shooter),
+            Commands.runOnce(shooter.getF()::spinUp, shooter),
             Commands.waitSeconds(0.5), // Wait for shooter to spin up
             // Feed all FUEL
             IntakeCommands.feedCommand(intake),
@@ -205,7 +205,7 @@ public final class AutoCommands {
    */
   public static Command shootOneFuel(Shooter shooter, Intake intake) {
     return Commands.sequence(
-            Commands.runOnce(shooter::spinUp, shooter),
+            Commands.runOnce(shooter.getF()::spinUp, shooter),
             Commands.waitSeconds(0.5),
             IntakeCommands.feedCommand(intake),
             Commands.waitSeconds(0.3))

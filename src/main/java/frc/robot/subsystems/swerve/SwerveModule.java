@@ -1,5 +1,7 @@
 package frc.robot.subsystems.swerve;
 
+// well documented, if anything
+
 /*
  * ========================================================================
  * SWERVE MODULE - Individual Wheel Control Unit
@@ -248,7 +250,7 @@ public class SwerveModule {
   // STATE TRACKING
 
   /** The last state we commanded (for optimization). Used to track what we last asked for. */
-  private SwerveModuleState lastState = new SwerveModuleState();
+  // private SwerveModuleState lastState = new SwerveModuleState();
 
   // CONSTRUCTOR
 
@@ -605,7 +607,7 @@ public class SwerveModule {
     }
 
     // Remember what we commanded (for debugging/optimization)
-    lastState = desiredState;
+    // lastState = desiredState;
   }
 
   /**

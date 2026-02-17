@@ -99,8 +99,8 @@ import frc.robot.OI.XboxDriver;
 import frc.robot.auto.AutoRoutines;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.Vision;
+import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.util.DipSwitchSelector;
 
@@ -270,6 +270,7 @@ public class RobotContainer {
 
     // Superstructure holds references to all subsystems for coordination
     superstructure = new Superstructure(swerve, vision, shooter, null);
+    superstructure.doNothing(); // Just to get rid of the java warning temporarily
 
     // ================================================================
     // STEP 4: SET DEFAULT COMMANDS

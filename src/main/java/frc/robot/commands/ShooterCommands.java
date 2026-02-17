@@ -4,14 +4,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.Physics.VisionAimedShot;
 
 public class ShooterCommands {
+    private ShooterCommands() {
+    }
 
     /** Command to spin up flywheel and wait until ready. */
-    public Command spinUpCommand() {
+    public Command spinUpCommand(Shooter shooter) {
         return Commands.sequence(
-                Commands.runOnce(this::spinUp, this), Commands.waitUntil(this::isFlywheelAtSpeed))
+                Commands.runOnce(shooter.getF()::spinUp, shooter),
+                Commands.waitUntil(shooter.getF()::isFlywheelAtSpeed))
                 .withName("Spin Up Shooter");
     }
 
@@ -20,15 +24,15 @@ public class ShooterCommands {
      * calculation to
      * determine optimal pitch angle.
      */
-    public Command prepareAutoShotCommand() {
+    public Command prepareAutoShotCommand(Shooter shooter) {
         return Commands.sequence(
                 Commands.runOnce(
                         () -> {
-                            double calculatedPitch = calculateOptimalPitch();
-                            prepareShot(calculatedPitch, ShooterConstants.FLYWHEEL_SHOOT_RPM);
+                            double calculatedPitch = shooter.getP().calculateOptimalPitch();
+                            shooter.prepareShot(calculatedPitch, ShooterConstants.FLYWHEEL_SHOOT_RPM);
                         },
-                        this),
-                Commands.waitUntil(this::isReadyToShoot))
+                        shooter),
+                Commands.waitUntil(shooter.getF()::isReadyToShoot))
                 .withName("Prepare Auto Shot");
     }
 
@@ -37,20 +41,20 @@ public class ShooterCommands {
      * for more precise
      * distance/angle calculation. Falls back to odometry if no tags visible.
      */
-    public Command prepareVisionShotCommand() {
+    public Command prepareVisionShotCommand(Shooter shooter) {
         return Commands.sequence(
                 Commands.runOnce(
                         () -> {
-                            VisionAimedShot shot = calculateOptimalPitchWithVision();
-                            prepareShot(shot.pitchAngle(), ShooterConstants.FLYWHEEL_SHOOT_RPM);
+                            VisionAimedShot shot = shooter.getP().calculateOptimalPitchWithVision();
+                            shooter.prepareShot(shot.pitchAngle(), ShooterConstants.FLYWHEEL_SHOOT_RPM);
 
                             // Log the shot info for driver feedback
                             SmartDashboard.putBoolean("Shooter/VisionAssisted", shot.visionAssisted());
                             SmartDashboard.putString("Shooter/ShotConfidence", shot.confidenceDescription());
                             SmartDashboard.putNumber("Shooter/VisionDistance", shot.distanceToHub());
                         },
-                        this),
-                Commands.waitUntil(this::isReadyToShoot))
+                        shooter),
+                Commands.waitUntil(shooter.getF()::isReadyToShoot))
                 .withName("Prepare Vision Shot");
     }
 
@@ -59,15 +63,15 @@ public class ShooterCommands {
      * while waiting for a
      * shot opportunity.
      */
-    public Command trackHubCommand() {
+    public Command trackHubCommand(Shooter shooter) {
         return Commands.run(
                 () -> {
-                    if (hasReliableVisionTarget()) {
-                        VisionAimedShot shot = calculateOptimalPitchWithVision();
-                        setPitchAngle(shot.pitchAngle());
+                    if (shooter.getP().hasReliableVisionTarget()) {
+                        VisionAimedShot shot = shooter.getP().calculateOptimalPitchWithVision();
+                        shooter.getO().setPitchAngle(shot.pitchAngle());
                     }
                 },
-                this)
+                shooter)
                 .withName("Track Hub");
     }
 
@@ -76,32 +80,32 @@ public class ShooterCommands {
      * Continuously updates
      * pitch based on AprilTag data.
      */
-    public Command aimAndSpinUpCommand() {
+    public Command aimAndSpinUpCommand(Shooter shooter) {
         return Commands.parallel(
                 // Keep flywheel spinning
-                Commands.run(this::spinUp, this),
+                Commands.run(shooter.getF()::spinUp, shooter),
                 // Continuously track the hub
                 Commands.run(
                         () -> {
-                            VisionAimedShot shot = calculateOptimalPitchWithVision();
-                            setPitchAngle(shot.pitchAngle());
+                            VisionAimedShot shot = shooter.getP().calculateOptimalPitchWithVision();
+                            shooter.getO().setPitchAngle(shot.pitchAngle());
 
                             // Update dashboard
                             SmartDashboard.putBoolean("Shooter/VisionAssisted", shot.visionAssisted());
                             SmartDashboard.putBoolean("Shooter/HighConfidence", shot.isHighConfidence());
                             SmartDashboard.putNumber("Shooter/AimPitch", shot.pitchAngle());
                         },
-                        this))
+                        shooter))
                 .withName("Aim and Spin Up");
     }
 
     /** Command to stop the shooter. */
-    public Command stopCommand() {
-        return Commands.runOnce(this::stop, this).withName("Stop Shooter");
+    public Command stopCommand(Shooter shooter) {
+        return Commands.runOnce(shooter::stop, shooter).withName("Stop Shooter");
     }
 
     /** Command to hold flywheel at idle speed (for warmup). */
-    public Command idleCommand() {
-        return Commands.run(this::spinUpIdle, this).withName("Idle Shooter");
+    public Command idleCommand(Shooter shooter) {
+        return Commands.run(shooter.getF()::spinUpIdle, shooter).withName("Idle Shooter");
     }
 }

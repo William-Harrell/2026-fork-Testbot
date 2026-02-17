@@ -9,21 +9,26 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterState.shooter_state;
 
 public class Flywheel {
     // Motor stuff
     private final SparkMax flywheelMotor;
     private final RelativeEncoder flywheelEncoder;
     private final SparkClosedLoopController flywheelController;
+    private final ShooterState state_machine;
+    private final Orientation orientation;
 
     // other
     private double targetFlywheelRPM = 0.0;
 
-    public Flywheel(SparkMax motor) {
+    public Flywheel(SparkMax motor, ShooterState myS, Orientation myO) {
         // Instance vars
         flywheelMotor = motor;
         flywheelEncoder = flywheelMotor.getEncoder();
         flywheelController = flywheelMotor.getClosedLoopController();
+        state_machine = myS;
+        orientation = myO;
 
         // Personal config
         SparkMaxConfig flywheelConfig = new SparkMaxConfig();
@@ -51,10 +56,10 @@ public class Flywheel {
 
         if (rpm <= 0) {
             flywheelMotor.set(0);
-            state = ShooterState.IDLE;
+            state_machine.set(shooter_state.IDLE);
         } else {
             flywheelController.setSetpoint(rpm, SparkMax.ControlType.kVelocity);
-            state = ShooterState.SPINNING_UP;
+            state_machine.set(shooter_state.SPINNING_UP);
         }
     }
 
@@ -71,7 +76,7 @@ public class Flywheel {
     /** Stop the flywheel. */
     public void stopFlywheel() {
         setFlywheelRPM(0);
-        state = ShooterState.SPINNING_DOWN;
+        state_machine.set(shooter_state.SPINNING_DOWN);
     }
 
     /**
@@ -98,7 +103,7 @@ public class Flywheel {
      * @return true if ready to shoot
      */
     public boolean isReadyToShoot() {
-        return isFlywheelAtSpeed() && isPitchAtTarget() && targetFlywheelRPM > 0;
+        return isFlywheelAtSpeed() && orientation.isPitchAtTarget() && targetFlywheelRPM > 0;
     }
 
     public double getTargetFlywheelRPM() {

@@ -9,17 +9,27 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Servo;
+import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
 
 public class Physics {
     private double x, y, z;
     private Rotation2d heading;
     private final Vision vision;
+    private final SwerveDrive swerve;
     private double[] hub = new double[2];
+    private Alliance alliance;
 
-    public Physics(Vision subsystem_v) {
-        vision = subsystem_v;
+    public Physics(Vision myV, SwerveDrive mySD) {
+        vision = myV;
+        swerve = mySD;
+        refreshAlliance();
+    }
+
+    private void refreshAlliance() {
+        alliance = DriverStation.getAlliance().orElse(Constants.ShooterConstants.DEFAULT_ALLIANCE);
     }
 
     /** Get robot pose from swerve odometry. */
@@ -28,15 +38,12 @@ public class Physics {
     }
 
     /** Update hub location based on alliance. */
-    @SuppressWarnings("unlikely-arg-type")
     private void UpdateHubLocation() {
         hub[1] = ShooterConstants.UNIV_Y;
 
-        hub[0] = ((DriverStation.getAlliance().equals(Alliance.Blue))
-                ? ShooterConstants.BLUE_X
-                : ((DriverStation.getAlliance().equals(Alliance.Red))
-                        ? ShooterConstants.RED_X
-                        : -180.0));
+        hub[0] = (alliance == Alliance.Blue) ? ShooterConstants.BLUE_X
+                : (alliance == Alliance.Red) ? ShooterConstants.RED_X
+                : -180.0; // it's called ternary operator. look it up.
     }
 
     /** Check if scoring is allowed based on game state and position. */

@@ -26,6 +26,12 @@ networktables.json.bck
 simgui*.json
 ctre_sim/
 
+# Simulator subproject
+simulator/
+simulator/.gradle/
+simulator/build/
+simulator/tmp/
+
 # Python
 .venv/
 __pycache__/

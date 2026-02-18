@@ -104,6 +104,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.util.DipSwitchSelector;
+import frc.robot.util.constants.DrivingConstants;
 
 /**
  * ======================================================================== ROBOTCONTAINER CLASS -
@@ -246,7 +247,7 @@ public class RobotContainer {
 
     // Create the Xbox controller on the specified USB port
     // Constants.DrivingConstants.CONTROLLER_PORT is typically 0
-    driverJoystick = new XboxDriver(Constants.DrivingConstants.CONTROLLER_PORT);
+    driverJoystick = new XboxDriver(DrivingConstants.CONTROLLER_PORT);
 
     // ================================================================
     // STEP 2: AUTONOMOUS SELECTION SETUP

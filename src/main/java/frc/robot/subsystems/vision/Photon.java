@@ -14,7 +14,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.VisionConstants;
+import frc.robot.util.constants.VisionConstants;
 import frc.robot.subsystems.vision.Config.CameraConfig;
 import frc.robot.subsystems.vision.Vision.VisionUpdate;
 

@@ -7,8 +7,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeState.intake_state;
+import frc.robot.util.constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
     private final Deploy deploy;
@@ -25,7 +25,7 @@ public class Intake extends SubsystemBase {
         return deploy;
     }
 
-    public IntakeState getS() {
+    public IntakeState getS() { // Unused
         return state_machine;
     }
 
@@ -33,7 +33,6 @@ public class Intake extends SubsystemBase {
         return roller;
     }
 
-    /** Deploy the intake to collect FUEL */
     public void deployIntakeMechanism() {
         if (state_machine.get() == intake_state.DEPLOYING || state_machine.get() == intake_state.DEPLOYED)
             return;
@@ -42,7 +41,6 @@ public class Intake extends SubsystemBase {
         state_machine.set(intake_state.DEPLOYING);
     }
 
-    /** Retract the intake to stowed position */
     public void retractIntakeMechanism() {
         if (state_machine.get() == intake_state.RETRACTING || state_machine.get() == intake_state.STOWED)
             return;

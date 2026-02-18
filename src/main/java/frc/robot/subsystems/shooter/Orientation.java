@@ -1,7 +1,6 @@
 package frc.robot.subsystems.shooter;
 
-import edu.wpi.first.wpilibj.Servo;
-import frc.robot.Constants.ShooterConstants;
+import edu.wpi.first.wpilibj.Servo;import frc.robot.util.constants.ShooterConstants;
 
 public class Orientation {
     private final Servo pitchServo;

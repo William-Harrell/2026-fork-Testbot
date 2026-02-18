@@ -6,7 +6,7 @@ import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import edu.wpi.first.math.geometry.Transform3d;
-import frc.robot.Constants.VisionConstants;
+import frc.robot.util.constants.VisionConstants;
 
 // chiikawa
 public class Config {

@@ -8,8 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.Constants;
-import frc.robot.Constants.ShooterConstants;
+import frc.robot.util.constants.ShooterConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
 
@@ -28,7 +27,7 @@ public class Physics {
     }
 
     private void refreshAlliance() {
-        alliance = DriverStation.getAlliance().orElse(Constants.ShooterConstants.DEFAULT_ALLIANCE);
+        alliance = DriverStation.getAlliance().orElse(ShooterConstants.DEFAULT_ALLIANCE);
     }
 
     /** Get robot pose from swerve odometry. */

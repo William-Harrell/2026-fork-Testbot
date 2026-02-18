@@ -2,7 +2,7 @@ package frc.robot.util;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.AutoConstants;
+import frc.robot.util.constants.AutoConstants;
 
 /**
  * Reads a physical DIP switch to select autonomous mode.

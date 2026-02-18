@@ -116,7 +116,7 @@ import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import frc.robot.Constants.SwerveConstants;
+import frc.robot.util.constants.SwerveConstants;
 
 /**
  * ======================================================================== SWERVE MODULE CLASS
@@ -630,3 +630,4 @@ public class SwerveModule {
     return moduleNumber;
   }
 } // End of SwerveModule class
+// fuck ai

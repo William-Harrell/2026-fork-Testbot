@@ -35,8 +35,8 @@ public final class ShooterConstants {
     public static final double PITCH_TOLERANCE = 2.0; // degrees
 
     // ABS_LIMIT +/- (TOLERANCE + 1.5)
-    public static final double PITCH_MIN_ANGLE = 10.0 + (PITCH_TOLERANCE + 1.5);
-    public static final double PITCH_MAX_ANGLE = 50.0 - (PITCH_TOLERANCE + 1.5);
+    public static final double PITCH_MIN_ANGLE = 5.0 + (PITCH_TOLERANCE + 1.5);
+    public static final double PITCH_MAX_ANGLE = 60.0 - (PITCH_TOLERANCE + 1.5);
 
     /** Default/resting pitch angle */
     public static final double PITCH_STOW_ANGLE = 45.0; // (placeholder TODO)

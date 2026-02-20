@@ -15,18 +15,17 @@ public class Flywheel {
     private final SparkMax flywheelMotor;
     private final RelativeEncoder flywheelEncoder;
     private final SparkClosedLoopController flywheelController;
-    private final ShooterState state_machine;
+    private ShooterState state_machine;
     private final Orientation orientation;
 
     // other
     private double targetFlywheelRPM = 0.0;
 
-    public Flywheel(SparkMax motor, ShooterState myS, Orientation myO) {
+    public Flywheel(SparkMax motor, Orientation myO) {
         // Instance vars
         flywheelMotor = motor;
         flywheelEncoder = flywheelMotor.getEncoder();
         flywheelController = flywheelMotor.getClosedLoopController();
-        state_machine = myS;
         orientation = myO;
 
         // Personal config
@@ -43,6 +42,10 @@ public class Flywheel {
 
         flywheelMotor.configure(
                 flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }
+
+    public void setStateMachine(ShooterState sm) {
+        state_machine = sm;
     }
 
     /**

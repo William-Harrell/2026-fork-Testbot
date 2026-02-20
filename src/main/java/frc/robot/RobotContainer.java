@@ -413,8 +413,6 @@ public class RobotContainer {
         .toggleSpeed()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    driverJoystick.toggleIntakeOutake().onTrue(IntakeCommands.toggleDirection(superstructure.getIntake()));
-
     /*
     How intake is going to work:
     > Hold right trigger to deploy
@@ -426,7 +424,11 @@ public class RobotContainer {
     // driverJoystick.climbUp().whileTrue();
     // driverJoystick.climbUp().whileTrue();
 
-    driverJoystick.maintainDeployed().whileTrue(IntakeCommands.holdToIntakeCommand(superstructure.getIntake()));
+    // Only bind intake controls if intake hardware is connected
+    if (superstructure.getIntake() != null) {
+      driverJoystick.toggleIntakeOutake().onTrue(IntakeCommands.toggleDirection(superstructure.getIntake()));
+      driverJoystick.maintainDeployed().whileTrue(IntakeCommands.holdToIntakeCommand(superstructure.getIntake()));
+    }
 
     // ----------------------------------------------------------------
     // INTAKE CONTROLS - DISABLED (Spark Max ID 9 not connected)

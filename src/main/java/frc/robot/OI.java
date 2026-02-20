@@ -111,7 +111,7 @@ public final class OI {
 
     @Override
     public boolean isMovementCommanded() {
-      return forward() + strafe() + turn() != 0;
+      return Math.abs(forward()) + Math.abs(strafe()) + Math.abs(turn()) > 0.01;
     }
 
     // ================================================================

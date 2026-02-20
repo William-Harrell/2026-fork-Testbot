@@ -64,6 +64,11 @@ public class Photon {
         int tagCount = targets.size();
         double avgAmbiguity = targets.stream().mapToDouble(PhotonTrackedTarget::getPoseAmbiguity).average().orElse(1.0);
 
+        // Can't validate tags without a field layout
+        if (field == null) {
+            return Optional.empty();
+        }
+
         // Is this tag legal?
         for (PhotonTrackedTarget t : targets) {
             if (field.getTagPose(t.getFiducialId()).isEmpty()) {

@@ -21,11 +21,12 @@ public class Shooter extends SubsystemBase {
         // Intra (w/ overload constructors)
         // Investigate what u don't know (ctrl+click)
         orientation = new Orientation(new Servo(ShooterConstants.PITCH_SERVO_CHANNEL));
-        state_machine = new ShooterState(flywheel);
         physics = new Physics(vision, swerve); // this guy really just wants ALL the fancy stuff huh
         flywheel = new Flywheel( // Just so its pretty
                 new SparkMax(ShooterConstants.FLYWHEEL_MOTOR_ID, MotorType.kBrushless),
-                state_machine, orientation);
+                orientation);
+        state_machine = new ShooterState(flywheel);
+        flywheel.setStateMachine(state_machine);
     }
 
     public Orientation getO() {

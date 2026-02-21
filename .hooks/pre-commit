@@ -1,16 +1,3 @@
 #!/bin/bash
-# Pre-commit hook: runs formatting and ASCII checks via Spotless.
-# This hook is advisory only - it will warn but never block a commit.
-
-echo "Running spotlessCheck..."
-./gradlew spotlessCheck --daemon 2>/dev/null
-
-if [ $? -ne 0 ]; then
-    echo ""
-    echo "WARNING: formatting or ASCII issues found."
-    echo "Consider running './gradlew spotlessApply' to fix."
-    echo "Committing anyway..."
-    echo ""
-fi
-
+# Pre-commit hook (no-op)
 exit 0

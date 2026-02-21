@@ -73,33 +73,25 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.util.constants.DrivingConstants;
 import frc.robot.util.constants.SwerveConstants;
-import frc.robot.subsystems.swerve.SwerveDrive;
 import java.util.Set;
 
 /**
- * ========================================================================
- * SWERVE COMMANDS -
+ * ======================================================================== SWERVE COMMANDS -
  * Utility Class for Swerve Drive Commands
  * ========================================================================
  *
- * <p>
- * This is a utility class - all methods are static, no instances needed.
- * Contains pre-built
+ * <p>This is a utility class - all methods are static, no instances needed. Contains pre-built
  * commands for common swerve drive operations.
  *
- * <p>
- * [UTILITY CLASS PATTERN] - Private constructor (can't create instances) - All
- * methods are
+ * <p>[UTILITY CLASS PATTERN] - Private constructor (can't create instances) - All methods are
  * static - No state (instance variables)
  */
 public final class SwerveCommands {
 
-  /**
-   * Private constructor prevents instantiation. Utility classes should never be
-   * instantiated.
-   */
+  /** Private constructor prevents instantiation. Utility classes should never be instantiated. */
   private SwerveCommands() {
     // Utility class - prevent instantiation
   }
@@ -120,15 +112,10 @@ public final class SwerveCommands {
   /**
    * Create a command that sets the wheels in an X pattern to resist pushing.
    *
-   * <p>
-   * [WHEN TO USE] - Defense: When another robot is trying to push you - End of
-   * autonomous: Lock
-   * position while waiting for teleop - Emergency: If you need to stop
-   * immediately
+   * <p>[WHEN TO USE] - Defense: When another robot is trying to push you - End of autonomous: Lock
+   * position while waiting for teleop - Emergency: If you need to stop immediately
    *
-   * <p>
-   * [HOW IT WORKS] Each wheel points toward/away from center, creating an X
-   * pattern. This locks
+   * <p>[HOW IT WORKS] Each wheel points toward/away from center, creating an X pattern. This locks
    * the robot in place - it can't be pushed in any direction.
    *
    * @param swerve The swerve drive subsystem
@@ -159,14 +146,10 @@ public final class SwerveCommands {
   /**
    * Command that drives the robot to a specific pose on the field.
    *
-   * <p>
-   * [WHAT IS A POSE?] A Pose2d contains X position, Y position, and rotation
-   * (heading). It fully
+   * <p>[WHAT IS A POSE?] A Pose2d contains X position, Y position, and rotation (heading). It fully
    * describes where the robot is on the field and which way it's facing.
    *
-   * <p>
-   * [PATH PLANNER CONTROLLER] We use PathPlanner's holonomic controller instead
-   * of writing our
+   * <p>[PATH PLANNER CONTROLLER] We use PathPlanner's holonomic controller instead of writing our
    * own. It handles the math of driving to a pose with smooth motion.
    */
   public static class DriveToPoseCommand extends Command {
@@ -179,15 +162,13 @@ public final class SwerveCommands {
     private final SwerveDrive swerve;
 
     /**
-     * Target state (wraps the target pose). PathPlanner uses trajectory states, so
-     * we wrap our pose
+     * Target state (wraps the target pose). PathPlanner uses trajectory states, so we wrap our pose
      * in one.
      */
     private final PathPlannerTrajectoryState target;
 
     /**
-     * The controller that calculates how to reach the target. "Holonomic" = can
-     * control X, Y, and
+     * The controller that calculates how to reach the target. "Holonomic" = can control X, Y, and
      * rotation independently.
      */
     private final PPHolonomicDriveController controller;
@@ -199,16 +180,12 @@ public final class SwerveCommands {
     /**
      * Create a drive to pose command.
      *
-     * <p>
-     * [NOTE] This command runs until manually cancelled - it doesn't have an
-     * isFinished()
+     * <p>[NOTE] This command runs until manually cancelled - it doesn't have an isFinished()
      * condition. Use .until() to add a finish condition:
      *
-     * <p>
-     * new DriveToPoseCommand(swerve, pose) .until(() -> atTarget()) // Finish when
-     * at target
+     * <p>new DriveToPoseCommand(swerve, pose) .until(() -> atTarget()) // Finish when at target
      *
-     * @param swerve     The swerve drive subsystem
+     * @param swerve The swerve drive subsystem
      * @param targetPose The target pose in field coordinates
      */
     public DriveToPoseCommand(SwerveDrive swerve, Pose2d targetPose) {
@@ -221,10 +198,11 @@ public final class SwerveCommands {
       // Create the holonomic controller with separate PID for:
       // - XY position (how fast to drive toward target)
       // - Theta/rotation (how fast to turn toward target heading)
-      this.controller = new PPHolonomicDriveController(
-          new PIDConstants(SwerveConstants.AUTO_XY_kP), // Position PID
-          new PIDConstants(SwerveConstants.AUTO_THETA_kP) // Rotation PID
-      );
+      this.controller =
+          new PPHolonomicDriveController(
+              new PIDConstants(SwerveConstants.AUTO_XY_kP), // Position PID
+              new PIDConstants(SwerveConstants.AUTO_THETA_kP) // Rotation PID
+              );
 
       // Tell the command scheduler this command uses the swerve drive
       addRequirements(swerve);
@@ -235,10 +213,7 @@ public final class SwerveCommands {
     // COMMAND LIFECYCLE
     // ================================================================
 
-    /**
-     * Called once when the command starts. Resets the controller to avoid using
-     * stale data.
-     */
+    /** Called once when the command starts. Resets the controller to avoid using stale data. */
     @Override
     public void initialize() {
       // Reset controller with current pose and zero velocity
@@ -247,8 +222,7 @@ public final class SwerveCommands {
     }
 
     /**
-     * Called repeatedly while command runs (every 20ms). Calculates and applies the
-     * speeds needed
+     * Called repeatedly while command runs (every 20ms). Calculates and applies the speeds needed
      * to reach target.
      */
     @Override
@@ -262,11 +236,9 @@ public final class SwerveCommands {
     }
 
     /**
-     * Called once when command ends (either finished or interrupted). Stops the
-     * robot.
+     * Called once when command ends (either finished or interrupted). Stops the robot.
      *
-     * @param interrupted True if command was interrupted, false if finished
-     *                    normally
+     * @param interrupted True if command was interrupted, false if finished normally
      */
     @Override
     public void end(boolean interrupted) {
@@ -275,8 +247,7 @@ public final class SwerveCommands {
     }
 
     /**
-     * Declares which subsystems this command requires. Required to prevent multiple
-     * commands from
+     * Declares which subsystems this command requires. Required to prevent multiple commands from
      * using swerve simultaneously.
      */
     @Override
@@ -304,14 +275,10 @@ public final class SwerveCommands {
   /**
    * Command that drives the robot a specific distance in a straight line.
    *
-   * <p>
-   * [DIFFERENCE FROM DRIVE TO POSE] - DriveToPose: Goes to a specific X,Y
-   * position on the field
+   * <p>[DIFFERENCE FROM DRIVE TO POSE] - DriveToPose: Goes to a specific X,Y position on the field
    * - DriveDistance: Goes a certain distance from where you are now
    *
-   * <p>
-   * DriveDistance is simpler but less precise. Use it for quick movements where
-   * exact
+   * <p>DriveDistance is simpler but less precise. Use it for quick movements where exact
    * positioning doesn't matter.
    */
   public static class DriveDistanceCommand extends Command {
@@ -324,8 +291,7 @@ public final class SwerveCommands {
     private final SwerveDrive swerve;
 
     /**
-     * The speed to drive at (X and Y components). The direction of motion is
-     * determined by the
+     * The speed to drive at (X and Y components). The direction of motion is determined by the
      * ratio of X to Y speed.
      */
     private final Translation2d speeds;
@@ -334,8 +300,7 @@ public final class SwerveCommands {
     private final double distance;
 
     /**
-     * Where we started - used to measure how far we've gone. Set in initialize(),
-     * used in
+     * Where we started - used to measure how far we've gone. Set in initialize(), used in
      * isFinished().
      */
     private Translation2d initialTranslation;
@@ -347,18 +312,14 @@ public final class SwerveCommands {
     /**
      * Create a drive distance command.
      *
-     * <p>
-     * [COORDINATE SYSTEM] The FRC field coordinate system: - X positive: Toward the
-     * Red Driver
+     * <p>[COORDINATE SYSTEM] The FRC field coordinate system: - X positive: Toward the Red Driver
      * Station - Y positive: To the left (when looking from Blue toward Red)
      *
-     * <p>
-     * +Y (left) ^ | Blue ---+----> +X Red |
+     * <p>+Y (left) ^ | Blue ---+----> +X Red |
      *
-     * @param swerve   The swerve drive subsystem
-     * @param xSpeed   Speed in x-direction (m/s), positive toward Red Driver
-     *                 Station
-     * @param ySpeed   Speed in y-direction (m/s), positive to the left
+     * @param swerve The swerve drive subsystem
+     * @param xSpeed Speed in x-direction (m/s), positive toward Red Driver Station
+     * @param ySpeed Speed in y-direction (m/s), positive to the left
      * @param distance Distance to travel (m), must be positive
      */
     public DriveDistanceCommand(SwerveDrive swerve, double xSpeed, double ySpeed, double distance) {
@@ -374,8 +335,7 @@ public final class SwerveCommands {
     // ================================================================
 
     /**
-     * Called once when command starts. Records the starting position so we can
-     * measure distance
+     * Called once when command starts. Records the starting position so we can measure distance
      * traveled.
      */
     @Override
@@ -385,8 +345,7 @@ public final class SwerveCommands {
     }
 
     /**
-     * Called repeatedly while command runs. Drives at constant speed in the
-     * specified direction.
+     * Called repeatedly while command runs. Drives at constant speed in the specified direction.
      */
     @Override
     public void execute() {
@@ -405,13 +364,10 @@ public final class SwerveCommands {
     /**
      * Determines when the command should finish.
      *
-     * <p>
-     * [THE MATH] We calculate the straight-line distance from start to current
-     * position. When
+     * <p>[THE MATH] We calculate the straight-line distance from start to current position. When
      * this distance exceeds our target, we're done.
      *
-     * <p>
-     * distance = sqrt[(x2-x1)^2 + (y2-y1)^2] (Pythagorean theorem)
+     * <p>distance = sqrt[(x2-x1)^2 + (y2-y1)^2] (Pythagorean theorem)
      *
      * @return True when we've traveled the specified distance
      */

@@ -1,3 +1,0 @@
-#!/bin/bash
-# Pre-commit hook (no-op)
-exit 0

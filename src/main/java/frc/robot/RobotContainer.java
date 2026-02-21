@@ -101,8 +101,8 @@ import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.DipSwitchSelector;
 import frc.robot.util.constants.DrivingConstants;
 
@@ -426,8 +426,12 @@ public class RobotContainer {
 
     // Only bind intake controls if intake hardware is connected
     if (superstructure.getIntake() != null) {
-      driverJoystick.toggleIntakeOutake().onTrue(IntakeCommands.toggleDirection(superstructure.getIntake()));
-      driverJoystick.maintainDeployed().whileTrue(IntakeCommands.holdToIntakeCommand(superstructure.getIntake()));
+      driverJoystick
+          .toggleIntakeOutake()
+          .onTrue(IntakeCommands.toggleDirection(superstructure.getIntake()));
+      driverJoystick
+          .maintainDeployed()
+          .whileTrue(IntakeCommands.holdToIntakeCommand(superstructure.getIntake()));
     }
 
     // ----------------------------------------------------------------

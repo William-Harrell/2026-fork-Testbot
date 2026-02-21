@@ -5,8 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.intake.Intake;
 
 public final class IntakeCommands {
-  private IntakeCommands() {
-  }
+  private IntakeCommands() {}
 
   public static Command toggleDirection(Intake intake) {
     return Commands.runOnce(intake.getR()::toggleIntakeOutake);
@@ -22,9 +21,9 @@ public final class IntakeCommands {
   /** Command to deploy and continuously intake (hold to run) */
   public static Command holdToIntakeCommand(Intake intake) {
     return Commands.sequence(
-        Commands.runOnce(intake::deployIntakeMechanism, intake),
-        Commands.waitUntil(intake.getD()::isDeployed),
-        Commands.run(intake.getR()::runIntake, intake))
+            Commands.runOnce(intake::deployIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isDeployed),
+            Commands.run(intake.getR()::runIntake, intake))
         .finallyDo(
             interrupted -> {
               intake.getR().stopRollers();
@@ -32,6 +31,7 @@ public final class IntakeCommands {
             })
         .withName("Hold to Intake");
   }
+
   // End of primary commands
 
   /**
@@ -42,19 +42,18 @@ public final class IntakeCommands {
    */
   public static Command intakeFuelCommand(Intake intake) {
     return Commands.sequence(
-        // Deploy command
-        Commands.sequence(
-            Commands.runOnce(intake::deployIntakeMechanism, intake),
-            Commands.waitUntil(intake.getD()::isDeployed),
-            Commands.runOnce(intake.getR()::runIntake, intake))
-            .withName("Intake FUEL"),
+            // Deploy command
+            Commands.sequence(
+                    Commands.runOnce(intake::deployIntakeMechanism, intake),
+                    Commands.waitUntil(intake.getD()::isDeployed),
+                    Commands.runOnce(intake.getR()::runIntake, intake))
+                .withName("Intake FUEL"),
 
-        // Retract command
-        Commands.sequence(
-            Commands.runOnce(intake::retractIntakeMechanism, intake),
-            Commands.waitUntil(intake.getD()::isStowed))
-            .withName("Retract Intake"))
-
+            // Retract command
+            Commands.sequence(
+                    Commands.runOnce(intake::retractIntakeMechanism, intake),
+                    Commands.waitUntil(intake.getD()::isStowed))
+                .withName("Retract Intake"))
         .withName("Intake and Retract");
   }
 
@@ -66,9 +65,9 @@ public final class IntakeCommands {
    */
   public static Command continuousIntakeCommand(Intake intake) {
     return Commands.sequence(
-        Commands.runOnce(intake::deployIntakeMechanism, intake),
-        Commands.waitUntil(intake.getD()::isDeployed),
-        Commands.run(intake.getR()::runIntake, intake))
+            Commands.runOnce(intake::deployIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isDeployed),
+            Commands.run(intake.getR()::runIntake, intake))
         .finallyDo(
             interrupted -> {
               intake.getR().stopRollers();
@@ -85,9 +84,9 @@ public final class IntakeCommands {
    */
   public static Command outtakeCommand(Intake intake) {
     return Commands.sequence(
-        Commands.runOnce(intake::deployIntakeMechanism, intake),
-        Commands.waitUntil(intake.getD()::isDeployed),
-        Commands.run(intake.getR()::runOuttake, intake))
+            Commands.runOnce(intake::deployIntakeMechanism, intake),
+            Commands.waitUntil(intake.getD()::isDeployed),
+            Commands.run(intake.getR()::runOuttake, intake))
         .finallyDo(
             interrupted -> {
               intake.getR().stopRollers();
@@ -123,11 +122,11 @@ public final class IntakeCommands {
    */
   public static Command emergencyStopCommand(Intake intake) {
     return Commands.runOnce(
-        () -> {
-          intake.getR().stopRollers();
-          intake.retractIntakeMechanism();
-        },
-        intake)
+            () -> {
+              intake.getR().stopRollers();
+              intake.retractIntakeMechanism();
+            },
+            intake)
         .withName("Intake Emergency Stop");
   }
 }

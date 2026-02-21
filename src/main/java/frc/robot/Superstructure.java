@@ -2,15 +2,13 @@ package frc.robot;
 
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.vision.Vision;
 
 /**
  * Superstructure holds references to all robot subsystems.
  *
- * <p>
- * This provides a centralized way to access subsystems for coordination and
- * complex sequences
+ * <p>This provides a centralized way to access subsystems for coordination and complex sequences
  * that span multiple mechanisms.
  */
 public class Superstructure {

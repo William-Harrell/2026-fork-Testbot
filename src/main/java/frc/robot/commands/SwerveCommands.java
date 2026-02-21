@@ -1,6 +1,6 @@
 package frc.robot.commands;
 
-// ts is hopelessly AI 😭
+// ts is hopelessly AI
 // not super difficult to get tho
 // you don't really need all these comments. a video is much more efficient and effective.
 // practice critical-thinking one way or another.

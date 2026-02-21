@@ -12,7 +12,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
-// im crine 😭
+// im crine
 
 /**
  * Complete autonomous routines for the REBUILT 2026 game.

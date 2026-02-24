@@ -8,13 +8,7 @@ import numpy as np
 
 from .base_detector import BaseDetector, Detection, nms
 from config import ROBOT_CONFIDENCE_THRESHOLD, ROBOT_MODEL_PATH, ROBOT_WIDTH_ESTIMATE
-from utils.geometry import (
-    pixel_to_robot_coords,
-    estimate_distance,
-    get_bbox_center,
-    get_bbox_dimensions,
-    calculate_velocity,
-)
+from utils.geometry import pixel_to_robot_coords, estimate_distance, get_bbox_center, get_bbox_dimensions, calculate_velocity
 
 
 class RobotDetector(BaseDetector):
@@ -42,6 +36,9 @@ class RobotDetector(BaseDetector):
         self,
         outputs: List[np.ndarray],
         original_size: Tuple[int, int],
+        fov_horizontal: float = 68.0,
+        fov_vertical: float = 41.0,
+        mount_yaw: float = 0.0,
     ) -> List[Detection]:
         """
         Post-process YOLOv8 outputs.
@@ -49,6 +46,9 @@ class RobotDetector(BaseDetector):
         Args:
             outputs: Raw model outputs
             original_size: Original frame size (width, height)
+            fov_horizontal: Camera horizontal FOV in degrees
+            fov_vertical: Camera vertical FOV in degrees
+            mount_yaw: Camera mount yaw in degrees
 
         Returns:
             List of Detection objects with robot-relative coordinates
@@ -112,6 +112,7 @@ class RobotDetector(BaseDetector):
                 bbox_height,
                 ROBOT_WIDTH_ESTIMATE,  # Using width as height estimate
                 original_size[1],
+                fov_vertical=fov_vertical,
             )
 
             # Convert to robot-relative coordinates
@@ -121,6 +122,8 @@ class RobotDetector(BaseDetector):
                 distance,
                 original_size[0],
                 original_size[1],
+                fov_horizontal=fov_horizontal,
+                mount_yaw=mount_yaw,
             )
 
             # Velocity estimation (simple nearest-neighbor tracking)

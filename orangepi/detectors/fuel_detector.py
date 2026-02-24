@@ -12,12 +12,7 @@ from config import (
     FUEL_DIAMETER,
     INTAKE_RANGE_DISTANCE,
 )
-from utils.geometry import (
-    pixel_to_robot_coords,
-    estimate_distance,
-    get_bbox_center,
-    get_bbox_dimensions,
-)
+from utils.geometry import pixel_to_robot_coords, estimate_distance, get_bbox_center, get_bbox_dimensions
 
 
 class FuelDetector(BaseDetector):
@@ -40,6 +35,9 @@ class FuelDetector(BaseDetector):
         self,
         outputs: List[np.ndarray],
         original_size: Tuple[int, int],
+        fov_horizontal: float = 68.0,
+        fov_vertical: float = 41.0,
+        mount_yaw: float = 0.0,
     ) -> List[Detection]:
         """
         Post-process YOLOv8 outputs for FUEL detection.
@@ -47,6 +45,9 @@ class FuelDetector(BaseDetector):
         Args:
             outputs: Raw model outputs
             original_size: Original frame size (width, height)
+            fov_horizontal: Camera horizontal FOV in degrees
+            fov_vertical: Camera vertical FOV in degrees
+            mount_yaw: Camera mount yaw in degrees
 
         Returns:
             List of Detection objects with robot-relative coordinates
@@ -105,6 +106,7 @@ class FuelDetector(BaseDetector):
                 bbox_height,
                 FUEL_DIAMETER,
                 original_size[1],
+                fov_vertical=fov_vertical,
             )
 
             # Convert to robot-relative coordinates
@@ -114,6 +116,8 @@ class FuelDetector(BaseDetector):
                 distance,
                 original_size[0],
                 original_size[1],
+                fov_horizontal=fov_horizontal,
+                mount_yaw=mount_yaw,
             )
 
             class_id = int(class_ids[idx])

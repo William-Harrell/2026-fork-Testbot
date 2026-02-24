@@ -10,23 +10,14 @@ Coordinate System (robot-relative, matching Vision.java):
 import math
 from typing import Tuple
 
-from config import (
-    CAMERA_WIDTH,
-    CAMERA_HEIGHT,
-    CAMERA_FOV_HORIZONTAL,
-    CAMERA_FOV_VERTICAL,
-    CAMERA_MOUNT_HEIGHT,
-    CAMERA_MOUNT_PITCH,
-)
-
 
 def pixel_to_angle(
     pixel_x: float,
     pixel_y: float,
-    image_width: int = CAMERA_WIDTH,
-    image_height: int = CAMERA_HEIGHT,
-    fov_horizontal: float = CAMERA_FOV_HORIZONTAL,
-    fov_vertical: float = CAMERA_FOV_VERTICAL,
+    image_width: int,
+    image_height: int,
+    fov_horizontal: float,
+    fov_vertical: float,
 ) -> Tuple[float, float]:
     """
     Convert pixel coordinates to angular offset from camera center.
@@ -60,8 +51,8 @@ def pixel_to_angle(
 def estimate_distance(
     bbox_height_pixels: float,
     known_height_meters: float,
-    image_height: int = CAMERA_HEIGHT,
-    fov_vertical: float = CAMERA_FOV_VERTICAL,
+    image_height: int,
+    fov_vertical: float = 41.0,
 ) -> float:
     """
     Estimate distance to object using its apparent size.
@@ -91,11 +82,16 @@ def pixel_to_robot_coords(
     pixel_x: float,
     pixel_y: float,
     distance: float,
-    image_width: int = CAMERA_WIDTH,
-    image_height: int = CAMERA_HEIGHT,
+    image_width: int,
+    image_height: int,
+    fov_horizontal: float = 68.0,
+    mount_yaw: float = 0.0,
 ) -> Tuple[float, float, float]:
     """
     Convert pixel position and distance to robot-relative coordinates.
+
+    Computes the camera-relative angle, then rotates by mount_yaw to get
+    robot-relative coordinates.
 
     Args:
         pixel_x: X coordinate in pixels (center of detection)
@@ -103,6 +99,8 @@ def pixel_to_robot_coords(
         distance: Estimated distance to object in meters
         image_width: Image width in pixels
         image_height: Image height in pixels
+        fov_horizontal: Horizontal field of view in degrees
+        mount_yaw: Camera mount yaw in degrees (0=front, CW from top)
 
     Returns:
         Tuple of (x, y, angle) in robot coordinates
@@ -110,18 +108,47 @@ def pixel_to_robot_coords(
         - y: distance sideways (positive = left of robot)
         - angle: angle from robot forward direction in degrees (positive = counterclockwise)
     """
+    # Use a dummy fov_vertical — vertical angle is unused for x,y computation
     horizontal_angle, _ = pixel_to_angle(
-        pixel_x, pixel_y, image_width, image_height
+        pixel_x, pixel_y, image_width, image_height, fov_horizontal, 41.0
     )
 
-    angle_rad = math.radians(horizontal_angle)
+    # Total angle = camera-relative angle + camera mount yaw
+    total_angle = horizontal_angle + mount_yaw
+    total_angle_rad = math.radians(total_angle)
 
     # Convert to robot-relative coordinates
     # X is forward, Y is left
-    x = distance * math.cos(angle_rad)
-    y = distance * math.sin(angle_rad)
+    x = distance * math.cos(total_angle_rad)
+    y = distance * math.sin(total_angle_rad)
 
-    return x, y, horizontal_angle
+    return x, y, total_angle
+
+
+def camera_to_robot_coords(
+    cam_x: float,
+    cam_y: float,
+    mount_yaw: float,
+) -> Tuple[float, float]:
+    """
+    Rotate camera-relative (x, y) into robot-relative coordinates by mount_yaw.
+
+    Args:
+        cam_x: Camera-relative X (forward from camera)
+        cam_y: Camera-relative Y (left from camera)
+        mount_yaw: Camera mount yaw in degrees (0=front, CW from top)
+
+    Returns:
+        Tuple of (robot_x, robot_y) in robot coordinates
+    """
+    yaw_rad = math.radians(mount_yaw)
+    cos_yaw = math.cos(yaw_rad)
+    sin_yaw = math.sin(yaw_rad)
+
+    robot_x = cam_x * cos_yaw - cam_y * sin_yaw
+    robot_y = cam_x * sin_yaw + cam_y * cos_yaw
+
+    return robot_x, robot_y
 
 
 def calculate_velocity(

@@ -2,130 +2,110 @@
 """
 Orange Pi Vision Service - Main Entry Point
 
-ML inference service for detecting robots and FUEL game pieces.
-Publishes results to NetworkTables for roboRIO consumption.
+Multi-camera ML inference service for detecting robots and FUEL game pieces.
+Runs one CameraPipeline per camera, fuses results, and publishes to NetworkTables.
 """
 
 import argparse
 import signal
 import sys
+import threading
 import time
-from typing import Optional
+from typing import List, Optional
 
-from config import CAMERA_FPS
-from detectors import RobotDetector, FuelDetector
+from config import CAMERAS, CameraConfig, FUSION_INTERVAL, INTAKE_RANGE_DISTANCE
+from detectors import RobotDetector, FuelDetector, Detection
 from network import NTPublisher
 from utils import Camera
 
 
-class VisionService:
-    """Main vision service orchestrating detection and publishing."""
+class CameraPipeline:
+    """Runs ML detection on a single camera stream in its own thread."""
 
-    def __init__(self, simulate: bool = False):
-        """
-        Initialize the vision service.
-
-        Args:
-            simulate: If True, run without actual camera/models
-        """
+    def __init__(self, cam_config: CameraConfig, simulate: bool = False):
+        self.config = cam_config
         self.simulate = simulate
-        self._running = False
+        self.name = cam_config.name
 
         # Components
-        self.camera: Optional[Camera] = None
-        self.robot_detector: Optional[RobotDetector] = None
-        self.fuel_detector: Optional[FuelDetector] = None
-        self.publisher: Optional[NTPublisher] = None
-
-        # Statistics
-        self._frame_count = 0
-        self._start_time = 0.0
-        self._last_fps_time = 0.0
-        self._fps = 0.0
-
-    def initialize(self) -> bool:
-        """
-        Initialize all components.
-
-        Returns:
-            True if all components initialized successfully
-        """
-        print("Initializing Vision Service...")
-
-        # Initialize camera
-        self.camera = Camera()
-        if not self.simulate:
-            if not self.camera.start():
-                print("Failed to start camera")
-                return False
-        else:
-            print("Camera simulation mode")
-
-        # Initialize detectors
+        self.camera = Camera(cam_config)
         self.robot_detector = RobotDetector()
         self.fuel_detector = FuelDetector()
 
+        # Latest results (thread-safe)
+        self._lock = threading.Lock()
+        self._robot_detections: List[Detection] = []
+        self._fuel_detections: List[Detection] = []
+        self._closest_robot: Optional[Detection] = None
+        self._best_fuel: Optional[Detection] = None
+        self._intake_ready: bool = False
+        self._timestamp: float = 0.0
+
+        # Thread
+        self._running = False
+        self._thread: Optional[threading.Thread] = None
+
+        # Stats
+        self._frame_count = 0
+        self._fps = 0.0
+
+    def start(self) -> bool:
+        """Initialize detectors and start the pipeline thread."""
         if not self.simulate:
+            if not self.camera.start():
+                print(f"[{self.name}] Failed to start camera")
+                return False
+
             if not self.robot_detector.load():
-                print("Warning: Robot detector failed to load")
+                print(f"[{self.name}] Warning: Robot detector failed to load")
             if not self.fuel_detector.load():
-                print("Warning: FUEL detector failed to load")
+                print(f"[{self.name}] Warning: FUEL detector failed to load")
         else:
-            print("Detector simulation mode")
+            print(f"[{self.name}] Simulation mode")
 
-        # Initialize NetworkTables publisher
-        self.publisher = NTPublisher()
-        if not self.publisher.connect():
-            print("Warning: NetworkTables connection failed")
-
-        print("Vision Service initialized")
+        self._running = True
+        self._thread = threading.Thread(
+            target=self._loop, daemon=True, name=f"pipeline-{self.name}"
+        )
+        self._thread.start()
+        print(f"[{self.name}] Pipeline started")
         return True
 
-    def run(self):
-        """Run the main inference loop."""
-        print("Starting inference loop...")
-        self._running = True
-        self._start_time = time.time()
-        self._last_fps_time = self._start_time
-
-        target_frame_time = 1.0 / CAMERA_FPS
+    def _loop(self):
+        """Main processing loop for this camera."""
+        fps_time = time.time()
+        fps_count = 0
 
         while self._running:
-            loop_start = time.time()
+            if self.simulate:
+                self._process_simulated()
+                time.sleep(1.0 / 30.0)
+            else:
+                self._process_frame()
 
-            self._process_frame()
-
-            # Maintain target FPS
-            elapsed = time.time() - loop_start
-            sleep_time = target_frame_time - elapsed
-            if sleep_time > 0:
-                time.sleep(sleep_time)
-
-            # Update FPS counter
-            self._frame_count += 1
-            if time.time() - self._last_fps_time >= 1.0:
-                self._fps = self._frame_count / (time.time() - self._last_fps_time)
-                self._frame_count = 0
-                self._last_fps_time = time.time()
-
-                if self._frame_count == 0:  # Print every second
-                    print(f"FPS: {self._fps:.1f}, NT Connected: {self.publisher.is_connected if self.publisher else False}")
+            fps_count += 1
+            now = time.time()
+            if now - fps_time >= 1.0:
+                self._fps = fps_count / (now - fps_time)
+                fps_count = 0
+                fps_time = now
 
     def _process_frame(self):
-        """Process a single frame."""
-        if self.simulate:
-            self._process_simulated_frame()
-            return
-
-        # Get frame from camera
+        """Process a single frame from this camera."""
         frame, timestamp = self.camera.get_frame()
         if frame is None:
+            time.sleep(0.001)
             return
 
         # Run robot detection
         robot_detections = []
-        if self.robot_detector and self.robot_detector.is_loaded:
-            robot_detections = self.robot_detector.detect(frame)
+        if self.robot_detector.is_loaded:
+            robot_detections = self.robot_detector.detect(
+                frame,
+                fov_horizontal=self.config.fov_horizontal,
+                fov_vertical=self.config.fov_vertical,
+                mount_yaw=self.config.mount_yaw,
+            )
 
         closest_robot = None
         if robot_detections:
@@ -133,8 +113,13 @@ class VisionService:
 
         # Run FUEL detection
         fuel_detections = []
-        if self.fuel_detector and self.fuel_detector.is_loaded:
-            fuel_detections = self.fuel_detector.detect(frame)
+        if self.fuel_detector.is_loaded:
+            fuel_detections = self.fuel_detector.detect(
+                frame,
+                fov_horizontal=self.config.fov_horizontal,
+                fov_vertical=self.config.fov_vertical,
+                mount_yaw=self.config.mount_yaw,
+            )
 
         best_fuel = None
         intake_ready = False
@@ -143,33 +128,201 @@ class VisionService:
             if best_fuel:
                 intake_ready = self.fuel_detector.is_intake_ready(best_fuel)
 
-        # Publish to NetworkTables
-        if self.publisher:
-            self.publisher.publish_robots(robot_detections, closest_robot, timestamp)
-            self.publisher.publish_fuel(fuel_detections, best_fuel, intake_ready, timestamp)
+        # Store results thread-safely
+        with self._lock:
+            self._robot_detections = robot_detections
+            self._fuel_detections = fuel_detections
+            self._closest_robot = closest_robot
+            self._best_fuel = best_fuel
+            self._intake_ready = intake_ready
+            self._timestamp = timestamp
 
-    def _process_simulated_frame(self):
-        """Process a simulated frame for testing."""
-        timestamp = time.time()
+    def _process_simulated(self):
+        """Produce empty results in simulation mode."""
+        with self._lock:
+            self._robot_detections = []
+            self._fuel_detections = []
+            self._closest_robot = None
+            self._best_fuel = None
+            self._intake_ready = False
+            self._timestamp = time.time()
 
-        # Publish empty data in simulation mode
+    def get_results(self):
+        """Get latest detection results from this pipeline.
+
+        Returns:
+            Tuple of (robot_detections, fuel_detections, closest_robot,
+                       best_fuel, intake_ready, timestamp)
+        """
+        with self._lock:
+            return (
+                list(self._robot_detections),
+                list(self._fuel_detections),
+                self._closest_robot,
+                self._best_fuel,
+                self._intake_ready,
+                self._timestamp,
+            )
+
+    def stop(self):
+        """Stop the pipeline."""
+        self._running = False
+
+        if self._thread is not None:
+            self._thread.join(timeout=2.0)
+            self._thread = None
+
+        self.camera.stop()
+        self.robot_detector.release()
+        self.fuel_detector.release()
+        print(f"[{self.name}] Pipeline stopped (avg FPS: {self._fps:.1f})")
+
+    @property
+    def fps(self) -> float:
+        return self._fps
+
+
+class VisionService:
+    """Main vision service orchestrating multi-camera detection and publishing."""
+
+    def __init__(self, simulate: bool = False):
+        self.simulate = simulate
+        self._running = False
+
+        self.pipelines: List[CameraPipeline] = []
+        self.publisher: Optional[NTPublisher] = None
+
+        # Statistics
+        self._start_time = 0.0
+
+    def initialize(self) -> bool:
+        """Initialize all pipelines and NetworkTables."""
+        print("Initializing Vision Service (multi-camera)...")
+
+        # Create a pipeline per camera
+        for cam_cfg in CAMERAS:
+            pipeline = CameraPipeline(cam_cfg, simulate=self.simulate)
+            self.pipelines.append(pipeline)
+
+        # Start all pipelines
+        for pipeline in self.pipelines:
+            if not pipeline.start():
+                print(f"Failed to start pipeline: {pipeline.name}")
+                return False
+
+        # Initialize NetworkTables publisher
+        self.publisher = NTPublisher()
+        if not self.publisher.connect():
+            print("Warning: NetworkTables connection failed")
+
+        print(f"Vision Service initialized with {len(self.pipelines)} cameras")
+        return True
+
+    def run(self):
+        """Run the main fusion loop."""
+        print("Starting fusion loop...")
+        self._running = True
+        self._start_time = time.time()
+        last_log_time = self._start_time
+
+        while self._running:
+            loop_start = time.time()
+
+            self._fuse_and_publish()
+
+            # Maintain target fusion rate
+            elapsed = time.time() - loop_start
+            sleep_time = FUSION_INTERVAL - elapsed
+            if sleep_time > 0:
+                time.sleep(sleep_time)
+
+            # Log status every second
+            now = time.time()
+            if now - last_log_time >= 1.0:
+                fps_str = ", ".join(
+                    f"{p.name}={p.fps:.1f}" for p in self.pipelines
+                )
+                print(
+                    f"FPS: [{fps_str}], "
+                    f"NT Connected: {self.publisher.is_connected if self.publisher else False}"
+                )
+                last_log_time = now
+
+    def _fuse_and_publish(self):
+        """Gather detections from all pipelines, fuse, and publish."""
+        all_robot_detections: List[Detection] = []
+        all_fuel_detections: List[Detection] = []
+        latest_timestamp = 0.0
+
+        for pipeline in self.pipelines:
+            (
+                robot_dets,
+                fuel_dets,
+                _closest,
+                _best,
+                _intake,
+                ts,
+            ) = pipeline.get_results()
+
+            all_robot_detections.extend(robot_dets)
+            all_fuel_detections.extend(fuel_dets)
+            if ts > latest_timestamp:
+                latest_timestamp = ts
+
+        # Fuse: pick closest robot across all cameras
+        fused_closest_robot = None
+        if all_robot_detections:
+            fused_closest_robot = min(all_robot_detections, key=lambda d: d.distance)
+
+        # Fuse: pick best fuel across all cameras
+        # Prefer intake-ready targets, then closest
+        fused_best_fuel = None
+        fused_intake_ready = False
+        if all_fuel_detections:
+            intake_candidates = [
+                d
+                for d in all_fuel_detections
+                if d.distance <= INTAKE_RANGE_DISTANCE and abs(d.angle) <= 15.0
+            ]
+            if intake_candidates:
+                fused_best_fuel = max(intake_candidates, key=lambda d: d.confidence)
+                fused_intake_ready = True
+            else:
+                fused_best_fuel = min(all_fuel_detections, key=lambda d: d.distance)
+
+        # Publish fused results
         if self.publisher:
-            self.publisher.publish_robots([], None, timestamp)
-            self.publisher.publish_fuel([], None, False, timestamp)
+            self.publisher.publish_robots(
+                all_robot_detections, fused_closest_robot, latest_timestamp
+            )
+            self.publisher.publish_fuel(
+                all_fuel_detections, fused_best_fuel, fused_intake_ready, latest_timestamp
+            )
+
+            # Per-camera debug publishing
+            for pipeline in self.pipelines:
+                (
+                    robot_dets,
+                    fuel_dets,
+                    closest,
+                    best,
+                    intake,
+                    ts,
+                ) = pipeline.get_results()
+                self.publisher.publish_robots(
+                    robot_dets, closest, ts, camera_name=pipeline.name
+                )
+                self.publisher.publish_fuel(
+                    fuel_dets, best, intake, ts, camera_name=pipeline.name
+                )
 
     def stop(self):
         """Stop the vision service."""
         print("Stopping Vision Service...")
         self._running = False
 
-        if self.camera:
-            self.camera.stop()
-
-        if self.robot_detector:
-            self.robot_detector.release()
-
-        if self.fuel_detector:
-            self.fuel_detector.release()
+        for pipeline in self.pipelines:
+            pipeline.stop()
 
         if self.publisher:
             self.publisher.disconnect()
@@ -181,7 +334,8 @@ class VisionService:
         runtime = time.time() - self._start_time
         print(f"\n--- Vision Service Statistics ---")
         print(f"Runtime: {runtime:.1f} seconds")
-        print(f"Average FPS: {self._fps:.1f}")
+        for p in self.pipelines:
+            print(f"  {p.name}: {p.fps:.1f} FPS")
         print(f"NT Connected: {self.publisher.is_connected if self.publisher else False}")
 
 

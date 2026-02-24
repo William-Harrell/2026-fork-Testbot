@@ -72,8 +72,8 @@ class BaseDetector(ABC):
                 print(f"Failed to load RKNN model: {self.model_path}")
                 return False
 
-            # Initialize runtime with all NPU cores
-            ret = self.rknn.init_runtime(core_mask=RKNNLite.NPU_CORE_0_1_2)
+            # Use NPU_CORE_AUTO so multiple pipelines can share NPU cores
+            ret = self.rknn.init_runtime(core_mask=RKNNLite.NPU_CORE_AUTO)
             if ret != 0:
                 print("Failed to initialize RKNN runtime")
                 return False
@@ -135,6 +135,9 @@ class BaseDetector(ABC):
         self,
         outputs: List[np.ndarray],
         original_size: Tuple[int, int],
+        fov_horizontal: float = 68.0,
+        fov_vertical: float = 41.0,
+        mount_yaw: float = 0.0,
     ) -> List[Detection]:
         """
         Post-process model outputs to extract detections.
@@ -142,18 +145,30 @@ class BaseDetector(ABC):
         Args:
             outputs: Raw model outputs
             original_size: Original frame size (width, height)
+            fov_horizontal: Camera horizontal FOV in degrees
+            fov_vertical: Camera vertical FOV in degrees
+            mount_yaw: Camera mount yaw in degrees
 
         Returns:
             List of Detection objects
         """
         pass
 
-    def detect(self, frame: np.ndarray) -> List[Detection]:
+    def detect(
+        self,
+        frame: np.ndarray,
+        fov_horizontal: float = 68.0,
+        fov_vertical: float = 41.0,
+        mount_yaw: float = 0.0,
+    ) -> List[Detection]:
         """
         Run full detection pipeline on a frame.
 
         Args:
             frame: Input frame (BGR, HWC format)
+            fov_horizontal: Camera horizontal FOV in degrees
+            fov_vertical: Camera vertical FOV in degrees
+            mount_yaw: Camera mount yaw in degrees (0=front)
 
         Returns:
             List of Detection objects
@@ -169,7 +184,12 @@ class BaseDetector(ABC):
         if outputs is None:
             return []
 
-        detections = self.postprocess(outputs, original_size)
+        detections = self.postprocess(
+            outputs, original_size,
+            fov_horizontal=fov_horizontal,
+            fov_vertical=fov_vertical,
+            mount_yaw=mount_yaw,
+        )
         return detections
 
     def release(self):

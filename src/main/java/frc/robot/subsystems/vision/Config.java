@@ -13,11 +13,15 @@ public class Config {
   public static final List<CameraConfig> cameraConfigs =
       List.of(
           new CameraConfig(
-              "example_cam_1",
-              VisionConstants.EXAMPLE_CAMERA_TRANSFORM_1,
+              "front_cam",
+              VisionConstants.FRONT_CAMERA_TRANSFORM,
               PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR),
           new CameraConfig(
-              "example_cam_2",
-              VisionConstants.EXAMPLE_CAMERA_TRANSFORM_2,
+              "back_left_cam",
+              VisionConstants.BACK_LEFT_CAMERA_TRANSFORM,
+              PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR),
+          new CameraConfig(
+              "back_right_cam",
+              VisionConstants.BACK_RIGHT_CAMERA_TRANSFORM,
               PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR));
 }

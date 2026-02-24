@@ -1,7 +1,8 @@
 [Unit]
 Description=Orange Pi Vision Service
-After=network.target
+After=network.target photonvision.service
 Wants=network-online.target
+Requires=photonvision.service
 
 [Service]
 Type=simple

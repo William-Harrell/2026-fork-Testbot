@@ -1,10 +1,13 @@
 """
 NetworkTables publisher for vision data.
 Publishes detection results to roboRIO using pynetworktables.
+
+Supports fused (best-across-all-cameras) publishing as well as
+optional per-camera debug publishing.
 """
 
 import time
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from networktables import NetworkTables
 
@@ -16,28 +19,20 @@ class NTPublisher:
     """Publishes vision data to NetworkTables for roboRIO consumption."""
 
     def __init__(self, server_ip: str = NT_SERVER_IP):
-        """
-        Initialize NetworkTables publisher.
-
-        Args:
-            server_ip: IP address of the NetworkTables server (roboRIO)
-        """
         self.server_ip = server_ip
         self._connected = False
         self._robots_table = None
         self._fuel_table = None
+        # Cache of per-camera subtables
+        self._camera_robots_tables: Dict[str, object] = {}
+        self._camera_fuel_tables: Dict[str, object] = {}
 
     def connect(self) -> bool:
-        """
-        Connect to the NetworkTables server.
-
-        Returns:
-            True if connection initiated successfully
-        """
+        """Connect to the NetworkTables server."""
         try:
             NetworkTables.initialize(server=self.server_ip)
 
-            # Get table references
+            # Get table references for fused data
             self._robots_table = NetworkTables.getTable(NTKeys.Robots.TABLE)
             self._fuel_table = NetworkTables.getTable(NTKeys.Fuel.TABLE)
 
@@ -67,11 +62,27 @@ class NTPublisher:
         """Check if connected to NetworkTables server."""
         return self._connected
 
+    def _get_camera_tables(self, camera_name: str):
+        """Get or create per-camera subtables for debug publishing."""
+        if camera_name not in self._camera_robots_tables:
+            self._camera_robots_tables[camera_name] = NetworkTables.getTable(
+                f"{NTKeys.Robots.TABLE}/{camera_name}"
+            )
+        if camera_name not in self._camera_fuel_tables:
+            self._camera_fuel_tables[camera_name] = NetworkTables.getTable(
+                f"{NTKeys.Fuel.TABLE}/{camera_name}"
+            )
+        return (
+            self._camera_robots_tables[camera_name],
+            self._camera_fuel_tables[camera_name],
+        )
+
     def publish_robots(
         self,
         detections: List[Detection],
         closest: Optional[Detection],
         timestamp: float,
+        camera_name: Optional[str] = None,
     ):
         """
         Publish robot detection data to NetworkTables.
@@ -80,11 +91,16 @@ class NTPublisher:
             detections: List of all robot detections
             closest: Closest robot detection (or None)
             timestamp: Frame timestamp
+            camera_name: If set, publishes to per-camera subtable for debugging
         """
-        if self._robots_table is None:
-            return
+        if camera_name is not None:
+            robots_table, _ = self._get_camera_tables(camera_name)
+            table = robots_table
+        else:
+            table = self._robots_table
 
-        table = self._robots_table
+        if table is None:
+            return
 
         # Robot count
         table.putNumber(NTKeys.Robots.COUNT, len(detections))
@@ -98,7 +114,6 @@ class NTPublisher:
             table.putNumber(NTKeys.Robots.CLOSEST_VEL_Y, closest.vel_y)
             table.putNumber(NTKeys.Robots.CLOSEST_CONFIDENCE, closest.confidence)
         else:
-            # No robot detected - publish default values
             table.putNumber(NTKeys.Robots.CLOSEST_X, 0.0)
             table.putNumber(NTKeys.Robots.CLOSEST_Y, 0.0)
             table.putNumber(NTKeys.Robots.CLOSEST_DISTANCE, 0.0)
@@ -106,7 +121,6 @@ class NTPublisher:
             table.putNumber(NTKeys.Robots.CLOSEST_VEL_Y, 0.0)
             table.putNumber(NTKeys.Robots.CLOSEST_CONFIDENCE, 0.0)
 
-        # Timestamp for latency compensation
         table.putNumber(NTKeys.Robots.TIMESTAMP, timestamp)
 
     def publish_fuel(
@@ -115,6 +129,7 @@ class NTPublisher:
         best: Optional[Detection],
         intake_ready: bool,
         timestamp: float,
+        camera_name: Optional[str] = None,
     ):
         """
         Publish FUEL detection data to NetworkTables.
@@ -124,11 +139,16 @@ class NTPublisher:
             best: Best FUEL target (or None)
             intake_ready: Whether best FUEL is ready for intake
             timestamp: Frame timestamp
+            camera_name: If set, publishes to per-camera subtable for debugging
         """
-        if self._fuel_table is None:
-            return
+        if camera_name is not None:
+            _, fuel_table = self._get_camera_tables(camera_name)
+            table = fuel_table
+        else:
+            table = self._fuel_table
 
-        table = self._fuel_table
+        if table is None:
+            return
 
         # FUEL count and presence
         table.putNumber(NTKeys.Fuel.COUNT, len(detections))
@@ -143,7 +163,7 @@ class NTPublisher:
             table.putNumber(NTKeys.Fuel.BEST_CONFIDENCE, best.confidence)
             table.putBoolean(
                 NTKeys.Fuel.IN_INTAKE_RANGE,
-                best.distance <= 0.5,  # INTAKE_RANGE_DISTANCE
+                best.distance <= 0.5,
             )
         else:
             table.putNumber(NTKeys.Fuel.BEST_X, 0.0)
@@ -153,10 +173,7 @@ class NTPublisher:
             table.putNumber(NTKeys.Fuel.BEST_CONFIDENCE, 0.0)
             table.putBoolean(NTKeys.Fuel.IN_INTAKE_RANGE, False)
 
-        # Intake ready status
         table.putBoolean(NTKeys.Fuel.INTAKE_READY, intake_ready)
-
-        # Timestamp for latency compensation
         table.putNumber(NTKeys.Fuel.TIMESTAMP, timestamp)
 
     def disconnect(self):
@@ -166,6 +183,8 @@ class NTPublisher:
             self._connected = False
             self._robots_table = None
             self._fuel_table = None
+            self._camera_robots_tables.clear()
+            self._camera_fuel_tables.clear()
             print("NetworkTables disconnected")
         except Exception as e:
             print(f"Error disconnecting from NetworkTables: {e}")

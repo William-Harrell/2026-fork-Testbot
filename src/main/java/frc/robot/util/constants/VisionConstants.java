@@ -31,33 +31,47 @@ public final class VisionConstants {
   // CAMERA CONFIGURATION
   // ================================================================
   // Camera names (must match what's in PhotonVision)
-  public static final String[] CAMERA_NAMES = {
-    "example_cam_1", "example_cam_2"
-  }; // (placeholder TODO)
-  public static final double AMBIGUITY_THRESHOLD = 0.4; // (placeholder TODO)
+  public static final String[] CAMERA_NAMES = {"front_cam", "back_left_cam", "back_right_cam"};
+
+  public static final double AMBIGUITY_THRESHOLD = 0.2;
 
   // Filters
-  public static final double MAX_TAG_DISTANCE = 100; // meters (placeholder TODO)
-  public static final double MAX_FRAME_AGE = 100; // seconds (placeholder TODO)
-  public static final double MIN_TAG_COUNT = 1; // (placeholder TODO)
-  public static final double MIN_AREA = 1.0; // meters squared (placeholder TODO)
-  public static final double MAX_POSE_DIFFERENCE = 1000.0; // meters (placeholder TODO)
+  public static final double MAX_TAG_DISTANCE = 5.0; // meters
+  public static final double MAX_FRAME_AGE = 0.3; // seconds
+  public static final double MIN_TAG_COUNT = 1;
+  public static final double MIN_AREA = 0.05; // meters squared
+  public static final double MAX_POSE_DIFFERENCE = 1.5; // meters
 
-  /**
-   * Camera positions relative to robot center. Transform3d(x, y, z, rotation) - x: forward/back
-   * from center (positive = forward) - y: left/right from center (positive = left) - z: up/down
-   * from ground (positive = up)
-   */
-  public static final Transform3d EXAMPLE_CAMERA_TRANSFORM_1 =
+  // ================================================================
+  // CAMERA TRANSFORMS
+  // ================================================================
+  // Camera positions relative to robot center. Transform3d(x, y, z, rotation)
+  // - x: forward/back from center (positive = forward)
+  // - y: left/right from center (positive = left)
+  // - z: up/down from ground (positive = up)
+  // NOTE: These are placeholder values — measure actual positions once cameras are mounted.
+
+  /** Front camera — centered, facing forward */
+  public static final Transform3d FRONT_CAMERA_TRANSFORM =
       new Transform3d(
           new Translation3d(Units.inchesToMeters(12.0), 0.0, Units.inchesToMeters(24.0)),
-          new Rotation3d(
-              0.0, Math.toRadians(-15.0), 0.0) // Roll, Pitch, and Yaw = X, Y, Z axis rotations
-          ); // (placeholder TODO)
+          new Rotation3d(0.0, Math.toRadians(-15.0), 0.0));
 
-  public static final Transform3d EXAMPLE_CAMERA_TRANSFORM_2 =
+  /** Back-left camera — offset left and back, facing 135 degrees */
+  public static final Transform3d BACK_LEFT_CAMERA_TRANSFORM =
       new Transform3d(
-          new Translation3d(Units.inchesToMeters(-12.0), 0.0, Units.inchesToMeters(24.0)),
-          new Rotation3d(0.0, Math.toRadians(-15.0), Math.toRadians(180.0)) // Facing backward
-          ); // (placeholder TODO)
+          new Translation3d(
+              Units.inchesToMeters(-10.0),
+              Units.inchesToMeters(10.0),
+              Units.inchesToMeters(24.0)),
+          new Rotation3d(0.0, Math.toRadians(-15.0), Math.toRadians(135.0)));
+
+  /** Back-right camera — offset right and back, facing 225 degrees */
+  public static final Transform3d BACK_RIGHT_CAMERA_TRANSFORM =
+      new Transform3d(
+          new Translation3d(
+              Units.inchesToMeters(-10.0),
+              Units.inchesToMeters(-10.0),
+              Units.inchesToMeters(24.0)),
+          new Rotation3d(0.0, Math.toRadians(-15.0), Math.toRadians(225.0)));
 }

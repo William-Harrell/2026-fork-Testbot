@@ -14,11 +14,16 @@ import frc.robot.subsystems.swerve.SwerveDrive;
 /**
  * Reusable building blocks for autonomous routines.
  *
- * <p>This class provides atomic commands that can be combined to create complete autonomous
+ * <p>
+ * This class provides atomic commands that can be combined to create complete
+ * autonomous
  * sequences in AutoRoutines.
  *
- * <p>Categories: - Movement: Drive forward, drive to pose, follow path - Intake: Collect FUEL while
- * moving or stationary - Shooter: Score FUEL in the hub - Utility: Wait, log messages
+ * <p>
+ * Categories: - Movement: Drive forward, drive to pose, follow path - Intake:
+ * Collect FUEL while
+ * moving or stationary - Shooter: Score FUEL in the hub - Utility: Wait, log
+ * messages
  */
 public final class AutoCommands {
 
@@ -33,9 +38,9 @@ public final class AutoCommands {
   /**
    * Drive forward a specified distance at a given speed.
    *
-   * @param swerve The swerve drive subsystem
+   * @param swerve         The swerve drive subsystem
    * @param distanceMeters Distance to travel (positive = forward)
-   * @param speedMps Speed in meters per second
+   * @param speedMps       Speed in meters per second
    * @return Command that drives forward
    */
   public static Command driveForward(SwerveDrive swerve, double distanceMeters, double speedMps) {
@@ -46,9 +51,9 @@ public final class AutoCommands {
   /**
    * Drive backward a specified distance.
    *
-   * @param swerve The swerve drive subsystem
+   * @param swerve         The swerve drive subsystem
    * @param distanceMeters Distance to travel (positive value)
-   * @param speedMps Speed in meters per second (positive value)
+   * @param speedMps       Speed in meters per second (positive value)
    * @return Command that drives backward
    */
   public static Command driveBackward(SwerveDrive swerve, double distanceMeters, double speedMps) {
@@ -59,9 +64,9 @@ public final class AutoCommands {
   /**
    * Strafe left a specified distance.
    *
-   * @param swerve The swerve drive subsystem
+   * @param swerve         The swerve drive subsystem
    * @param distanceMeters Distance to travel
-   * @param speedMps Speed in meters per second
+   * @param speedMps       Speed in meters per second
    * @return Command that strafes left
    */
   public static Command strafeLeft(SwerveDrive swerve, double distanceMeters, double speedMps) {
@@ -72,9 +77,9 @@ public final class AutoCommands {
   /**
    * Strafe right a specified distance.
    *
-   * @param swerve The swerve drive subsystem
+   * @param swerve         The swerve drive subsystem
    * @param distanceMeters Distance to travel
-   * @param speedMps Speed in meters per second
+   * @param speedMps       Speed in meters per second
    * @return Command that strafes right
    */
   public static Command strafeRight(SwerveDrive swerve, double distanceMeters, double speedMps) {
@@ -85,7 +90,7 @@ public final class AutoCommands {
   /**
    * Drive to a specific pose on the field.
    *
-   * @param swerve The swerve drive subsystem
+   * @param swerve     The swerve drive subsystem
    * @param targetPose Target position and heading
    * @return Command that drives to the pose
    */
@@ -98,10 +103,10 @@ public final class AutoCommands {
   /**
    * Drive to a pose with custom tolerances.
    *
-   * @param swerve The swerve drive subsystem
-   * @param targetPose Target position and heading
+   * @param swerve                  The swerve drive subsystem
+   * @param targetPose              Target position and heading
    * @param positionToleranceMeters How close to get (meters)
-   * @param angleTolerance How close to get (degrees)
+   * @param angleTolerance          How close to get (degrees)
    * @return Command that drives to the pose
    */
   public static Command driveToPose(
@@ -117,7 +122,8 @@ public final class AutoCommands {
   /**
    * Follow a PathPlanner path.
    *
-   * <p>Note: Requires PathPlanner auto builder to be configured in SwerveDrive.
+   * <p>
+   * Note: Requires PathPlanner auto builder to be configured in SwerveDrive.
    *
    * @param pathName Name of the path file (without extension)
    * @return Command that follows the path, or does nothing if path not found
@@ -146,24 +152,24 @@ public final class AutoCommands {
   /**
    * Drive forward while intaking FUEL.
    *
-   * @param intake The intake subsystem
-   * @param swerve The swerve drive subsystem
+   * @param intake         The intake subsystem
+   * @param swerve         The swerve drive subsystem
    * @param distanceMeters Distance to travel
-   * @param speedMps Speed in meters per second
+   * @param speedMps       Speed in meters per second
    * @return Command that drives and intakes simultaneously
    */
   public static Command intakeWhileDriving(
       Intake intake, SwerveDrive swerve, double distanceMeters, double speedMps) {
     return Commands.parallel(
-            driveForward(swerve, distanceMeters, speedMps),
-            IntakeCommands.continuousIntakeCommand(intake))
+        driveForward(swerve, distanceMeters, speedMps),
+        IntakeCommands.continuousIntakeCommand(intake))
         .withName("Intake While Driving");
   }
 
   /**
    * Deploy intake and collect FUEL with timeout.
    *
-   * @param intake The intake subsystem
+   * @param intake         The intake subsystem
    * @param timeoutSeconds Maximum time to wait
    * @return Command that collects FUEL or times out
    */
@@ -181,18 +187,18 @@ public final class AutoCommands {
    * Shoot all collected FUEL.
    *
    * @param shooter The shooter subsystem
-   * @param intake The intake subsystem (for feeding)
+   * @param intake  The intake subsystem (for feeding)
    * @return Command that shoots all FUEL
    */
   public static Command shootAllFuel(Shooter shooter, Intake intake) {
     return Commands.sequence(
-            // Spin up shooter
-            Commands.runOnce(shooter.getF()::spinUp, shooter),
-            Commands.waitSeconds(0.5), // Wait for shooter to spin up
-            // Feed all FUEL
-            IntakeCommands.feedCommand(intake),
-            // Stop shooter
-            Commands.waitSeconds(0.5))
+        // Spin up shooter
+        Commands.runOnce(shooter.getF()::spinUp, shooter),
+        Commands.waitSeconds(0.5), // Wait for shooter to spin up
+        // Feed all FUEL
+        IntakeCommands.feedCommand(intake),
+        // Stop shooter
+        Commands.waitSeconds(0.5))
         .withName("Shoot All FUEL");
   }
 
@@ -200,15 +206,15 @@ public final class AutoCommands {
    * Shoot a single FUEL.
    *
    * @param shooter The shooter subsystem
-   * @param intake The intake subsystem
+   * @param intake  The intake subsystem
    * @return Command that shoots one FUEL
    */
   public static Command shootOneFuel(Shooter shooter, Intake intake) {
     return Commands.sequence(
-            Commands.runOnce(shooter.getF()::spinUp, shooter),
-            Commands.waitSeconds(0.5),
-            IntakeCommands.feedCommand(intake),
-            Commands.waitSeconds(0.3))
+        Commands.runOnce(shooter.getF()::spinUp, shooter),
+        Commands.waitSeconds(0.5),
+        IntakeCommands.feedCommand(intake),
+        Commands.waitSeconds(0.3))
         .withName("Shoot One FUEL");
   }
 
@@ -240,7 +246,7 @@ public final class AutoCommands {
   /**
    * Set wheels to X pattern (ski stop) for a duration.
    *
-   * @param swerve The swerve drive subsystem
+   * @param swerve  The swerve drive subsystem
    * @param seconds Duration to hold
    * @return Command that holds X pattern
    */
@@ -266,10 +272,10 @@ public final class AutoCommands {
   /**
    * Check if robot is at a target pose within tolerances.
    *
-   * @param swerve The swerve drive subsystem
-   * @param target Target pose
+   * @param swerve            The swerve drive subsystem
+   * @param target            Target pose
    * @param positionTolerance Position tolerance in meters
-   * @param angleTolerance Angle tolerance in degrees
+   * @param angleTolerance    Angle tolerance in degrees
    * @return True if at pose within tolerances
    */
   private static boolean isAtPose(

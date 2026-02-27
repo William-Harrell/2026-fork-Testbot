@@ -9,6 +9,7 @@ public final class IntakeCommands {
   }
 
   public static Command toggleDirection(Intake intake) {
+    if (intake == null) return Commands.none();
     return Commands.runOnce(intake.getR()::toggleIntakeOutake);
   }
 
@@ -21,6 +22,7 @@ public final class IntakeCommands {
 
   /** Command to deploy and continuously intake (hold to run) */
   public static Command holdToIntakeCommand(Intake intake) {
+    if (intake == null) return Commands.none();
     return Commands.sequence(
         Commands.runOnce(intake::deployIntakeMechanism, intake),
         Commands.waitUntil(intake.getD()::isDeployed),
@@ -40,6 +42,7 @@ public final class IntakeCommands {
    * @return Command that completes a full intake cycle
    */
   public static Command intakeFuelCommand(Intake intake) {
+    if (intake == null) return Commands.none();
     return Commands.sequence(
         // Deploy command
         Commands.sequence(
@@ -63,6 +66,7 @@ public final class IntakeCommands {
    * @return Command that runs until interrupted
    */
   public static Command continuousIntakeCommand(Intake intake) {
+    if (intake == null) return Commands.none();
     return Commands.sequence(
         Commands.runOnce(intake::deployIntakeMechanism, intake),
         Commands.waitUntil(intake.getD()::isDeployed),
@@ -82,6 +86,7 @@ public final class IntakeCommands {
    * @return Command that runs outtake until released
    */
   public static Command outtakeCommand(Intake intake) {
+    if (intake == null) return Commands.none();
     return Commands.sequence(
         Commands.runOnce(intake::deployIntakeMechanism, intake),
         Commands.waitUntil(intake.getD()::isDeployed),
@@ -105,6 +110,7 @@ public final class IntakeCommands {
    * @return Command that feeds FUEL
    */
   public static Command feedCommand(Intake intake) {
+    if (intake == null) return Commands.none();
     return Commands.startEnd(intake.getR()::feedToShooter, intake.getR()::stopRollers, intake)
         .withName("Feed FUEL");
   }
@@ -120,6 +126,7 @@ public final class IntakeCommands {
    * @return Instant command that stops everything
    */
   public static Command emergencyStopCommand(Intake intake) {
+    if (intake == null) return Commands.none();
     return Commands.runOnce(
         () -> {
           intake.getR().stopRollers();

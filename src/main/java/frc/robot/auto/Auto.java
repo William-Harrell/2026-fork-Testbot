@@ -50,11 +50,19 @@ public class Auto {
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_YELLOW = "\u001B[33m";
 
+    public record FieldObject(double x, double y, double length, double width) {
+    }
+
+    // Maybe Rhys can help fill these out idk
+    public static FieldObject[] nogos = {
+            new FieldObject(0, 0, 0, 0),
+    };
+
     public Auto() {
         s = 10; // Scaling factor (1 : s meters) <-- (real : grid)
 
-        width = s * (int) Math.ceil(FieldConstants.FIELD_WIDTH);
-        length = s * (int) Math.ceil(FieldConstants.FIELD_LENGTH);
+        width = 2 * s * (int) Math.floor(FieldConstants.FIELD_WIDTH / 2) + 1; // (make them odd so it's centered)
+        length = 2 * s * (int) Math.floor(FieldConstants.FIELD_LENGTH / 2) + 1;
 
         ConstantField = new double[length][width]; // Inches
         MutableField = new double[length][width]; // Inches
@@ -81,7 +89,7 @@ public class Auto {
         }
     }
 
-    private static void assignColor(double a, int max, JButton cell) { // For UI
+    private static void assignColor(double a, int max, JButton cell) { // For GUI
         if (a == 1 * max) {
             cell.setBackground(Color.BLACK);
         } else if (a > 0.8 * max) {
@@ -99,8 +107,7 @@ public class Auto {
         }
     }
 
-    public void display() { // Swing GUI
-        // Constant Field
+    public void display() {
         JFrame constantview = new JFrame("Field View (Constant)");
         constantview.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -169,14 +176,23 @@ public class Auto {
             }
         }
 
-        // int rel_length = mapTo(, width, s, 0, length)
-        // maybe a job for AI idk we gotta write this logic out this is wild
-    }
+        // draw the nogos
+        for (FieldObject obj: nogos) {
+            // draw it
+            /*
+             * Multiply the values by scaling factor
+             * loop thru
+             */
 
-    // We're gonna be using this a bit to map the field positions to grid positions
-    // Maybe search online to see if a scalar field like this already exists or if
-    // we can generate one
-    public static int mapTo(double value, double lb1, double ub1, double lb2, double ub2) {
-        return (int) (lb2 + (ub2 - lb2) * ((value - lb1) / (ub1 - lb1)));
+            int x = s * (int) obj.x(), y = s * (int) obj.y;
+
+             for (int i = x)
+        }
+
+        /**
+         * So, when drawing obstacles:
+         * - real-world [x, y, height, width] times scaling factor for grid dimensions
+         * 
+         */
     }
 }

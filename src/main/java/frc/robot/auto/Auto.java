@@ -1,6 +1,11 @@
 package frc.robot.auto;
 
-import java.util.Arrays;
+// For UI in testing
+import javax.swing.*;
+
+import java.awt.Color;
+import java.awt.GridLayout;
+// End of UI/testing libs
 
 import frc.robot.util.constants.FieldConstants;
 
@@ -46,7 +51,7 @@ public class Auto {
     public static final String ANSI_YELLOW = "\u001B[33m";
 
     public Auto() {
-        s = 2; // Scaling factor
+        s = 10; // Scaling factor (1 : s meters) <-- (real : grid)
 
         width = s * (int) Math.ceil(FieldConstants.FIELD_WIDTH);
         length = s * (int) Math.ceil(FieldConstants.FIELD_LENGTH);
@@ -60,10 +65,11 @@ public class Auto {
         var myAuto = new Auto();
         myAuto.initializeConstantField();
 
-        myAuto.print();
+        // myAuto.print(); <-- (Not nearly as clean, especially w/ large scaling)
+        myAuto.display(); // very nice indeed
     }
 
-    private static String assignColor(double a, int max) {
+    private static String assignColor(double a, int max) { // For text
         if (a > 0.9 * max) {
             return ANSI_RED + a + ANSI_RESET;
         } else if (a > 0.5 * max) {
@@ -73,6 +79,47 @@ public class Auto {
         } else {
             return ANSI_RESET + a + ANSI_RESET;
         }
+    }
+
+    private static void assignColor(double a, int max, JButton cell) { // For UI
+        if (a == 1 * max) {
+            cell.setBackground(Color.BLACK);
+        } else if (a > 0.8 * max) {
+            cell.setBackground(Color.RED);
+        } else if (a > 0.65 * max) {
+            cell.setBackground(Color.ORANGE);
+        } else if (a > 0.5 * max) {
+            cell.setBackground(Color.YELLOW);
+        } else if (a > 0.35 * max) {
+            cell.setBackground(Color.GREEN);
+        } else if (a > 0.15 * max) {
+            cell.setBackground(Color.GRAY);
+        } else {
+            cell.setBackground(Color.WHITE);
+        }
+    }
+
+    public void display() { // Swing GUI
+        // Constant Field
+        JFrame constantview = new JFrame("Field View (Constant)");
+        constantview.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        JPanel gridPanel = new JPanel();
+        gridPanel.setLayout(new GridLayout(length, width));
+
+        for (int y = 0; y < length; y++) {
+            for (int x = 0; x < width; x++) {
+                double val = ConstantField[y][x];
+                JButton cell = new JButton(String.valueOf(val));
+                cell.setToolTipText(String.valueOf(val));
+                assignColor(val, max, cell);
+                gridPanel.add(cell);
+            }
+        }
+
+        constantview.add(gridPanel);
+        constantview.pack();
+        constantview.setVisible(true);
     }
 
     public void print() {

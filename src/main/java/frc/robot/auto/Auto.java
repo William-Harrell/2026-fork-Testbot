@@ -63,11 +63,6 @@ public class Auto {
     public static record FieldObject(double x, double y, double length, double width) {
     }
 
-    // Maybe Rhys can help fill these out idk
-    public static FieldObject[] nogos = {
-            new FieldObject(0, 0, 0, 0),
-    };
-
     // Constructor
     public Auto(int max_heuristic) {
         s = 5; // Scaling factor (1 : s meters) <-- (real : grid)
@@ -94,47 +89,106 @@ public class Auto {
 
     // Create field method
     public void initializeConstantField() {
-        int rel_max = (int) Math.sqrt(((width-1)/2) * ((width-1)/2) + ((length-1)/2) * ((length-1)/2));
+        int rel_max = (int) Math.sqrt(((width - 1) / 2) * ((width - 1) / 2) + ((length - 1) / 2) * ((length - 1) / 2));
 
-        for (int y = 0; y < length; y++) {
-            for (int x = 0; x < width; x++) {
-                int rel_y = y - length / 2;
-                int rel_x = x - width / 2;
+        for (FieldObject obj : FieldConstants.nogos) {
+            // (81, 123) | Origin is bottom left
+            int x = (int) Math.round(map(obj.x(), 0, FieldConstants.FIELD_LENGTH, 0, width));
+            int y = (int) Math.round(map(obj.y(), 0, FieldConstants.FIELD_WIDTH, 0, length));
+            int w = (int) Math.round(map(obj.width(), 0, FieldConstants.FIELD_WIDTH, 0, length));
+            int l = (int) Math.round(map(obj.length(), 0, FieldConstants.FIELD_LENGTH, 0, width));
 
-                // Radial
-                ConstantField[y][x] = (int) map(Math.sqrt(rel_x * rel_x + rel_y * rel_y), rel_max);
+            int xStart = Math.max(x, 0);
+            int yStart = Math.max(y, 0);
+            int xEnd = Math.min(x + l, width);
+            int yEnd = Math.min(y + w, length);
+
+            if (xStart >= width || yStart >= length || xEnd <= 0 || yEnd <= 0) {
+                System.out.println("Fully out of bounds, skipping: " + obj);
+                continue;
             }
-        }
 
-        // Walls
-        int boundary = 2;
-
-        for (int y = 0; y < length; y++) {
-            for (int x = 0; x < width; x++) {
-                if (x <= boundary || y <= boundary || y >= length - (1 + boundary) || x >= width - (1 + boundary)) {
-                    ConstantField[y][x] = max;
+            for (int i = yStart; i < yEnd; i++) {
+                for (int j = xStart; j < xEnd; j++) {
+                    ConstantField[i][j] = max;
                 }
             }
         }
 
-        // draw the nogos
-        // for (FieldObject obj: nogos) {
-        // // draw it
-        // /*
-        // * Multiply the values by scaling factor
-        // * loop thru
-        // */
+        // No more radial!
+        applyDistanceHeuristic(ConstantField, FieldConstants.CENTER_X, FieldConstants.CENTER_Y);
+    }
 
-        // int x = s * (int) obj.x(), y = s * (int) obj.y;
+    /**
+     * Fills the given field grid with heuristic values based on true navigable
+     * distance to the target position (tx, ty) in meters, routing AROUND obstacles.
+     *
+     * Uses BFS (wave propagation) from the target cell outward. Cells already
+     * set to max (obstacles) are treated as walls and block propagation.
+     * Cells that are unreachable stay at max.
+     *
+     * @param field the grid to write into (must have obstacles already drawn)
+     * @param tx    target X in meters (along field length)
+     * @param ty    target Y in meters (along field width)
+     */
+    public void applyDistanceHeuristic(double[][] field, double tx, double ty) {
+        int targetX = (int) Math.round(map(tx, 0, FieldConstants.FIELD_LENGTH, 0, width - 1));
+        int targetY = (int) Math.round(map(ty, 0, FieldConstants.FIELD_WIDTH, 0, length - 1));
 
-        // for (int i = x)
-        // }
+        // BFS hop count grid — -1 means unvisited
+        int[][] hops = new int[length][width];
+        for (int[] row : hops)
+            java.util.Arrays.fill(row, -1);
 
-        /**
-         * So, when drawing obstacles:
-         * - real-world [x, y, height, width] times scaling factor for grid dimensions
-         * - account for the "1x1" (the ratio multiplication might've handled that)
-         */
+        java.util.Queue<int[]> queue = new java.util.LinkedList<>();
+
+        // Seed from target (only if target itself isn't an obstacle)
+        if (field[targetY][targetX] < max) {
+            hops[targetY][targetX] = 0;
+            queue.add(new int[] { targetX, targetY });
+        }
+
+        // 8-directional neighbors (allows diagonal pathing like a real robot)
+        int[] dx = { -1, 0, 1, -1, 1, -1, 0, 1 };
+        int[] dy = { -1, -1, -1, 0, 0, 1, 1, 1 };
+
+        int maxHops = 0;
+
+        while (!queue.isEmpty()) {
+            int[] cur = queue.poll();
+            int cx = cur[0], cy = cur[1];
+
+            for (int d = 0; d < 8; d++) {
+                int nx = cx + dx[d];
+                int ny = cy + dy[d];
+
+                // Skip out-of-bounds
+                if (nx < 0 || nx >= width || ny < 0 || ny >= length)
+                    continue;
+
+                // Skip obstacles and already-visited cells
+                if (field[ny][nx] >= max || hops[ny][nx] != -1)
+                    continue;
+
+                hops[ny][nx] = hops[cy][cx] + 1;
+                if (hops[ny][nx] > maxHops)
+                    maxHops = hops[ny][nx];
+                queue.add(new int[] { nx, ny });
+            }
+        }
+
+        // Write normalized values back — obstacles and unreachable cells stay at max
+        for (int y = 0; y < length; y++) {
+            for (int x = 0; x < width; x++) {
+                if (field[y][x] >= max)
+                    continue; // preserve obstacles
+                if (hops[y][x] == -1) {
+                    field[y][x] = max; // unreachable
+                } else {
+                    field[y][x] = (maxHops > 0) ? map(hops[y][x], 0, maxHops, 0, max) : 0;
+                }
+            }
+        }
     }
 
     // FIELD DISPLAY METHODS
@@ -173,19 +227,19 @@ public class Auto {
     // GUI Methods
     private static void assignColor(double a, int max, JButton cell) { // For GUI
         if (a == 1 * max) {
-            cell.setBackground(Color.BLACK);
+            cell.setBackground(new Color(Color.HSBtoRGB(0, 0, (float) ((a/max)))));
         } else if (a > 0.8 * max) {
-            cell.setBackground(Color.RED);
+            cell.setBackground(new Color(Color.HSBtoRGB(0, .99f, (float) ((a/max)))));
         } else if (a > 0.65 * max) {
-            cell.setBackground(Color.ORANGE);
+            cell.setBackground(new Color(Color.HSBtoRGB(33f, .99f, (float) ((a/max)))));
         } else if (a > 0.5 * max) {
-            cell.setBackground(Color.YELLOW);
+            cell.setBackground(new Color(Color.HSBtoRGB(55f, .99f, (float) ((a/max)))));
         } else if (a > 0.35 * max) {
-            cell.setBackground(Color.GREEN);
+            cell.setBackground(new Color(Color.HSBtoRGB(115f, .99f, (float) ((a/max)))));
         } else if (a > 0.15 * max) {
-            cell.setBackground(Color.GRAY);
+            cell.setBackground(new Color(Color.HSBtoRGB(115f, 0f, (float) ((a/max)))));
         } else {
-            cell.setBackground(Color.WHITE);
+            cell.setBackground(new Color(Color.HSBtoRGB(115f, 0f, (float) ((a/max)))));
         }
     }
 
@@ -222,5 +276,9 @@ public class Auto {
 
         double ratio = (max) / (endCoord1);
         return ratio * (valueCoord1);
+    }
+
+    public static double map(double value, double istart, double istop, double ostart, double ostop) {
+        return ostart + (ostop - ostart) * ((value - istart) / (istop - istart));
     }
 }

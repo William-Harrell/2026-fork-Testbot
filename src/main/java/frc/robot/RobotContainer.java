@@ -264,8 +264,8 @@ public class RobotContainer {
     // ================================================================
     // Order matters here! Some subsystems depend on others.
     // Vision and Swerve are needed by Shooter for targeting.
-    swerve = new SwerveDrive();
     vision = new Vision();
+    swerve = new SwerveDrive(vision); // SwerveDrive needs vision for pose correction
     shooter = new Shooter(vision, swerve); // Shooter needs vision for targeting
     // intake = new Intake();  // DISABLED - Spark Max ID 9 not connected
     intake = null;

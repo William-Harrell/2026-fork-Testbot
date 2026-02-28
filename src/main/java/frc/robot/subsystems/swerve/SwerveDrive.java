@@ -31,6 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.constants.SwerveConstants;
 import java.util.function.DoubleSupplier;
 
@@ -47,6 +48,7 @@ public class SwerveDrive extends SubsystemBase {
   private final SwerveModule[] modules;
 
   private final Pigeon2 gyro;
+  private final Vision vision;
 
   // MATH - Kinematics and pose estimation
 
@@ -107,7 +109,9 @@ public class SwerveDrive extends SubsystemBase {
    * robot 3. Creates the kinematics object 4. Creates all four swerve modules 5. Sets up pose
    * estimation 6. Initializes visualization tools
    */
-  public SwerveDrive() {
+  public SwerveDrive(Vision vision) {
+    this.vision = vision;
+
     // ----------------------------------------------------------------
     // STEP 1: Initialize the gyroscope
     // ----------------------------------------------------------------
@@ -234,6 +238,12 @@ public class SwerveDrive extends SubsystemBase {
     // Update pose estimator with latest gyro and wheel data
     // This is how we track where the robot is on the field
     poseEstimator.update(getYaw(), getModulePositions());
+
+    // Inject vision correction when a valid AprilTag reading is available.
+    // The timestamp tells the estimator when the image was captured so it can
+    // rewind and re-apply wheel odometry, compensating for camera latency.
+    vision.getBestVisionUpdateRaw(getPose()).ifPresent(update ->
+        addVisionMeasurement(update.pose2d(), update.timestampSeconds()));
 
     // Update the Field2d visualization in Shuffleboard
     field.setRobotPose(getPose());

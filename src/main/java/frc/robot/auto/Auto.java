@@ -50,6 +50,8 @@ public class Auto {
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_YELLOW = "\u001B[33m";
 
+    public static final int FIELD_SIZE_RATIO = (int) Math.ceil(FieldConstants.FIELD_LENGTH/FieldConstants.FIELD_WIDTH);
+
     public record FieldObject(double x, double y, double length, double width) {
     }
 
@@ -63,6 +65,8 @@ public class Auto {
 
         width = 2 * s * (int) Math.floor(FieldConstants.FIELD_WIDTH / 2) + 1; // (make them odd so it's centered)
         length = 2 * s * (int) Math.floor(FieldConstants.FIELD_LENGTH / 2) + 1;
+
+        width *= FIELD_SIZE_RATIO; // For 1 x ~1 cells
 
         ConstantField = new double[length][width]; // Inches
         MutableField = new double[length][width]; // Inches
@@ -112,7 +116,7 @@ public class Auto {
         constantview.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel gridPanel = new JPanel();
-        gridPanel.setLayout(new GridLayout(length, width));
+        gridPanel.setLayout(new GridLayout(length, width/FIELD_SIZE_RATIO));
 
         for (int y = 0; y < length; y++) {
             for (int x = 0; x < width; x++) {
@@ -177,17 +181,17 @@ public class Auto {
         }
 
         // draw the nogos
-        for (FieldObject obj: nogos) {
-            // draw it
-            /*
-             * Multiply the values by scaling factor
-             * loop thru
-             */
+        // for (FieldObject obj: nogos) {
+        //     // draw it
+        //     /*
+        //      * Multiply the values by scaling factor
+        //      * loop thru
+        //      */
 
-            int x = s * (int) obj.x(), y = s * (int) obj.y;
+        //     int x = s * (int) obj.x(), y = s * (int) obj.y;
 
-             for (int i = x)
-        }
+        //      for (int i = x)
+        // }
 
         /**
          * So, when drawing obstacles:

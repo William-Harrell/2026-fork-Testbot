@@ -133,7 +133,7 @@ public class Auto {
         /**
          * So, when drawing obstacles:
          * - real-world [x, y, height, width] times scaling factor for grid dimensions
-         * 
+         * - account for the "1x1" (the ratio multiplication might've handled that)
          */
     }
 

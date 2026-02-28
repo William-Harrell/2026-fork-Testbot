@@ -121,7 +121,7 @@ public class Auto {
         for (int y = 0; y < length; y++) {
             for (int x = 0; x < width; x++) {
                 double val = ConstantField[y][x];
-                JButton cell = new JButton(String.valueOf(val));
+                JButton cell = new JButton();
                 cell.setToolTipText(String.valueOf(val));
                 assignColor(val, max, cell);
                 gridPanel.add(cell);

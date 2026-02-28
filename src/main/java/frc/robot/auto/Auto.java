@@ -70,7 +70,7 @@ public class Auto {
 
     // Constructor
     public Auto(int max_heuristic) {
-        s = 10; // Scaling factor (1 : s meters) <-- (real : grid)
+        s = 5; // Scaling factor (1 : s meters) <-- (real : grid)
 
         width = 2 * s * (int) Math.floor(FieldConstants.FIELD_WIDTH / 2) + 1; // (make them odd so it's centered)
         length = 2 * s * (int) Math.floor(FieldConstants.FIELD_LENGTH / 2) + 1;

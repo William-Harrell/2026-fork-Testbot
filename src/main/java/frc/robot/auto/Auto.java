@@ -54,7 +54,8 @@ public class Auto {
     public static final String ANSI_YELLOW = "\u001B[33m"; // Apply the color yellow in Java terminal
 
     public static final int FIELD_SIZE_RATIO = (int) Math
-            .round(FieldConstants.FIELD_LENGTH / FieldConstants.FIELD_WIDTH); // The field's length:width ratio so we can
+            .round(FieldConstants.FIELD_LENGTH / FieldConstants.FIELD_WIDTH); // The field's length:width ratio so we
+                                                                              // can
                                                                               // have "1x1" cells
 
     // The template for a field object (it's x, y, length, and width)
@@ -224,19 +225,15 @@ public class Auto {
     // GUI Methods
     private static void assignColor(double a, int max, JButton cell) { // For GUI
         if (a == 1 * max) {
-            cell.setBackground(new Color(Color.HSBtoRGB(0, 0, (float) ((a/max)))));
-        } else if (a > 0.8 * max) {
-            cell.setBackground(new Color(Color.HSBtoRGB(0, .99f, (float) ((a/max)))));
-        } else if (a > 0.65 * max) {
-            cell.setBackground(new Color(Color.HSBtoRGB(33f, .99f, (float) ((a/max)))));
+            cell.setBackground(new Color(Color.HSBtoRGB(0f, 0f, (float) (a / max))));
+        } else if (a > 0.9 * max) {
+            cell.setBackground(new Color(Color.HSBtoRGB(0.0f, 0.99f, (float) (a / max)))); // RED
         } else if (a > 0.5 * max) {
-            cell.setBackground(new Color(Color.HSBtoRGB(55f, .99f, (float) ((a/max)))));
-        } else if (a > 0.35 * max) {
-            cell.setBackground(new Color(Color.HSBtoRGB(115f, .99f, (float) ((a/max)))));
-        } else if (a > 0.15 * max) {
-            cell.setBackground(new Color(Color.HSBtoRGB(115f, 0f, (float) ((a/max)))));
+            cell.setBackground(new Color(Color.HSBtoRGB(0.167f, 0.99f, (float) (a / max)))); // YELLOW
+        } else if (a > 0.25 * max) {
+            cell.setBackground(new Color(Color.HSBtoRGB(0.333f, 0.99f, (float) (a / max)))); // GREEN
         } else {
-            cell.setBackground(new Color(Color.HSBtoRGB(115f, 0f, (float) ((a/max)))));
+            cell.setBackground(new Color(Color.HSBtoRGB(0f, 0f, (float) (a / max)))); // WHITE/DEFAULT
         }
     }
 

@@ -54,8 +54,8 @@ public class Auto {
     public static final String ANSI_YELLOW = "\u001B[33m"; // Apply the color yellow in Java terminal
 
     public static final int FIELD_SIZE_RATIO = (int) Math
-            .ceil(FieldConstants.FIELD_LENGTH / FieldConstants.FIELD_WIDTH); // The field's length:width ratio so we can
-                                                                             // have "1x1" cells
+            .round(FieldConstants.FIELD_LENGTH / FieldConstants.FIELD_WIDTH); // The field's length:width ratio so we can
+                                                                              // have "1x1" cells
 
     // The template for a field object (it's x, y, length, and width)
     // idk the origin yet
@@ -67,10 +67,9 @@ public class Auto {
     public Auto(int max_heuristic) {
         s = 5; // Scaling factor (1 : s meters) <-- (real : grid)
 
-        width = 2 * s * (int) Math.floor(FieldConstants.FIELD_WIDTH / 2) + 1; // (make them odd so it's centered)
-        length = 2 * s * (int) Math.floor(FieldConstants.FIELD_LENGTH / 2) + 1;
-
-        width *= FIELD_SIZE_RATIO; // For 1 x ~1 cells
+        // cols (x) cover FIELD_LENGTH, rows (y) cover FIELD_WIDTH — both at s cells/m
+        width = 2 * s * (int) Math.floor(FieldConstants.FIELD_LENGTH / 2) + 1; // (make them odd so it's centered)
+        length = 2 * s * (int) Math.floor(FieldConstants.FIELD_WIDTH / 2) + 1;
 
         max = max_heuristic;
 
@@ -89,8 +88,6 @@ public class Auto {
 
     // Create field method
     public void initializeConstantField() {
-        int rel_max = (int) Math.sqrt(((width - 1) / 2) * ((width - 1) / 2) + ((length - 1) / 2) * ((length - 1) / 2));
-
         for (FieldObject obj : FieldConstants.nogos) {
             // (81, 123) | Origin is bottom left
             int x = (int) Math.round(map(obj.x(), 0, FieldConstants.FIELD_LENGTH, 0, width));
@@ -248,7 +245,7 @@ public class Auto {
         constantview.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel gridPanel = new JPanel();
-        gridPanel.setLayout(new GridLayout(length, width / FIELD_SIZE_RATIO));
+        gridPanel.setLayout(new GridLayout(length, width));
 
         for (int y = 0; y < length; y++) {
             for (int x = 0; x < width; x++) {

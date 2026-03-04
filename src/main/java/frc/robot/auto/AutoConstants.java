@@ -1,4 +1,4 @@
-package frc.robot.util.constants;
+package frc.robot.auto;
 
 public final class AutoConstants {
   // ================================================================

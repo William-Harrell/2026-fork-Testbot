@@ -1,4 +1,4 @@
-package frc.robot.util.constants;
+package frc.robot.subsystems.intake;
 
 public final class IntakeConstants {
   public static final int DEPLOY_MOTOR_ID = 9;

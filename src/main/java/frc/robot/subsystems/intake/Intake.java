@@ -4,7 +4,6 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.intake.IntakeState.intake_state;
-import frc.robot.util.constants.IntakeConstants;
 
 public class Intake extends SubsystemBase {
   private final Deploy deploy;

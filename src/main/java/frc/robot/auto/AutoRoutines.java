@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
-import frc.robot.util.constants.AutoConstants;
 import frc.robot.util.constants.FieldConstants;
 
 // im crine

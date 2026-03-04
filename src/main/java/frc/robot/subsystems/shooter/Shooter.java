@@ -9,7 +9,6 @@ import frc.robot.subsystems.shooter.Physics.VisionAimedShot;
 import frc.robot.subsystems.shooter.ShooterState.shooter_state;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.util.constants.ShooterConstants;
 
 public class Shooter extends SubsystemBase {
   // Sub-subsystems

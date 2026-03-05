@@ -25,7 +25,7 @@ public class Roller {
 
     // Config stuff
     SparkMaxConfig rollerConfig = new SparkMaxConfig();
-    rollerConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(40);
+    rollerConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(30);
     rollerMotor.configure(
         rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }

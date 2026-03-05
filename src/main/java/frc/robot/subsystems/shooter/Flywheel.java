@@ -31,7 +31,8 @@ public class Flywheel {
     SparkMaxConfig flywheelConfig = new SparkMaxConfig();
     flywheelConfig
         .idleMode(IdleMode.kCoast)
-        .smartCurrentLimit(ShooterConstants.FLYWHEEL_CURRENT_LIMIT);
+        .smartCurrentLimit(ShooterConstants.FLYWHEEL_CURRENT_LIMIT)
+        .closedLoopRampRate(ShooterConstants.FLYWHEEL_RAMP_RATE);
 
     flywheelConfig
         .closedLoop

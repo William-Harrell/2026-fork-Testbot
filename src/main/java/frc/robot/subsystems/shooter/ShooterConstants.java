@@ -63,4 +63,7 @@ public final class ShooterConstants {
 
   /** Flywheel current limit */
   public static final int FLYWHEEL_CURRENT_LIMIT = 40; // Amps
+
+  /** Ramp rate for closed-loop spinup (seconds from 0 to full output) — limits inrush current */
+  public static final double FLYWHEEL_RAMP_RATE = 0.75; // seconds
 }

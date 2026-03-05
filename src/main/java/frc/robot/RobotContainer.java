@@ -97,8 +97,10 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.OI.DriverActionSet;
 import frc.robot.OI.XboxDriver;
 import frc.robot.auto.AutoRoutines;
+import frc.robot.commands.ClimberCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.SwerveCommands;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -162,6 +164,9 @@ public class RobotContainer {
 
   /** Intake subsystem - collects FUEL from the ground. */
   private final Intake intake;
+
+  /** Climber subsystem - extends and retracts the climbing arms. */
+  private final Climber climber;
 
   /**
    * Superstructure - coordinates multiple subsystems.
@@ -267,10 +272,11 @@ public class RobotContainer {
     vision = new Vision();
     swerve = new SwerveDrive(vision); // SwerveDrive needs vision for pose correction
     shooter = new Shooter(vision, swerve); // Shooter needs vision for targeting
-    intake = new Intake();  // DISABLED - Spark Max ID 9 not connected
+    intake = new Intake();
+    climber = new Climber();
 
     // Superstructure holds references to all subsystems for coordination
-    superstructure = new Superstructure(swerve, vision, shooter, intake);
+    superstructure = new Superstructure(swerve, vision, shooter, intake, climber);
     superstructure.doNothing(); // Just to get rid of the java warning temporarily
 
     // ================================================================
@@ -419,30 +425,38 @@ public class RobotContainer {
     > While deployed, click left bumper to toggle intake/outake (motor spin direction)
     */
 
-    // driverJoystick.orientAndShoot().onTrue();
-    // driverJoystick.climbUp().whileTrue();
-    // driverJoystick.climbUp().whileTrue();
-
-    // Only bind intake controls if intake hardware is connected
-    if (superstructure.getIntake() != null) {
-      driverJoystick
-          .toggleIntakeOutake()
-          .onTrue(IntakeCommands.toggleDirection(superstructure.getIntake()));
-      driverJoystick
-          .maintainDeployed()
-          .whileTrue(IntakeCommands.holdToIntakeCommand(superstructure.getIntake()));
-    }
-
     // ----------------------------------------------------------------
-    // INTAKE CONTROLS - DISABLED (Spark Max ID 9 not connected)
+    // INTAKE CONTROLS
     // ----------------------------------------------------------------
 
-    // Intake FUEL while trigger is held
-    // holdToIntakeCommand(): deploys intake, runs rollers, retracts when released
-    // driverJoystick.intake().whileTrue(intake.holdToIntakeCommand());
+    // A button: toggle deploy/retract (press once to extend, press again to retract)
+    driverJoystick
+        .toggleDeploy()
+        .onTrue(IntakeCommands.toggleDeployCommand(superstructure.getIntake()));
 
-    // Outtake (eject) FUEL while button is held
-    // driverJoystick.outtake().whileTrue(intake.outtakeCommand());
+    // Left bumper: toggle intake/outtake roller direction (while deployed)
+    driverJoystick
+        .toggleIntakeOutake()
+        .onTrue(IntakeCommands.toggleDirection(superstructure.getIntake()));
+
+    // Right trigger: hold to deploy + run intake, retract on release
+    driverJoystick
+        .maintainDeployed()
+        .whileTrue(IntakeCommands.holdToIntakeCommand(superstructure.getIntake()));
+
+    // ----------------------------------------------------------------
+    // CLIMBER CONTROLS
+    // ----------------------------------------------------------------
+
+    // D-pad up: extend climber while held
+    driverJoystick
+        .climbUp()
+        .whileTrue(ClimberCommands.extendCommand(superstructure.getClimber()));
+
+    // D-pad down: retract climber while held
+    driverJoystick
+        .climbDown()
+        .whileTrue(ClimberCommands.retractCommand(superstructure.getClimber()));
   }
 
   // ================================================================

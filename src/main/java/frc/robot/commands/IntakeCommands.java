@@ -13,6 +13,27 @@ public final class IntakeCommands {
     return Commands.runOnce(intake.getR()::toggleIntakeOutake);
   }
 
+  /**
+   * Toggle intake deploy/retract. Press once to deploy, press again to retract.
+   *
+   * @param intake The intake subsystem
+   * @return Command that toggles the deploy state
+   */
+  public static Command toggleDeployCommand(Intake intake) {
+    if (intake == null) return Commands.none();
+    return Commands.runOnce(
+        () -> {
+          if (intake.getD().isStowed()) {
+            intake.deployIntakeMechanism();
+          } else {
+            intake.getR().stopRollers();
+            intake.retractIntakeMechanism();
+          }
+        },
+        intake)
+        .withName("Toggle Deploy");
+  }
+
   // /** Command to run outtake while button held */
   // private Command outtakeCommand(Intake intake) {
   // return Commands.startEnd(intake.getR()::runOuttake,

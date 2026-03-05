@@ -52,8 +52,10 @@ public final class OI {
      */
     boolean isMovementCommanded();
 
-    // TODO implement these Triggers in the main code
     Trigger toggleIntakeOutake();
+
+    /** Toggle intake deploy/retract with a single button press */
+    Trigger toggleDeploy();
 
     Trigger maintainDeployed();
 
@@ -121,6 +123,11 @@ public final class OI {
     @Override
     public Trigger toggleIntakeOutake() {
       return stick.leftBumper();
+    }
+
+    @Override
+    public Trigger toggleDeploy() {
+      return stick.a();
     }
 
     @Override

@@ -192,13 +192,16 @@ public final class AutoCommands {
    */
   public static Command shootAllFuel(Shooter shooter, Intake intake) {
     return Commands.sequence(
-        // Spin up shooter
-        Commands.runOnce(shooter.getF()::spinUp, shooter),
-        Commands.waitSeconds(0.5), // Wait for shooter to spin up
+        // Set pitch angle + spin up to shoot RPM
+        Commands.runOnce(shooter::prepareDefaultShot, shooter),
+        // Wait until flywheel is at speed AND pitch is at target
+        Commands.waitUntil(shooter.getF()::isReadyToShoot),
         // Feed all FUEL
         IntakeCommands.feedCommand(intake),
+        // Give last FUEL time to exit barrel
+        Commands.waitSeconds(0.3),
         // Stop shooter
-        Commands.waitSeconds(0.5))
+        Commands.runOnce(shooter::stop, shooter))
         .withName("Shoot All FUEL");
   }
 
@@ -211,10 +214,11 @@ public final class AutoCommands {
    */
   public static Command shootOneFuel(Shooter shooter, Intake intake) {
     return Commands.sequence(
-        Commands.runOnce(shooter.getF()::spinUp, shooter),
-        Commands.waitSeconds(0.5),
+        Commands.runOnce(shooter::prepareDefaultShot, shooter),
+        Commands.waitUntil(shooter.getF()::isReadyToShoot),
         IntakeCommands.feedCommand(intake),
-        Commands.waitSeconds(0.3))
+        Commands.waitSeconds(0.3),
+        Commands.runOnce(shooter::stop, shooter))
         .withName("Shoot One FUEL");
   }
 

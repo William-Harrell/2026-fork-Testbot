@@ -54,6 +54,21 @@ public class Physics {
         || (active == 'R' && alliance.equals(Alliance.Red) && x <= ShooterConstants.RED_X));
   }
 
+  /**
+   * Check if our alliance's hub is currently active (accepting FUEL for points).
+   *
+   * <p>The FMS broadcasts a game-specific message each period: 'B' = Blue hub active, 'R' = Red
+   * hub active. Shooting into an inactive hub scores zero points.
+   */
+  public boolean isHubActive() {
+    refreshAlliance();
+    String gameData = DriverStation.getGameSpecificMessage();
+    if (gameData.length() == 0) return true; // No FMS data (practice/testing) — assume active
+    char active = gameData.charAt(0);
+    return (active == 'B' && alliance.equals(Alliance.Blue))
+        || (active == 'R' && alliance.equals(Alliance.Red));
+  }
+
   /** Calculate angle from robot heading to shooter direction. */
   private Rotation2d robotToShooter() {
     return Rotation2d.fromDegrees(0.0);

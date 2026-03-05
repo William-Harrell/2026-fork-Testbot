@@ -55,6 +55,9 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("Shooter/ReadyToShoot", flywheel.isReadyToShoot());
     physics.hubDistance().ifPresent(d -> SmartDashboard.putNumber("Shooter/HubDistance", d));
 
+    // Hub active/inactive (FMS game-specific message)
+    SmartDashboard.putBoolean("Shooter/HubActive", physics.isHubActive());
+
     // Vision-related (can-shoot? & what the shot would look like)
     SmartDashboard.putBoolean("Shooter/VisionAvailable", physics.hasReliableVisionTarget());
     if (physics.hasReliableVisionTarget()) {

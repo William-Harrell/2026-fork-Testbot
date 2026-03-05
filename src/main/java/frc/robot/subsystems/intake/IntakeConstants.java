@@ -4,6 +4,9 @@ public final class IntakeConstants {
   public static final int DEPLOY_MOTOR_ID = 9;
   public static final int ROLLER_MOTOR_ID = 10;
 
+  // Hex encoder (REV Through Bore, 8192 CPR)
+  public static final int ENCODER_CPR = 8192;
+
   public static final double DEPLOYED_POSITION = 1.0;
   public static final double STOWED_POSITION = 0.0;
   public static final double POSITION_TOLERANCE = 0.05;

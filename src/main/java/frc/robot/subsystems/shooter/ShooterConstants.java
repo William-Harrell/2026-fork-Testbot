@@ -21,11 +21,22 @@ public final class ShooterConstants {
   // SHOOTER HARDWARE
   // ================================================================
 
-  /** PWM channel for pitch servo */
-  public static final int PITCH_SERVO_CHANNEL = 0; // (placeholder TODO)
-
   /** CAN ID for flywheel motor */
   public static final int FLYWHEEL_MOTOR_ID = 11; // (placeholder TODO)
+
+  /** CAN ID for hood motor */
+  public static final int HOOD_MOTOR_ID = 12; // (placeholder TODO)
+
+  // Hex encoder (REV Through Bore, 8192 CPR)
+  public static final int ENCODER_CPR = 8192;
+
+  /** Degrees per encoder rotation (based on hood gear ratio) — TODO: measure on real robot */
+  public static final double HOOD_DEGREES_PER_ROTATION = 10.0;
+
+  /** Hood PID gains */
+  public static final double HOOD_kP = 0.05; // TODO: tune
+  public static final double HOOD_kI = 0.0;
+  public static final double HOOD_kD = 0.0;
 
   // ================================================================
   // PITCH SERVO CONFIGURATION

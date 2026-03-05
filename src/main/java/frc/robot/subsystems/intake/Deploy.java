@@ -5,6 +5,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,7 +21,7 @@ public class Deploy {
   public Deploy(SparkMax myDM) {
     // Instance vars
     deployMotor = myDM;
-    deployEncoder = deployMotor.getEncoder();
+    deployEncoder = deployMotor.getAlternateEncoder();
     deployController = deployMotor.getClosedLoopController();
 
     targetPosition = IntakeConstants.STOWED_POSITION;
@@ -28,8 +29,10 @@ public class Deploy {
     // Personal Configuration
     SparkMaxConfig deployConfig = new SparkMaxConfig();
     deployConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(30);
-
-    deployConfig.closedLoop.p(IntakeConstants.DEPLOY_kP).i(0).d(0);
+    deployConfig.alternateEncoder.countsPerRevolution(IntakeConstants.ENCODER_CPR);
+    deployConfig.closedLoop
+        .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+        .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
 
     deployMotor.configure(
         deployConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

@@ -89,4 +89,10 @@ public final class SwerveConstants {
 
   public static final double AUTO_THETA_kP = 4.0; // Rotation correction
   public static final double AUTO_XY_kP = 2.0; // Position correction
+
+  // VISION AIM - PID for rotating to face a target (hub/AprilTag)
+  public static final double AIM_kP = 0.06; // TODO: tune — (rad/s) per degree of error
+  public static final double AIM_kI = 0.0;
+  public static final double AIM_kD = 0.004;
+  public static final double AIM_TOLERANCE_DEG = 2.0; // degrees — "close enough" to target
 }

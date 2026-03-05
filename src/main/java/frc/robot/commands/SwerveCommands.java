@@ -67,16 +67,20 @@ package frc.robot.commands;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.subsystems.shooter.Physics;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.util.constants.DrivingConstants;
 import java.util.Set;
+import java.util.function.DoubleSupplier;
 
 /**
  * ======================================================================== SWERVE COMMANDS -
@@ -384,4 +388,98 @@ public final class SwerveCommands {
       return Set.of(swerve);
     }
   }
+  // ORIENT TO HUB COMMAND
+
+  //
+  // Rotates the robot so the shooter faces the hub (scoring target),
+  // using AprilTag pose from PhotonVision to compute heading error.
+  //
+  // Driver retains full translation control — only rotation is overridden.
+  // If vision is lost mid-command, rotation output stops (omega = 0).
+  //
+  // [CONTROL LOOP]
+  //   robotToHub() -> heading error (degrees)
+  //       -> PIDController -> omega (rad/s)
+  //           -> swerve.drive(driverTranslation, omega, fieldRelative, openLoop)
+  //
+
+  /**
+   * Command that rotates the robot to face the hub using AprilTag vision, while
+   * the driver retains full translation control.
+   *
+   * <p>Bind to a button with whileTrue() — robot snaps to face the hub while
+   * held, and returns to normal rotation control when released.
+   *
+   * @param swerve The swerve drive subsystem
+   * @param physics The shooter physics subsystem (provides heading error)
+   * @param forward Supplier for driver forward input (m/s scaled)
+   * @param strafe  Supplier for driver strafe input (m/s scaled)
+   */
+  public static class OrientToHubCommand extends Command {
+
+    private final SwerveDrive swerve;
+    private final Physics physics;
+    private final DoubleSupplier forward;
+    private final DoubleSupplier strafe;
+    private final PIDController thetaController;
+
+    public OrientToHubCommand(
+        SwerveDrive swerve, Physics physics, DoubleSupplier forward, DoubleSupplier strafe) {
+      this.swerve = swerve;
+      this.physics = physics;
+      this.forward = forward;
+      this.strafe = strafe;
+
+      thetaController =
+          new PIDController(SwerveConstants.AIM_kP, SwerveConstants.AIM_kI, SwerveConstants.AIM_kD);
+      thetaController.setSetpoint(0.0); // want zero heading error
+      thetaController.setTolerance(SwerveConstants.AIM_TOLERANCE_DEG);
+      thetaController.enableContinuousInput(-180.0, 180.0);
+
+      addRequirements(swerve);
+      setName("OrientToHub");
+    }
+
+    @Override
+    public void initialize() {
+      thetaController.reset();
+    }
+
+    @Override
+    public void execute() {
+      double omega = 0.0;
+
+      if (physics.hasReliableVisionTarget()) {
+        double errorDeg = physics.robotToHub();
+        omega = thetaController.calculate(errorDeg);
+      }
+
+      Translation2d translation =
+          new Translation2d(
+              forward.getAsDouble() * SwerveConstants.MAX_SPEED,
+              strafe.getAsDouble() * SwerveConstants.MAX_SPEED);
+
+      swerve.drive(translation, omega, true, DrivingConstants.OPEN_LOOP);
+
+      SmartDashboard.putBoolean("Aim/Locked", thetaController.atSetpoint());
+      SmartDashboard.putBoolean("Aim/VisionAvailable", physics.hasReliableVisionTarget());
+      SmartDashboard.putNumber("Aim/ErrorDeg", physics.robotToHub());
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+      swerve.drive(new Translation2d(), 0, true, DrivingConstants.OPEN_LOOP);
+    }
+
+    @Override
+    public boolean isFinished() {
+      return false; // runs until button released
+    }
+
+    @Override
+    public Set<Subsystem> getRequirements() {
+      return Set.of(swerve);
+    }
+  }
+
 } // End of SwerveCommands class

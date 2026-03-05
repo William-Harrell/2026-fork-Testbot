@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.vision.Config.CameraConfig;
 import frc.robot.subsystems.vision.Vision.VisionUpdate;
-import frc.robot.util.constants.VisionConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

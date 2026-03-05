@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.shooter.Physics.VisionAimedShot;
 import frc.robot.subsystems.shooter.Shooter;
-import frc.robot.util.constants.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterConstants;
 
 public class ShooterCommands {
   private ShooterCommands() {}

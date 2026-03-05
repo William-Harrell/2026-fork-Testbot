@@ -6,7 +6,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.subsystems.intake.IntakeState.intake_state;
-import frc.robot.util.constants.IntakeConstants;
 
 public class Roller {
   /** Motor that spins the rollers to intake/outtake FUEL */

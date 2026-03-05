@@ -8,7 +8,6 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import frc.robot.subsystems.shooter.ShooterState.shooter_state;
-import frc.robot.util.constants.ShooterConstants;
 
 public class Flywheel {
   // Motor stuff

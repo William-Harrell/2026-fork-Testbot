@@ -16,8 +16,13 @@ public class Vision {
       double avgDistanceMeters,
       double avgAmbiguity) {}
 
+      public static void ieasnd() {
+
+      }
+
   private final AprilTagFieldLayout fieldLayout;
   private Photon photon;
+  private Limelight limelight;
 
   public Vision() {
     // Load tags and let us know if it fails. don't screw w/ program @ runtime.
@@ -30,10 +35,15 @@ public class Vision {
     }
 
     photon = new Photon(Optional.of(fieldLayout));
+    limelight = new Limelight(VisionConstants.LIMELIGHT_NAME);
   }
 
   public Photon getP() {
     return photon;
+  }
+
+  public Limelight getL() {
+    return limelight;
   }
 
   /**
@@ -43,6 +53,7 @@ public class Vision {
    * @return Robot pose if valid detection available, empty otherwise
    */
   public Optional<Pose2d> getPose2d(Pose2d robotPose) {
+    // TODO LIMELIGHT VERSION HERE
     return photon.getBestVisionUpdate(robotPose).map(VisionUpdate::pose2d);
   }
 
@@ -53,7 +64,8 @@ public class Vision {
    * @return 3D pose if available
    */
   public Optional<Pose3d> getPose3d(Pose2d robotPose) {
-    return photon.getBestVisionUpdate(robotPose).map(update -> update.pose3d());
+     // return 
+    return photon.getBestVisionUpdate(robotPose).map(VisionUpdate::pose3d);
   }
 
   /**
@@ -63,6 +75,7 @@ public class Vision {
    * @return Complete vision update with confidence metrics
    */
   public Optional<VisionUpdate> getBestVisionUpdateRaw(Pose2d robotPose) {
+     // TODO LIMELIGHT VERSION HERE
     return photon.getBestVisionUpdate(robotPose);
   }
 }

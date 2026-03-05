@@ -32,6 +32,7 @@ public final class VisionConstants {
   // ================================================================
   // Camera names (must match what's in PhotonVision)
   public static final String[] CAMERA_NAMES = {"front_cam", "back_left_cam", "back_right_cam"};
+  public static final String LIMELIGHT_NAME = "ye";
 
   public static final double AMBIGUITY_THRESHOLD = 0.2;
 

@@ -108,7 +108,7 @@ public class Photon {
         targets.stream()
             .mapToDouble(t -> t.getBestCameraToTarget().getTranslation().getNorm())
             .average()
-            .orElse(5.0);
+            .orElse(VisionConstants.MAX_TAG_DISTANCE);
     if (avgDistance > VisionConstants.MAX_TAG_DISTANCE) return Optional.empty();
 
     SmartDashboard.putNumber("Vision/" + camera.getName() + "/TagCount", tagCount);

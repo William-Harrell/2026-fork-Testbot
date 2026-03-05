@@ -267,11 +267,10 @@ public class RobotContainer {
     vision = new Vision();
     swerve = new SwerveDrive(vision); // SwerveDrive needs vision for pose correction
     shooter = new Shooter(vision, swerve); // Shooter needs vision for targeting
-    // intake = new Intake();  // DISABLED - Spark Max ID 9 not connected
-    intake = null;
+    intake = new Intake();  // DISABLED - Spark Max ID 9 not connected
 
     // Superstructure holds references to all subsystems for coordination
-    superstructure = new Superstructure(swerve, vision, shooter, null);
+    superstructure = new Superstructure(swerve, vision, shooter, intake);
     superstructure.doNothing(); // Just to get rid of the java warning temporarily
 
     // ================================================================

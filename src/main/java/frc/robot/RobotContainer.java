@@ -563,7 +563,7 @@ public class RobotContainer {
       // Lock the selection at the start of auto to prevent mid-match changes
       dipSwitchSelector.lockSelection();
       int selection = dipSwitchSelector.getSelection();
-      return AutoRoutines.getAutoFromSelection(selection, swerve, intake, shooter);
+      return AutoRoutines.getAutoFromSelection(selection, swerve, intake, shooter, vision);
     } else {
       return autoChooser.getSelected();
     }

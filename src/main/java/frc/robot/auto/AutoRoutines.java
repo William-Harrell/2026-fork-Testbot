@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.constants.FieldConstants;
 
 // im crine
@@ -95,6 +96,25 @@ public final class AutoRoutines {
         farSide ? FieldConstants.NEUTRAL_FAR_OFFSET : FieldConstants.NEUTRAL_CLOSE_OFFSET;
     double x = FieldConstants.CENTER_X + (isRedAlliance() ? -offset : offset);
     return new Pose2d(x, FieldConstants.CENTER_Y, Rotation2d.fromDegrees(0));
+  }
+
+  // ================================================================
+  // VISION POSE SEEDING
+  // ================================================================
+
+  /**
+   * Snap the pose estimator to the best available AprilTag reading.
+   *
+   * <p>If vision can't see any tags, the existing odometry pose is kept unchanged.
+   */
+  static Command seedPoseFromVision(SwerveDrive swerve, Vision vision) {
+    return Commands.runOnce(
+            () ->
+                vision
+                    .getBestVisionUpdateRaw(swerve.getPose())
+                    .ifPresent(update -> swerve.resetPose(update.pose2d())),
+            swerve)
+        .withName("Seed Pose From Vision");
   }
 
   // ================================================================
@@ -534,34 +554,47 @@ public final class AutoRoutines {
    * @return The selected autonomous command
    */
   public static Command getAutoFromSelection(
-      int selection, SwerveDrive swerve, Intake intake, Shooter shooter) {
+      int selection, SwerveDrive swerve, Intake intake, Shooter shooter, Vision vision) {
+    Command routine;
     switch (selection) {
       case AutoConstants.AUTO_DO_NOTHING:
-        return doNothing();
+        return doNothing(); // No driving — skip pose seed
       case AutoConstants.AUTO_SCORE_AND_COLLECT:
-        return scoreAndCollectAuto(swerve, intake, shooter);
+        routine = scoreAndCollectAuto(swerve, intake, shooter);
+        break;
       case AutoConstants.AUTO_DEPOT_RAID:
-        return depotRaidAuto(swerve, intake, shooter);
+        routine = depotRaidAuto(swerve, intake, shooter);
+        break;
       case AutoConstants.AUTO_FAR_NEUTRAL:
-        return farNeutralAuto(swerve, intake, shooter);
+        routine = farNeutralAuto(swerve, intake, shooter);
+        break;
       case AutoConstants.AUTO_PRELOAD_ONLY:
-        return preloadOnlyAuto(swerve, intake, shooter);
+        routine = preloadOnlyAuto(swerve, intake, shooter);
+        break;
       case AutoConstants.AUTO_MAX_CYCLES:
-        return maxCyclesAuto(swerve, intake, shooter);
+        routine = maxCyclesAuto(swerve, intake, shooter);
+        break;
       case AutoConstants.AUTO_CLIMB_SUPPORT:
-        return climbSupportAuto(swerve, intake, shooter);
+        routine = climbSupportAuto(swerve, intake, shooter);
+        break;
       case AutoConstants.AUTO_WIN_AUTO:
-        return winAutoAuto(swerve, intake, shooter);
+        routine = winAutoAuto(swerve, intake, shooter);
+        break;
       case AutoConstants.AUTO_DUAL_CYCLE:
-        return dualCycleAuto(swerve, intake, shooter);
+        routine = dualCycleAuto(swerve, intake, shooter);
+        break;
       case AutoConstants.AUTO_DENY_FUEL:
-        return denyFuelAuto(swerve, intake, shooter);
+        routine = denyFuelAuto(swerve, intake, shooter);
+        break;
       case AutoConstants.AUTO_CENTER_CONTROL:
-        return centerControlAuto(swerve, intake, shooter);
+        routine = centerControlAuto(swerve, intake, shooter);
+        break;
       case AutoConstants.AUTO_ALLIANCE_SUPPORT:
-        return allianceSupportAuto(swerve, intake, shooter);
+        routine = allianceSupportAuto(swerve, intake, shooter);
+        break;
       default:
         return doNothing();
     }
+    return Commands.sequence(seedPoseFromVision(swerve, vision), routine);
   }
 }

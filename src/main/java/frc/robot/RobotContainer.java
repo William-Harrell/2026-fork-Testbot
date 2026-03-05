@@ -312,10 +312,13 @@ public class RobotContainer {
             () -> applySpeedCurve(driverJoystick.turn())); // Rotation input
     swerve.setDefaultCommand(teleopDriveCommand);
 
-    // Set initial gyro heading
-    // 180 deg because robot typically starts facing YOUR driver station
-    // (so "forward" on joystick pushes robot toward opposite alliance)
-    swerve.resetYaw(Rotation2d.fromDegrees(180));
+    // Set initial gyro heading based on alliance
+    // Blue alliance: 180° (robot faces your driver station, forward = toward red)
+    // Red alliance: 0° (mirrored field, forward = toward blue)
+    boolean isRed =
+        DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+            == DriverStation.Alliance.Red;
+    swerve.resetYaw(Rotation2d.fromDegrees(isRed ? 0 : 180));
 
     // Put the teleop command on SmartDashboard for debugging
     SmartDashboard.putData("TeleOp Command", teleopDriveCommand);

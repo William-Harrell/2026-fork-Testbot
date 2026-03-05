@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Physics.VisionAimedShot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
@@ -102,5 +103,25 @@ public class ShooterCommands {
   /** Command to hold flywheel at idle speed (for warmup). */
   public Command idleCommand(Shooter shooter) {
     return Commands.run(shooter.getF()::spinUpIdle, shooter).withName("Idle Shooter");
+  }
+
+  /**
+   * Hold-to-shoot command for teleop.
+   *
+   * <p>While button is held: spins up flywheel + sets pitch, waits until ready, then feeds FUEL.
+   * On release: stops shooter and rollers.
+   */
+  public static Command shootCommand(Shooter shooter, Intake intake) {
+    if (shooter == null || intake == null) return Commands.none();
+    return Commands.sequence(
+            Commands.runOnce(shooter::prepareDefaultShot, shooter),
+            Commands.waitUntil(shooter.getF()::isReadyToShoot),
+            Commands.run(intake.getR()::feedToShooter, intake))
+        .finallyDo(
+            interrupted -> {
+              shooter.stop();
+              intake.getR().stopRollers();
+            })
+        .withName("Shoot");
   }
 }

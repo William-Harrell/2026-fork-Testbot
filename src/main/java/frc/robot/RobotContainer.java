@@ -99,6 +99,7 @@ import frc.robot.OI.XboxDriver;
 import frc.robot.auto.AutoRoutines;
 import frc.robot.commands.ClimberCommands;
 import frc.robot.commands.IntakeCommands;
+import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.intake.Intake;
@@ -460,6 +461,17 @@ public class RobotContainer {
     driverJoystick
         .climbDown()
         .whileTrue(ClimberCommands.retractCommand(superstructure.getClimber()));
+
+    // ----------------------------------------------------------------
+    // SHOOTER CONTROLS
+    // ----------------------------------------------------------------
+
+    // X button: hold to spin up + shoot, release to stop
+    driverJoystick
+        .orientAndShoot()
+        .whileTrue(
+            ShooterCommands.shootCommand(
+                superstructure.getShooter(), superstructure.getIntake()));
   }
 
   // ================================================================

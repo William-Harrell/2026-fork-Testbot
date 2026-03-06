@@ -17,7 +17,7 @@ public class RollerBelt extends SubsystemBase {
     motor2 = new SparkMax(RollerBeltConstants.BELT_MOTOR_2_ID, MotorType.kBrushless);
 
     SparkMaxConfig config = new SparkMaxConfig();
-    config.idleMode(IdleMode.kCoast).smartCurrentLimit(RollerBeltConstants.CURRENT_LIMIT);
+    config.idleMode(IdleMode.kBrake).smartCurrentLimit(RollerBeltConstants.CURRENT_LIMIT);
 
     motor1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     motor2.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

@@ -1,49 +1,52 @@
 package frc.robot.subsystems.shooter;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.subsystems.shooter.ShooterState.shooter_state;
 
 public class Flywheel {
-  // Motor stuff
-  private final SparkMax flywheelMotor;
-  private final RelativeEncoder flywheelEncoder;
-  private final SparkClosedLoopController flywheelController;
+  private final TalonFX flywheelMotor1;
+  private final TalonFX flywheelMotor2;
+  private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0);
   private ShooterState state_machine;
   private final Orientation orientation;
 
-  // other
   private double targetFlywheelRPM = 0.0;
 
-  public Flywheel(SparkMax motor, Orientation myO) {
-    // Instance vars
-    flywheelMotor = motor;
-    flywheelEncoder = flywheelMotor.getEncoder();
-    flywheelController = flywheelMotor.getClosedLoopController();
+  public Flywheel(TalonFX motor1, TalonFX motor2, Orientation myO) {
+    flywheelMotor1 = motor1;
+    flywheelMotor2 = motor2;
     orientation = myO;
 
-    // Personal config
-    SparkMaxConfig flywheelConfig = new SparkMaxConfig();
-    flywheelConfig
-        .idleMode(IdleMode.kCoast)
-        .smartCurrentLimit(ShooterConstants.FLYWHEEL_CURRENT_LIMIT)
-        .closedLoopRampRate(ShooterConstants.FLYWHEEL_RAMP_RATE);
+    TalonFXConfiguration config = new TalonFXConfiguration();
+    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config.CurrentLimits.StatorCurrentLimit = ShooterConstants.FLYWHEEL_CURRENT_LIMIT;
+    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
+    // TODO: PID gains need re-tuning for TalonFX (units: V/RPS_error for kP, V/RPS for kV)
+    config.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
+    config.Slot0.kI = ShooterConstants.FLYWHEEL_kI;
+    config.Slot0.kD = ShooterConstants.FLYWHEEL_kD;
+    config.Slot0.kV = ShooterConstants.FLYWHEEL_kFF;
 
-    flywheelConfig
-        .closedLoop
-        .p(ShooterConstants.FLYWHEEL_kP)
-        .i(ShooterConstants.FLYWHEEL_kI)
-        .d(ShooterConstants.FLYWHEEL_kD)
-        .feedForward
-        .kV(ShooterConstants.FLYWHEEL_kFF);
+    flywheelMotor1.getConfigurator().apply(config);
 
-    flywheelMotor.configure(
-        flywheelConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    // Motor 2 faces the opposite side of the ball — TODO: verify invert direction on real robot
+    TalonFXConfiguration config2 = new TalonFXConfiguration();
+    config2.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config2.CurrentLimits.StatorCurrentLimit = ShooterConstants.FLYWHEEL_CURRENT_LIMIT;
+    config2.CurrentLimits.StatorCurrentLimitEnable = true;
+    config2.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
+    config2.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
+    config2.Slot0.kI = ShooterConstants.FLYWHEEL_kI;
+    config2.Slot0.kD = ShooterConstants.FLYWHEEL_kD;
+    config2.Slot0.kV = ShooterConstants.FLYWHEEL_kFF;
+    config2.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    flywheelMotor2.getConfigurator().apply(config2);
   }
 
   public void setStateMachine(ShooterState sm) {
@@ -59,10 +62,13 @@ public class Flywheel {
     targetFlywheelRPM = rpm;
 
     if (rpm <= 0) {
-      flywheelMotor.set(0);
+      flywheelMotor1.set(0);
+      flywheelMotor2.set(0);
       state_machine.set(shooter_state.IDLE);
     } else {
-      flywheelController.setSetpoint(rpm, SparkMax.ControlType.kVelocity);
+      double targetRPS = rpm / 60.0;
+      flywheelMotor1.setControl(velocityRequest.withVelocity(targetRPS));
+      flywheelMotor2.setControl(velocityRequest.withVelocity(targetRPS));
       state_machine.set(shooter_state.SPINNING_UP);
     }
   }
@@ -89,7 +95,7 @@ public class Flywheel {
    * @return Current velocity in RPM
    */
   public double getFlywheelRPM() {
-    return flywheelEncoder.getVelocity();
+    return flywheelMotor1.getVelocity().getValueAsDouble() * 60.0;
   }
 
   /**

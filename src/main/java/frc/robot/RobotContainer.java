@@ -98,11 +98,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.OI.DriverActionSet;
 import frc.robot.OI.XboxDriver;
 import frc.robot.auto.AutoRoutines;
-import frc.robot.commands.ClimberCommands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.SwerveCommands;
-import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.rollerbelt.RollerBelt;
 import frc.robot.subsystems.intake.Intake;
@@ -168,9 +166,6 @@ public class RobotContainer {
 
   /** Intake subsystem - collects FUEL from the ground. */
   private final Intake intake;
-
-  /** Climber subsystem - extends and retracts the climbing arms. */
-  private final Climber climber;
 
   /** Hopper subsystem - feeds FUEL from storage to shooter. */
   private final Hopper hopper;
@@ -283,12 +278,11 @@ public class RobotContainer {
     swerve = new SwerveDrive(vision); // SwerveDrive needs vision for pose correction
     shooter = new Shooter(vision, swerve); // Shooter needs vision for targeting
     intake = new Intake();
-    climber = new Climber();
     hopper = new Hopper();
     rollerBelt = new RollerBelt();
 
     // Superstructure holds references to all subsystems for coordination
-    superstructure = new Superstructure(swerve, vision, shooter, intake, climber);
+    superstructure = new Superstructure(swerve, vision, shooter, intake);
     superstructure.doNothing(); // Just to get rid of the java warning temporarily
 
     // ================================================================
@@ -463,25 +457,6 @@ public class RobotContainer {
                 Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt)));
 
     // ----------------------------------------------------------------
-    // CLIMBER CONTROLS
-    // ----------------------------------------------------------------
-
-    // D-pad up: climb to Level 3 while held
-    driverJoystick
-        .climbUp()
-        .whileTrue(ClimberCommands.climbToLevel3Command(superstructure.getClimber()));
-
-    // D-pad down: retract climber while held
-    driverJoystick
-        .climbDown()
-        .whileTrue(ClimberCommands.retractCommand(superstructure.getClimber()));
-
-    // D-pad left: climb to Level 2 while held
-    driverJoystick
-        .climbLevel2()
-        .whileTrue(ClimberCommands.climbToLevel2Command(superstructure.getClimber()));
-
-    // ----------------------------------------------------------------
     // SHOOTER CONTROLS
     // ----------------------------------------------------------------
 
@@ -520,10 +495,7 @@ public class RobotContainer {
   private void registerAutoRoutines() {
     autoChooser.setDefaultOption("0: Do Nothing", AutoRoutines.doNothing());
     autoChooser.addOption(
-        "1: Score, Collect & Climb",
-        AutoRoutines.scoreCollectAndClimbAuto(swerve, intake, shooter, climber));
-    autoChooser.addOption(
-        "2: Quick Climb", AutoRoutines.quickClimbAuto(swerve, intake, shooter, climber));
+        "1: Score & Collect", AutoRoutines.scoreCollectAuto(swerve, intake, shooter));
     autoChooser.addOption(
         "3: Preload Only", AutoRoutines.preloadOnlyAuto(swerve, intake, shooter));
   }
@@ -557,7 +529,7 @@ public class RobotContainer {
       // Lock the selection at the start of auto to prevent mid-match changes
       dipSwitchSelector.lockSelection();
       int selection = dipSwitchSelector.getSelection();
-      return AutoRoutines.getAutoFromSelection(selection, swerve, intake, shooter, climber, vision);
+      return AutoRoutines.getAutoFromSelection(selection, swerve, intake, shooter, vision);
     } else {
       return autoChooser.getSelected();
     }

@@ -1,34 +1,14 @@
 package frc.robot.subsystems.skidplate;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/** SkidPlate subsystem — no motor (passive mechanism). */
 public class SkidPlate extends SubsystemBase {
-  private final SparkMax motor;
+  public SkidPlate() {}
 
-  public SkidPlate() {
-    motor = new SparkMax(SkidPlateConstants.MOTOR_ID, MotorType.kBrushless);
+  public void deploy() {}
 
-    SparkMaxConfig config = new SparkMaxConfig();
-    config.idleMode(IdleMode.kBrake).smartCurrentLimit(SkidPlateConstants.CURRENT_LIMIT);
+  public void retract() {}
 
-    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-  }
-
-  public void deploy() {
-    motor.set(SkidPlateConstants.DEPLOY_SPEED);
-  }
-
-  public void retract() {
-    motor.set(SkidPlateConstants.RETRACT_SPEED);
-  }
-
-  public void stop() {
-    motor.set(0);
-  }
+  public void stop() {}
 }

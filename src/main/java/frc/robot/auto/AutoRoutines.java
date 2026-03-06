@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -62,18 +61,6 @@ public final class AutoRoutines {
   }
 
   // ================================================================
-  // AUTO CLIMB helper
-  // ================================================================
-
-  private static Command autoClimb(SwerveDrive swerve, Climber climber) {
-    return Commands.sequence(
-        AutoCommands.driveToPose(swerve, getTowerPose()),
-        Commands.runOnce(climber::extend, climber),
-        Commands.waitUntil(climber::isExtended).withTimeout(AutoConstants.CLIMB_TIMEOUT),
-        Commands.runOnce(climber::stop, climber));
-  }
-
-  // ================================================================
   // MODE 0: DO NOTHING
   // ================================================================
 
@@ -84,13 +71,12 @@ public final class AutoRoutines {
   }
 
   // ================================================================
-  // MODE 1: SCORE, COLLECT & CLIMB
+  // MODE 1: SCORE & COLLECT
   // ================================================================
 
-  public static Command scoreCollectAndClimbAuto(
-      SwerveDrive swerve, Intake intake, Shooter shooter, Climber climber) {
+  public static Command scoreCollectAuto(SwerveDrive swerve, Intake intake, Shooter shooter) {
     return Commands.sequence(
-            AutoCommands.logMessage("Mode 1: Score, Collect & Climb"),
+            AutoCommands.logMessage("Mode 1: Score & Collect"),
 
             // Phase 1: Shoot preload
             AutoCommands.shootAllFuel(shooter, intake),
@@ -110,24 +96,8 @@ public final class AutoRoutines {
             // Phase 3: Return and shoot
             AutoCommands.driveToPose(swerve, getShootingPose()),
             AutoCommands.shootAllFuel(shooter, intake),
-
-            // Phase 4: Climb
-            autoClimb(swerve, climber),
             AutoCommands.logMessage("Mode 1 Complete"))
-        .withName("1: Score, Collect & Climb");
-  }
-
-  // ================================================================
-  // MODE 2: QUICK CLIMB
-  // ================================================================
-
-  public static Command quickClimbAuto(SwerveDrive swerve, Intake intake, Shooter shooter, Climber climber) {
-    return Commands.sequence(
-            AutoCommands.logMessage("Mode 2: Quick Climb"),
-            AutoCommands.shootAllFuel(shooter, intake),
-            autoClimb(swerve, climber),
-            AutoCommands.logMessage("Mode 2 Complete"))
-        .withName("2: Quick Climb");
+        .withName("1: Score & Collect");
   }
 
   // ================================================================
@@ -149,16 +119,13 @@ public final class AutoRoutines {
   // ================================================================
 
   public static Command getAutoFromSelection(
-      int selection, SwerveDrive swerve, Intake intake, Shooter shooter, Climber climber, Vision vision) {
+      int selection, SwerveDrive swerve, Intake intake, Shooter shooter, Vision vision) {
     Command routine;
     switch (selection) {
       case AutoConstants.AUTO_DO_NOTHING:
         return doNothing();
       case AutoConstants.AUTO_SCORE_COLLECT_CLIMB:
-        routine = scoreCollectAndClimbAuto(swerve, intake, shooter, climber);
-        break;
-      case AutoConstants.AUTO_QUICK_CLIMB:
-        routine = quickClimbAuto(swerve, intake, shooter, climber);
+        routine = scoreCollectAuto(swerve, intake, shooter);
         break;
       case AutoConstants.AUTO_PRELOAD_ONLY:
         routine = preloadOnlyAuto(swerve, intake, shooter);

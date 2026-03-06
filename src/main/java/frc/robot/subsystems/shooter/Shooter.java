@@ -1,7 +1,8 @@
 package frc.robot.subsystems.shooter;
 
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.shooter.Physics.VisionAimedShot;
@@ -19,11 +20,13 @@ public class Shooter extends SubsystemBase {
   public Shooter(Vision vision, SwerveDrive swerve) {
     // Intra (w/ overload constructors)
     // Investigate what u don't know (ctrl+click)
-    orientation = new Orientation(new SparkMax(ShooterConstants.HOOD_MOTOR_ID, MotorType.kBrushless));
+    orientation = new Orientation(new SparkFlex(ShooterConstants.HOOD_MOTOR_ID, MotorType.kBrushless));
     physics = new Physics(vision, swerve); // this guy really just wants ALL the fancy stuff huh
     flywheel =
         new Flywheel( // Just so its pretty
-            new SparkMax(ShooterConstants.FLYWHEEL_MOTOR_ID, MotorType.kBrushless), orientation);
+            new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID),
+            new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_2_ID),
+            orientation);
     state_machine = new ShooterState(flywheel);
     flywheel.setStateMachine(state_machine);
   }

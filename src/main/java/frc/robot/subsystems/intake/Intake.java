@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -12,7 +13,9 @@ public class Intake extends SubsystemBase {
 
   public Intake() {
     state_machine = new IntakeState();
-    deploy = new Deploy(new SparkMax(IntakeConstants.DEPLOY_MOTOR_ID, MotorType.kBrushless));
+    deploy = new Deploy(
+        new SparkFlex(IntakeConstants.DEPLOY_MOTOR_ID, MotorType.kBrushless),
+        new SparkFlex(IntakeConstants.DEPLOY_MOTOR_2_ID, MotorType.kBrushless));
     roller =
         new Roller(
             new SparkMax(IntakeConstants.ROLLER_MOTOR_ID, MotorType.kBrushless),

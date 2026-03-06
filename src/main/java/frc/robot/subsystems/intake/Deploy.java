@@ -4,49 +4,53 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-/** Motor that deploys/retracts the intake mechanism */
+/** Two Vortex (SparkFlex) motors that deploy/retract the intake mechanism */
 public class Deploy {
-  private final SparkMax deployMotor;
+  private final SparkFlex deployMotor;
+  private final SparkFlex deployMotor2;
   private final RelativeEncoder deployEncoder;
   private final SparkClosedLoopController deployController;
   private double targetPosition;
 
-  /** {@code myDM} is the deploy motor */
-  public Deploy(SparkMax myDM) {
-    // Instance vars
-    deployMotor = myDM;
-    deployEncoder = deployMotor.getAlternateEncoder();
+  /** {@code motor1} is the leader, {@code motor2} follows it */
+  public Deploy(SparkFlex motor1, SparkFlex motor2) {
+    deployMotor = motor1;
+    deployMotor2 = motor2;
+    deployEncoder = deployMotor.getEncoder();
     deployController = deployMotor.getClosedLoopController();
 
     targetPosition = IntakeConstants.STOWED_POSITION;
 
-    // Personal Configuration
-    SparkMaxConfig deployConfig = new SparkMaxConfig();
+    SparkFlexConfig deployConfig = new SparkFlexConfig();
     deployConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(30);
-    deployConfig.alternateEncoder.countsPerRevolution(IntakeConstants.ENCODER_CPR);
     deployConfig.closedLoop
-        .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
+
+    SparkFlexConfig followerConfig = new SparkFlexConfig();
+    followerConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(30).follow(deployMotor, false);
 
     deployMotor.configure(
         deployConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    deployMotor2.configure(
+        followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    deployEncoder.setPosition(0); // reset encoder (assuming we start @ stowed)
+    deployEncoder.setPosition(0);
   }
 
-  public SparkMax get() {
+  public SparkFlex get() {
     return deployMotor;
   }
 
   public void setTargetPosition(double newPos) {
     targetPosition = newPos;
-    deployController.setSetpoint(targetPosition, SparkMax.ControlType.kPosition);
+    deployController.setSetpoint(targetPosition, SparkFlex.ControlType.kPosition);
   }
 
   /** Check if intake is at deployed position */

@@ -4,27 +4,26 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 
 public class Orientation {
-  private final SparkMax hoodMotor;
+  private final SparkFlex hoodMotor;
   private final RelativeEncoder hoodEncoder;
   private final SparkClosedLoopController hoodController;
   private double targetPitchAngle;
 
-  public Orientation(SparkMax motor) {
+  public Orientation(SparkFlex motor) {
     hoodMotor = motor;
-    hoodEncoder = hoodMotor.getAlternateEncoder();
+    hoodEncoder = hoodMotor.getEncoder();
     hoodController = hoodMotor.getClosedLoopController();
 
-    SparkMaxConfig config = new SparkMaxConfig();
+    SparkFlexConfig config = new SparkFlexConfig();
     config.idleMode(IdleMode.kBrake).smartCurrentLimit(20);
-    config.alternateEncoder.countsPerRevolution(ShooterConstants.ENCODER_CPR);
     config.closedLoop
-        .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(ShooterConstants.HOOD_kP)
         .i(ShooterConstants.HOOD_kI)
         .d(ShooterConstants.HOOD_kD);
@@ -45,7 +44,7 @@ public class Orientation {
         Math.max(
             ShooterConstants.PITCH_MIN_ANGLE,
             Math.min(ShooterConstants.PITCH_MAX_ANGLE, angleDegrees));
-    hoodController.setSetpoint(degreesToRotations(targetPitchAngle), SparkMax.ControlType.kPosition);
+    hoodController.setSetpoint(degreesToRotations(targetPitchAngle), SparkFlex.ControlType.kPosition);
   }
 
   /** Get the target pitch angle. */

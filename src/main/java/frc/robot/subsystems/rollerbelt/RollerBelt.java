@@ -3,20 +3,20 @@ package frc.robot.subsystems.rollerbelt;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class RollerBelt extends SubsystemBase {
-  private final SparkMax motor1;
-  private final SparkMax motor2;
+  private final SparkFlex motor1;
+  private final SparkFlex motor2;
 
   public RollerBelt() {
-    motor1 = new SparkMax(RollerBeltConstants.BELT_MOTOR_1_ID, MotorType.kBrushless);
-    motor2 = new SparkMax(RollerBeltConstants.BELT_MOTOR_2_ID, MotorType.kBrushless);
+    motor1 = new SparkFlex(RollerBeltConstants.BELT_MOTOR_1_ID, MotorType.kBrushless);
+    motor2 = new SparkFlex(RollerBeltConstants.BELT_MOTOR_2_ID, MotorType.kBrushless);
 
-    SparkMaxConfig config = new SparkMaxConfig();
+    SparkFlexConfig config = new SparkFlexConfig();
     config.idleMode(IdleMode.kBrake).smartCurrentLimit(RollerBeltConstants.CURRENT_LIMIT);
 
     motor1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

@@ -101,12 +101,15 @@ package frc.robot.subsystems.swerve;
  */
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -146,10 +149,10 @@ public class SwerveModule {
    * <p>[PHYSICAL DESCRIPTION] This motor spins the wheel forward/backward. It's usually connected
    * through a gearbox to increase torque.
    *
-   * <p>[NEO MOTOR] REV Robotics NEO is a brushless motor with: - Built-in encoder - High power
-   * density - Controlled by SparkMAX
+   * <p>[FALCON 500 / TalonFX] CTRE Falcon 500 brushless motor with: - Built-in encoder - High power
+   * density - Controlled by TalonFX (Phoenix 6)
    */
-  private final SparkMax driveMotor;
+  private final TalonFX driveMotor;
 
   /**
    * AZIMUTH MOTOR - Controls wheel direction.
@@ -164,16 +167,8 @@ public class SwerveModule {
 
   // ENCODERS - Position/velocity feedback
 
-  /**
-   * Drive motor's built-in encoder.
-   *
-   * <p>[WHAT IT MEASURES] - Position: How far the wheel has traveled (meters) - Velocity: How fast
-   * the wheel is spinning (m/s)
-   *
-   * <p>We use conversion factors to convert motor rotations to real-world units (accounts for gear
-   * ratio and wheel size).
-   */
-  private final RelativeEncoder driveEncoder;
+  /** Pre-allocated velocity control request for TalonFX closed-loop drive. */
+  private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
 
   /**
    * Azimuth motor's built-in encoder.
@@ -198,16 +193,6 @@ public class SwerveModule {
   private final CANcoder canCoder;
 
   // CONTROLLERS - PID control
-
-  /**
-   * PID controller for drive motor velocity.
-   *
-   * <p>[WHAT IT DOES] Takes a target velocity (m/s) and calculates motor output to achieve that
-   * speed.
-   *
-   * <p>Works with feedforward for better performance.
-   */
-  private final SparkClosedLoopController driveController;
 
   /**
    * PID controller for azimuth motor position.
@@ -278,12 +263,8 @@ public class SwerveModule {
     // ----------------------------------------------------------------
     // DRIVE MOTOR SETUP
     // ----------------------------------------------------------------
-    // Create SparkMAX, kBrushless because NEO is a brushless motor
-    driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
-
-    // Get the built-in encoder and PID controller
-    driveEncoder = driveMotor.getEncoder();
-    driveController = driveMotor.getClosedLoopController();
+    // Falcon 500 / TalonFX (CTRE Phoenix 6)
+    driveMotor = new TalonFX(driveMotorId);
 
     // ----------------------------------------------------------------
     // AZIMUTH MOTOR SETUP
@@ -336,44 +317,22 @@ public class SwerveModule {
    */
   private void configureMotors() {
     // ================================================================
-    // DRIVE MOTOR CONFIGURATION
+    // DRIVE MOTOR CONFIGURATION (TalonFX / Falcon 500)
     // ================================================================
-    SparkMaxConfig driveConfig = new SparkMaxConfig();
+    TalonFXConfiguration driveConfig = new TalonFXConfiguration();
 
-    driveConfig
-        .idleMode(IdleMode.kCoast) // Coast when not powered (easier to push)
-        .smartCurrentLimit(SwerveConstants.DRIVE_CURRENT_LIMIT) // Prevent motor damage
-        .openLoopRampRate(SwerveConstants.DRIVE_OPEN_LOOP_RAMP) // Smooth teleop
-        .closedLoopRampRate(SwerveConstants.DRIVE_CLOSED_LOOP_RAMP); // Smooth auto
+    driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    driveConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_CURRENT_LIMIT;
+    driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    driveConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SwerveConstants.DRIVE_OPEN_LOOP_RAMP;
+    driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SwerveConstants.DRIVE_CLOSED_LOOP_RAMP;
 
-    // ----------------------------------------------------------------
-    // ENCODER CONVERSION: Motor rotations -> Meters
-    // ----------------------------------------------------------------
-    // Position: How far the robot has traveled (meters)
-    double drivePositionFactor =
-        SwerveConstants.WHEEL_CIRCUMFERENCE / SwerveConstants.DRIVE_GEAR_RATIO;
+    // TODO: kP was tuned for SparkMax (units: %/m/s). TalonFX uses V/RPS — retune on real robot.
+    driveConfig.Slot0.kP = SwerveConstants.DRIVE_kP;
+    driveConfig.Slot0.kI = SwerveConstants.DRIVE_kI;
+    driveConfig.Slot0.kD = SwerveConstants.DRIVE_kD;
 
-    // Velocity: How fast the robot is moving (meters/second)
-    // NEO reports RPM, so divide by 60 to get per-second
-    double driveVelocityFactor = drivePositionFactor / 60.0;
-
-    driveConfig
-        .encoder
-        .positionConversionFactor(drivePositionFactor) // Now getPosition() returns meters
-        .velocityConversionFactor(driveVelocityFactor); // Now getVelocity() returns m/s
-
-    // ----------------------------------------------------------------
-    // PID GAINS for velocity control
-    // ----------------------------------------------------------------
-    driveConfig
-        .closedLoop
-        .p(SwerveConstants.DRIVE_kP) // Proportional: main correction
-        .i(SwerveConstants.DRIVE_kI) // Integral: steady-state error (usually 0)
-        .d(SwerveConstants.DRIVE_kD); // Derivative: damping (reduces overshoot)
-
-    // Apply configuration to motor
-    driveMotor.configure(
-        driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    driveMotor.getConfigurator().apply(driveConfig);
 
     // ================================================================
     // AZIMUTH MOTOR CONFIGURATION
@@ -486,7 +445,10 @@ public class SwerveModule {
    * @return The velocity in meters per second (positive = forward)
    */
   public double getVelocity() {
-    return driveEncoder.getVelocity();
+    // TalonFX reports RPS (rotations/s) → convert to m/s
+    return driveMotor.getVelocity().getValueAsDouble()
+        * SwerveConstants.WHEEL_CIRCUMFERENCE
+        / SwerveConstants.DRIVE_GEAR_RATIO;
   }
 
   /**
@@ -498,7 +460,10 @@ public class SwerveModule {
    * @return The position in meters
    */
   public double getPosition() {
-    return driveEncoder.getPosition();
+    // TalonFX reports rotations → convert to meters
+    return driveMotor.getPosition().getValueAsDouble()
+        * SwerveConstants.WHEEL_CIRCUMFERENCE
+        / SwerveConstants.DRIVE_GEAR_RATIO;
   }
 
   /**
@@ -591,18 +556,17 @@ public class SwerveModule {
 
     } else {
       // --------------------------------------------------------
-      // CLOSED LOOP - PID with feedforward
+      // CLOSED LOOP - PID with feedforward (TalonFX VelocityVoltage)
       // --------------------------------------------------------
-      // Calculate feedforward: how much power we EXPECT to need
-      double feedforward = driveFeedforward.calculate(desiredState.speedMetersPerSecond);
+      // Convert m/s → RPS (motor rotations per second)
+      double targetRPS = desiredState.speedMetersPerSecond
+          * SwerveConstants.DRIVE_GEAR_RATIO
+          / SwerveConstants.WHEEL_CIRCUMFERENCE;
 
-      // Use PID to get to exact velocity, with feedforward as base power
-      driveController.setSetpoint(
-          desiredState.speedMetersPerSecond, // Target velocity
-          SparkMax.ControlType.kVelocity, // Velocity control mode
-          ClosedLoopSlot.kSlot0, // PID slot 0
-          feedforward // Add feedforward to output
-          );
+      // Feedforward in volts from SimpleMotorFeedforward (kS, kV, kA)
+      double ffVolts = driveFeedforward.calculate(desiredState.speedMetersPerSecond);
+
+      driveMotor.setControl(driveVelocityRequest.withVelocity(targetRPS).withFeedForward(ffVolts));
     }
 
     // Remember what we commanded (for debugging/optimization)

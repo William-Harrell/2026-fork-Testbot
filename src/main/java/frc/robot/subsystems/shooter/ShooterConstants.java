@@ -21,10 +21,13 @@ public final class ShooterConstants {
   // SHOOTER HARDWARE
   // ================================================================
 
-  /** CAN ID for flywheel motor */
+  /** CAN ID for flywheel motor 1 (Kraken/TalonFX) */
   public static final int FLYWHEEL_MOTOR_ID = 11;
 
-  /** CAN ID for hood motor */
+  /** CAN ID for flywheel motor 2 (Kraken/TalonFX) — assign actual ID in Phoenix Tuner */
+  public static final int FLYWHEEL_MOTOR_2_ID = 13;
+
+  /** CAN ID for hood motor (Vortex/SparkFlex) */
   public static final int HOOD_MOTOR_ID = 12;
 
   // Hex encoder (REV Through Bore, 8192 CPR)
@@ -65,12 +68,12 @@ public final class ShooterConstants {
   /** Tolerance for flywheel at target speed */
   public static final double FLYWHEEL_RPM_TOLERANCE = 100.0;
 
-  /** Flywheel PID gains — tune on real robot (kFF ≈ 1/maxRPM for NEO) */
+  /** Flywheel PID gains — tune on real robot for TalonFX (units: V/RPS_error for kP, V/RPS for kV) */
   public static final double FLYWHEEL_kP = 0.0005;
 
   public static final double FLYWHEEL_kI = 0.0;
   public static final double FLYWHEEL_kD = 0.0;
-  public static final double FLYWHEEL_kFF = 0.000175; // 1/5700 for NEO
+  public static final double FLYWHEEL_kFF = 0.12; // kV: ~0.12 V/RPS for Kraken — tune on real robot
 
   /**
    * Flywheel wheel radius for exit velocity calculation (meters).

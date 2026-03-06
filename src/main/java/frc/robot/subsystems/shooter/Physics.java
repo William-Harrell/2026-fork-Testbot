@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.constants.FieldConstants;
 import java.util.Optional;
 
 public class Physics {
@@ -240,6 +241,22 @@ public class Physics {
         visionUpdate.avgAmbiguity(),
         horizontalDistance,
         confidence);
+  }
+
+  /**
+   * Check if robot is in its alliance zone (G407 — must be here to shoot for points).
+   *
+   * @return true if robot x-position is within the alliance zone
+   */
+  public boolean isInAllianceZone() {
+    refreshAlliance();
+    double robotX = getRobotPose().getX();
+    if (alliance == Alliance.Blue) {
+      return robotX <= FieldConstants.BLUE_ALLIANCE_ZONE_MAX_X;
+    } else if (alliance == Alliance.Red) {
+      return robotX >= FieldConstants.RED_ALLIANCE_ZONE_MIN_X;
+    }
+    return false; // unknown alliance
   }
 
   /**

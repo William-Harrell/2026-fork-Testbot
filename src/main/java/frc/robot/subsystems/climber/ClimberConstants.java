@@ -21,6 +21,11 @@ public final class ClimberConstants {
   public static final double EXTENDED_POSITION = 50.0; // rotations — TODO: measure on real robot
   public static final double POSITION_TOLERANCE = 1.0; // rotations
 
+  // Climb level positions (tune on real robot — based on rung heights in FieldConstants)
+  // Level 2: bumpers above LOW_RUNG (27in / 0.686m). Level 3: bumpers above MID_RUNG (45in / 1.143m).
+  public static final double LEVEL_2_POSITION = 30.0; // rotations — TODO: measure on real robot
+  public static final double LEVEL_3_POSITION = 50.0; // rotations — TODO: measure on real robot
+
   public static final double HOOD_kP = 0.1; // TODO: tune
   public static final double HOOD_kI = 0.0;
   public static final double HOOD_kD = 0.0;

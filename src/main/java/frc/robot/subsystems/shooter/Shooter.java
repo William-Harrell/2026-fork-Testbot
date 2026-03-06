@@ -57,6 +57,8 @@ public class Shooter extends SubsystemBase {
 
     // Hub active/inactive (FMS game-specific message)
     SmartDashboard.putBoolean("Shooter/HubActive", physics.isHubActive());
+    // G407 alliance zone (robot must be inside to score)
+    SmartDashboard.putBoolean("Shooter/InAllianceZone", physics.isInAllianceZone());
 
     // Vision-related (can-shoot? & what the shot would look like)
     SmartDashboard.putBoolean("Shooter/VisionAvailable", physics.hasReliableVisionTarget());

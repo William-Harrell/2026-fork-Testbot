@@ -219,7 +219,7 @@ public class RobotContainer {
    * Whether to use DIP switch (true) or SmartDashboard chooser (false). Set to true for
    * competition, false for development.
    */
-  private static final boolean USE_DIP_SWITCH = true;
+  private static final boolean USE_DIP_SWITCH = false;
 
   // ================================================================
   // DRIVER SETTINGS

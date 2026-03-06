@@ -60,6 +60,9 @@ public final class OI {
     Trigger maintainDeployed();
 
     Trigger orientAndShoot();
+
+    /** Hold to reverse hopper + roller belt (jam clearing) */
+    Trigger reverseFeeder();
   }
 
   public static class XboxDriver implements DriverActionSet {
@@ -134,6 +137,11 @@ public final class OI {
     @Override
     public Trigger orientAndShoot() {
       return stick.x();
+    }
+
+    @Override
+    public Trigger reverseFeeder() {
+      return stick.povDown();
     }
   }
 }

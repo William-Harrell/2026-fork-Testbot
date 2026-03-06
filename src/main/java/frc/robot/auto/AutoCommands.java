@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.SwerveCommands;
+import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.Intake;
+import frc.robot.subsystems.rollerbelt.RollerBelt;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
@@ -190,14 +192,18 @@ public final class AutoCommands {
    * @param intake  The intake subsystem (for feeding)
    * @return Command that shoots all FUEL
    */
-  public static Command shootAllFuel(Shooter shooter, Intake intake) {
+  public static Command shootAllFuel(
+      Shooter shooter, Intake intake, Hopper hopper, RollerBelt rollerBelt) {
     return Commands.sequence(
         // Set pitch angle + spin up to shoot RPM
         Commands.runOnce(shooter::prepareDefaultShot, shooter),
         // Wait until flywheel is at speed AND pitch is at target
         Commands.waitUntil(shooter.getF()::isReadyToShoot),
-        // Feed all FUEL
-        IntakeCommands.feedCommand(intake),
+        // Feed all FUEL through belt → hopper → shooter
+        Commands.parallel(
+            IntakeCommands.feedCommand(intake),
+            Commands.startEnd(hopper::feed, hopper::stop, hopper),
+            Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt)),
         // Give last FUEL time to exit barrel
         Commands.waitSeconds(0.3),
         // Stop shooter
@@ -212,11 +218,15 @@ public final class AutoCommands {
    * @param intake  The intake subsystem
    * @return Command that shoots one FUEL
    */
-  public static Command shootOneFuel(Shooter shooter, Intake intake) {
+  public static Command shootOneFuel(
+      Shooter shooter, Intake intake, Hopper hopper, RollerBelt rollerBelt) {
     return Commands.sequence(
         Commands.runOnce(shooter::prepareDefaultShot, shooter),
         Commands.waitUntil(shooter.getF()::isReadyToShoot),
-        IntakeCommands.feedCommand(intake),
+        Commands.parallel(
+            IntakeCommands.feedCommand(intake),
+            Commands.startEnd(hopper::feed, hopper::stop, hopper),
+            Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt)),
         Commands.waitSeconds(0.3),
         Commands.runOnce(shooter::stop, shooter))
         .withName("Shoot One FUEL");

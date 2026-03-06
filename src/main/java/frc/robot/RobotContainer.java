@@ -460,14 +460,31 @@ public class RobotContainer {
     // SHOOTER CONTROLS
     // ----------------------------------------------------------------
 
-    // X button: hold to spin up + shoot (hopper feeds from storage), release to stop
+    // X button: hold to orient toward hub + spin up + shoot + feed hopper
     driverJoystick
         .orientAndShoot()
         .whileTrue(
             Commands.parallel(
+                new SwerveCommands.OrientToHubCommand(
+                    swerve,
+                    shooter.getP(),
+                    () -> applySpeedCurve(driverJoystick.forward()),
+                    () -> applySpeedCurve(driverJoystick.strafe())),
                 ShooterCommands.shootCommand(
                     superstructure.getShooter(), superstructure.getIntake()),
                 Commands.startEnd(hopper::feed, hopper::stop, hopper)));
+
+    // ----------------------------------------------------------------
+    // FEEDER JAM CLEARING
+    // ----------------------------------------------------------------
+
+    // POV Down: hold to reverse hopper + roller belt
+    driverJoystick
+        .reverseFeeder()
+        .whileTrue(
+            Commands.parallel(
+                Commands.startEnd(hopper::reverse, hopper::stop, hopper),
+                Commands.startEnd(rollerBelt::reverse, rollerBelt::stop, rollerBelt)));
   }
 
   // ================================================================
@@ -491,9 +508,14 @@ public class RobotContainer {
   private void registerAutoRoutines() {
     autoChooser.setDefaultOption("0: Do Nothing", AutoRoutines.doNothing());
     autoChooser.addOption(
-        "1: Score & Collect", AutoRoutines.scoreCollectAuto(swerve, intake, shooter));
+        "1: Score & Collect",
+        AutoRoutines.scoreCollectAuto(swerve, intake, shooter, hopper, rollerBelt));
     autoChooser.addOption(
-        "3: Preload Only", AutoRoutines.preloadOnlyAuto(swerve, intake, shooter));
+        "2: Score Only",
+        AutoRoutines.scoreOnlyAuto(swerve, intake, shooter, hopper, rollerBelt));
+    autoChooser.addOption(
+        "3: Preload Only",
+        AutoRoutines.preloadOnlyAuto(swerve, intake, shooter, hopper, rollerBelt));
   }
 
   // ================================================================
@@ -525,7 +547,8 @@ public class RobotContainer {
       // Lock the selection at the start of auto to prevent mid-match changes
       dipSwitchSelector.lockSelection();
       int selection = dipSwitchSelector.getSelection();
-      return AutoRoutines.getAutoFromSelection(selection, swerve, intake, shooter, vision);
+      return AutoRoutines.getAutoFromSelection(
+          selection, swerve, intake, shooter, vision, hopper, rollerBelt);
     } else {
       return autoChooser.getSelected();
     }

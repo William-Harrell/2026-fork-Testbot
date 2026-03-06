@@ -17,20 +17,20 @@ public final class SwerveConstants {
   public static final double AZIMUTH_GEAR_RATIO = 150.0 / 7.0;
 
   // Front Left Module
-  public static final int FL_DRIVE_ID = 7;
-  public static final int FL_AZIMUTH_ID = 8;
+  public static final int FL_DRIVE_ID = 1;   // TalonFX
+  public static final int FL_AZIMUTH_ID = 1; // SparkMax
 
   // Front Right Module
-  public static final int FR_DRIVE_ID = 5;
-  public static final int FR_AZIMUTH_ID = 6;
+  public static final int FR_DRIVE_ID = 2;   // TalonFX
+  public static final int FR_AZIMUTH_ID = 2; // SparkMax
 
   // Rear Left Module
-  public static final int RL_DRIVE_ID = 3;
-  public static final int RL_AZIMUTH_ID = 4;
+  public static final int RL_DRIVE_ID = 3;   // TalonFX
+  public static final int RL_AZIMUTH_ID = 3; // SparkMax
 
   // Rear Right Module
-  public static final int RR_DRIVE_ID = 1;
-  public static final int RR_AZIMUTH_ID = 2;
+  public static final int RR_DRIVE_ID = 4;   // TalonFX
+  public static final int RR_AZIMUTH_ID = 4; // SparkMax
 
   // Absolute encoders
   public static final int FL_CANCODER_ID = 1;

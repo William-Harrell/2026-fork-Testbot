@@ -22,13 +22,13 @@ public final class ShooterConstants {
   // ================================================================
 
   /** CAN ID for flywheel motor 1 (Kraken/TalonFX) */
-  public static final int FLYWHEEL_MOTOR_ID = 11;
+  public static final int FLYWHEEL_MOTOR_ID = 5;
 
-  /** CAN ID for flywheel motor 2 (Kraken/TalonFX) — assign actual ID in Phoenix Tuner */
-  public static final int FLYWHEEL_MOTOR_2_ID = 13;
+  /** CAN ID for flywheel motor 2 (Kraken/TalonFX) */
+  public static final int FLYWHEEL_MOTOR_2_ID = 6;
 
   /** CAN ID for hood motor (Vortex/SparkFlex) */
-  public static final int HOOD_MOTOR_ID = 12;
+  public static final int HOOD_MOTOR_ID = 8;
 
   // Hex encoder (REV Through Bore, 8192 CPR)
   public static final int ENCODER_CPR = 8192;

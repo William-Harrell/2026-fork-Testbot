@@ -1,9 +1,9 @@
 package frc.robot.subsystems.intake;
 
 public final class IntakeConstants {
-  public static final int DEPLOY_MOTOR_ID = 9;   // Vortex (SparkFlex)
-  public static final int DEPLOY_MOTOR_2_ID = 14; // Vortex (SparkFlex) — assign actual CAN ID
-  public static final int ROLLER_MOTOR_ID = 10;   // NEO (SparkMax)
+  public static final int DEPLOY_MOTOR_ID = 6;   // Vortex (SparkFlex)
+  public static final int DEPLOY_MOTOR_2_ID = 7;  // Vortex (SparkFlex)
+  public static final int ROLLER_MOTOR_ID = 5;    // NEO (SparkMax)
 
   // Hex encoder (REV Through Bore, 8192 CPR)
   public static final int ENCODER_CPR = 8192;

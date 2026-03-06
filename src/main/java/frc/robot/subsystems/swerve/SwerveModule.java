@@ -324,6 +324,8 @@ public class SwerveModule {
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     driveConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_CURRENT_LIMIT;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    driveConfig.CurrentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_SUPPLY_CURRENT_LIMIT;
+    driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     driveConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SwerveConstants.DRIVE_OPEN_LOOP_RAMP;
     driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SwerveConstants.DRIVE_CLOSED_LOOP_RAMP;
 

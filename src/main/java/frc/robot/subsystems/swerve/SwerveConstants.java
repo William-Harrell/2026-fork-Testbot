@@ -76,8 +76,10 @@ public final class SwerveConstants {
 
   // CURRENT LIMITS - Protects motors from overheating
 
-  public static final int DRIVE_CURRENT_LIMIT = 60; // Amps
-  public static final int AZIMUTH_CURRENT_LIMIT = 30; // Amps
+  public static final int DRIVE_CURRENT_LIMIT = 40; // Amps stator (was 60 — lowered for breaker safety)
+  public static final int DRIVE_SUPPLY_CURRENT_LIMIT = 35; // Amps from battery
+
+  public static final int AZIMUTH_CURRENT_LIMIT = 20; // Amps (was 30 — steering mostly holds position)
 
   // RAMP RATES - How quickly motors speed up
 

@@ -25,6 +25,8 @@ public class Flywheel {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.CurrentLimits.StatorCurrentLimit = ShooterConstants.FLYWHEEL_CURRENT_LIMIT;
     config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_CURRENT_LIMIT;
+    config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
     // TODO: PID gains need re-tuning for TalonFX (units: V/RPS_error for kP, V/RPS for kV)
     config.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
@@ -39,6 +41,8 @@ public class Flywheel {
     config2.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config2.CurrentLimits.StatorCurrentLimit = ShooterConstants.FLYWHEEL_CURRENT_LIMIT;
     config2.CurrentLimits.StatorCurrentLimitEnable = true;
+    config2.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_CURRENT_LIMIT;
+    config2.CurrentLimits.SupplyCurrentLimitEnable = true;
     config2.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
     config2.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
     config2.Slot0.kI = ShooterConstants.FLYWHEEL_kI;

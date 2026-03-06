@@ -17,8 +17,8 @@ public class AutonomousController {
     // ── Mode IDs matching AutoConstants ────────────────────────────────────
     public static final int AUTO_DO_NOTHING       = 0;
     public static final int AUTO_SCORE_AND_COLLECT= 1;  // legacy alias
-    public static final int AUTO_QUICK_CLIMB      = 2;
-    public static final int AUTO_SCORE_THEN_CLIMB = 3;  // legacy alias
+    public static final int AUTO_SCORE_ONLY       = 2;
+    public static final int AUTO_PRELOAD_ONLY_3   = 3;  // legacy alias
     public static final int AUTO_DEPOT_RAID       = 4;
     public static final int AUTO_FAR_NEUTRAL      = 5;
     public static final int AUTO_PRELOAD_ONLY     = 6;  // legacy slot 6
@@ -39,21 +39,21 @@ public class AutonomousController {
 
     public static final String[] AUTO_MODE_NAMES = {
         "0: Do Nothing",
-        "1: Score, Collect & Climb",
-        "2: Quick Climb",
+        "1: Score & Collect",
+        "2: Score Only",
         "3: Preload Only",
         "4: Depot Raid",
         "5: Far Neutral",
         "6: Preload Only",
         "7: Max Cycles",
-        "8: Climb Support",
+        "8: Alliance Support",
         "9: Win AUTO",
-        "10: Score+Collect+Climb",
-        "11: Fast Climb",
+        "10: Score & Collect",
+        "11: Max Cycles",
         "12: Balanced",
-        "13: Depot+Climb OPTIMAL",
+        "13: Depot Score",
         "14: Max Points",
-        "15: Safe Climb",
+        "15: Score & Hold",
         "16: Dual Cycle",
         "17: Deny FUEL",
         "18: Center Control",
@@ -62,7 +62,7 @@ public class AutonomousController {
 
     public enum AutoPhase {
         IDLE, POSITIONING_TO_SHOOT, SCORING_PRELOAD, DRIVING_TO_NEUTRAL,
-        INTAKING, SCORING_COLLECTED, DRIVING_TO_TOWER, CLIMBING, HOLDING,
+        INTAKING, SCORING_COLLECTED, HOLDING,
         DRIVING_TO_DEPOT, COLLECTING_FROM_DEPOT, DRIVING_TO_SCORE,
         DRIVING_TO_FAR_NEUTRAL, INTAKING_FAR, RETURNING_TO_SCORE,
         CYCLING, RAPID_SCORING, COMPLETE
@@ -72,9 +72,6 @@ public class AutonomousController {
     private static final double SHOOT_TIME_PER_FUEL   = 0.25;
     private static final double DRIVE_TO_NEUTRAL_TIME = 6.0;   // ~3.5m @ 2m/s + accel
     private static final double INTAKE_TIMEOUT        = 4.0;   // AutoConstants.INTAKE_TIMEOUT
-    private static final double CLIMB_TIMEOUT         = 12.0;  // AutoConstants.CLIMB_TIMEOUT
-    private static final double DRIVE_TO_TOWER_TIME   = 5.0;
-
     // Debug
     public static boolean DEBUG_DRIVING = false;
     private static double lastDebugTime = 0.0;
@@ -128,21 +125,21 @@ public class AutonomousController {
 
         switch (selectedMode) {
             case AUTO_DO_NOTHING:                         break; // stay still
-            case AUTO_SCORE_AND_COLLECT:                  updateScoreCollectClimb(robot, input, dt); break;
-            case AUTO_QUICK_CLIMB:                        updateQuickClimb(robot, input, dt); break;
-            case AUTO_SCORE_THEN_CLIMB:                   updatePreloadOnly(robot, input, dt); break;
+            case AUTO_SCORE_AND_COLLECT:                  updateScoreAndCollect(robot, input, dt); break;
+            case AUTO_SCORE_ONLY:                         updateScoreOnly(robot, input, dt); break;
+            case AUTO_PRELOAD_ONLY_3:                     updatePreloadOnly(robot, input, dt); break;
             case AUTO_DEPOT_RAID:                         updateDepotRaid(robot, input, dt); break;
             case AUTO_FAR_NEUTRAL:                        updateFarNeutral(robot, input, dt); break;
             case AUTO_PRELOAD_ONLY:                       updatePreloadOnly(robot, input, dt); break;
             case AUTO_MAX_CYCLES:                         updateMaxCycles(robot, input, dt); break;
-            case AUTO_CLIMB_SUPPORT:                      updateClimbSupport(robot, input, dt); break;
+            case AUTO_CLIMB_SUPPORT:                      updateAllianceSupport(robot, input, dt); break;
             case AUTO_WIN_AUTO:                           updateWinAuto(robot, input, dt); break;
-            case AUTO_SCORE_COLLECT_CLIMB:                updateScoreCollectClimb(robot, input, dt); break;
-            case AUTO_FAST_CLIMB:                         updateFastClimb(robot, input, dt); break;
+            case AUTO_SCORE_COLLECT_CLIMB:                updateScoreAndCollect(robot, input, dt); break;
+            case AUTO_FAST_CLIMB:                         updateMaxCycles(robot, input, dt); break;
             case AUTO_BALANCED:                           updateBalanced(robot, input, dt); break;
             case AUTO_DEPOT_CLIMB:                        updateDepotClimb(robot, input, dt); break;
             case AUTO_MAX_POINTS:                         updateMaxPoints(robot, input, dt); break;
-            case AUTO_SAFE_CLIMB:                         updateSafeClimb(robot, input, dt); break;
+            case AUTO_SAFE_CLIMB:                         updatePreloadOnly(robot, input, dt); break;
             case AUTO_DUAL_CYCLE:                         updateDualCycle(robot, input, dt); break;
             case AUTO_DENY_FUEL:                          updateDenyFuel(robot, input, dt); break;
             case AUTO_CENTER_CONTROL:                     updateCenterControl(robot, input, dt); break;
@@ -225,10 +222,10 @@ public class AutonomousController {
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // MODE 2 — QUICK CLIMB
-    // Shoot preload → drive to tower → climb
+    // MODE 2 — SCORE ONLY
+    // Shoot preload → hold position
     // ══════════════════════════════════════════════════════════════════════
-    private void updateQuickClimb(RobotState robot, InputState input, double dt) {
+    private void updateScoreOnly(RobotState robot, InputState input, double dt) {
         switch (currentPhase) {
             case IDLE:
                 robot.currentCommand = "Mode2: Spin up";
@@ -244,24 +241,6 @@ public class AutonomousController {
                 input.shooterPower = 1.0;
                 double tShoot = robot.fuelCount * SHOOT_TIME_PER_FUEL + 0.3;
                 if (phaseTimer > tShoot || robot.fuelCount == 0) {
-                    setTowerTarget(robot);
-                    transitionToPhase(AutoPhase.DRIVING_TO_TOWER);
-                }
-                break;
-
-            case DRIVING_TO_TOWER:
-                robot.currentCommand = "Mode2: Drive to tower";
-                driveToTarget(robot, input, targetX, targetY);
-                if (isAtTarget(robot, targetX, targetY, 1.5) || phaseTimer > DRIVE_TO_TOWER_TIME) {
-                    transitionToPhase(AutoPhase.CLIMBING);
-                }
-                break;
-
-            case CLIMBING:
-                robot.currentCommand = "Mode2: Climbing L1";
-                input.level1    = true;
-                input.climberUp = true;
-                if (robot.climbComplete || phaseTimer > CLIMB_TIMEOUT) {
                     transitionToPhase(AutoPhase.HOLDING);
                 }
                 break;
@@ -274,42 +253,6 @@ public class AutonomousController {
         }
     }
 
-    // ══════════════════════════════════════════════════════════════════════
-    // MODE 3 — SCORE THEN CLIMB (old mode 3)
-    // Shoot preload → drive toward tower → hold
-    // ══════════════════════════════════════════════════════════════════════
-    private void updateScoreThenClimb(RobotState robot, InputState input, double dt) {
-        switch (currentPhase) {
-            case IDLE:
-                robot.currentCommand = "Mode3: Spin up";
-                input.spinUp = true;
-                if (phaseTimer > Constants.Shooter.SPINUP_TIME) transitionToPhase(AutoPhase.SCORING_PRELOAD);
-                break;
-
-            case SCORING_PRELOAD:
-                robot.currentCommand = "Mode3: Shoot preload";
-                input.shoot = true; input.spinUp = true;
-                if (phaseTimer > robot.fuelCount * SHOOT_TIME_PER_FUEL + 0.3 || robot.fuelCount == 0) {
-                    setTowerTarget(robot);
-                    transitionToPhase(AutoPhase.DRIVING_TO_TOWER);
-                }
-                break;
-
-            case DRIVING_TO_TOWER:
-                robot.currentCommand = "Mode3: Drive to tower";
-                driveToTarget(robot, input, targetX, targetY);
-                if (isAtTarget(robot, targetX, targetY, 1.8) || phaseTimer > DRIVE_TO_TOWER_TIME) {
-                    transitionToPhase(AutoPhase.HOLDING);
-                }
-                break;
-
-            case HOLDING:
-                robot.currentCommand = "Mode3: Holding at tower";
-                break;
-            default:
-                break;
-        }
-    }
 
     // ══════════════════════════════════════════════════════════════════════
     // MODE 6 — PRELOAD ONLY (simple — matches AutoRoutines.preloadOnlyAuto)
@@ -340,19 +283,19 @@ public class AutonomousController {
     }
 
     // ══════════════════════════════════════════════════════════════════════
-    // MODE 10 — SCORE, COLLECT & CLIMB (matches real robot Mode 1)
-    // Shoot preload → neutral → collect → shoot → climb
+    // MODE 10 — SCORE & COLLECT (matches real robot Mode 1)
+    // Shoot preload → neutral → collect → return → shoot
     // ══════════════════════════════════════════════════════════════════════
     private void updateScoreCollectClimb(RobotState robot, InputState input, double dt) {
         switch (currentPhase) {
             case IDLE:
-                robot.currentCommand = "SCC: Spin up";
+                robot.currentCommand = "SC: Spin up";
                 input.spinUp = true;
                 if (phaseTimer > Constants.Shooter.SPINUP_TIME) transitionToPhase(AutoPhase.SCORING_PRELOAD);
                 break;
 
             case SCORING_PRELOAD:
-                robot.currentCommand = "SCC: Shoot preload";
+                robot.currentCommand = "SC: Shoot preload";
                 input.shoot = true; input.spinUp = true; input.shooterPower = 1.0;
                 if (phaseTimer > robot.fuelCount * SHOOT_TIME_PER_FUEL + 0.3 || robot.fuelCount == 0) {
                     double[] n = getNeutralPosition(robot);
@@ -362,7 +305,7 @@ public class AutonomousController {
                 break;
 
             case DRIVING_TO_NEUTRAL:
-                robot.currentCommand = "SCC: Drive to neutral";
+                robot.currentCommand = "SC: Drive to neutral";
                 driveToTarget(robot, input, targetX, targetY);
                 input.intake = true;
                 if (isAtTarget(robot, targetX, targetY, 0.5) || phaseTimer > DRIVE_TO_NEUTRAL_TIME) {
@@ -371,7 +314,7 @@ public class AutonomousController {
                 break;
 
             case INTAKING:
-                robot.currentCommand = "SCC: Collecting";
+                robot.currentCommand = "SC: Collecting";
                 input.intake = true; input.forward = 0.3;
                 if (robot.fuelCount >= 4 || phaseTimer > INTAKE_TIMEOUT) {
                     double[] sp = getShootingPosition(robot);
@@ -381,36 +324,19 @@ public class AutonomousController {
                 break;
 
             case SCORING_COLLECTED:
-                robot.currentCommand = "SCC: Return+shoot";
+                robot.currentCommand = "SC: Return+shoot";
                 if (!isAtTarget(robot, targetX, targetY, 0.5)) {
                     driveToTarget(robot, input, targetX, targetY);
                 } else {
                     input.shoot = true; input.spinUp = true; input.shooterPower = 1.0;
                     if (robot.fuelCount == 0 || phaseTimer > 5.0) {
-                        setTowerTarget(robot);
-                        transitionToPhase(AutoPhase.DRIVING_TO_TOWER);
+                        transitionToPhase(AutoPhase.COMPLETE);
                     }
                 }
                 break;
 
-            case DRIVING_TO_TOWER:
-                robot.currentCommand = "SCC: Drive to tower";
-                driveToTarget(robot, input, targetX, targetY);
-                if (isAtTarget(robot, targetX, targetY, 1.5) || phaseTimer > DRIVE_TO_TOWER_TIME) {
-                    transitionToPhase(AutoPhase.CLIMBING);
-                }
-                break;
-
-            case CLIMBING:
-                robot.currentCommand = "SCC: Climbing";
-                input.level1 = true; input.climberUp = true;
-                if (robot.climbComplete || phaseTimer > CLIMB_TIMEOUT) {
-                    transitionToPhase(AutoPhase.HOLDING);
-                }
-                break;
-
-            case HOLDING:
-                robot.currentCommand = "SCC: Holding";
+            case COMPLETE:
+                robot.currentCommand = "SC: Complete";
                 break;
             default:
                 break;
@@ -578,24 +504,22 @@ public class AutonomousController {
     }
 
     private void updateClimbSupport(RobotState robot, InputState input, double dt) {
-        // Position near tower to assist alliance partners
+        // Drive to alliance zone and hold
         switch (currentPhase) {
             case IDLE:
-                setTowerTarget(robot);
-                // Offset slightly from tower
-                boolean isRed = robot.alliance == MatchState.Alliance.RED;
-                targetX += isRed ? -1.5 : 1.5;
-                transitionToPhase(AutoPhase.DRIVING_TO_TOWER);
+                double[] sp = getShootingPosition(robot);
+                targetX = sp[0]; targetY = sp[1];
+                transitionToPhase(AutoPhase.DRIVING_TO_NEUTRAL);
                 break;
-            case DRIVING_TO_TOWER:
-                robot.currentCommand = "ClimbSupport: Position";
+            case DRIVING_TO_NEUTRAL:
+                robot.currentCommand = "AllianceSupport: Position";
                 driveToTarget(robot, input, targetX, targetY);
                 if (isAtTarget(robot, targetX, targetY, 0.5) || phaseTimer > 8.0) {
                     transitionToPhase(AutoPhase.HOLDING);
                 }
                 break;
             case HOLDING:
-                robot.currentCommand = "ClimbSupport: Ready";
+                robot.currentCommand = "AllianceSupport: Ready";
                 break;
             default:
                 break;
@@ -606,16 +530,12 @@ public class AutonomousController {
         updateScoreAndCollect(robot, input, dt); // same logic
     }
 
-    private void updateFastClimb(RobotState robot, InputState input, double dt) {
-        updateQuickClimb(robot, input, dt); // alias
-    }
-
     private void updateBalanced(RobotState robot, InputState input, double dt) {
         updateScoreCollectClimb(robot, input, dt);
     }
 
     private void updateDepotClimb(RobotState robot, InputState input, double dt) {
-        // Depot + climb combo
+        // Depot score (no climb)
         switch (currentPhase) {
             case IDLE:
                 boolean isRed = robot.alliance == MatchState.Alliance.RED;
@@ -624,7 +544,7 @@ public class AutonomousController {
                 transitionToPhase(AutoPhase.DRIVING_TO_DEPOT);
                 break;
             case DRIVING_TO_DEPOT:
-                robot.currentCommand = "DepotClimb: Drive to depot";
+                robot.currentCommand = "DepotScore: Drive to depot";
                 driveToTarget(robot, input, targetX, targetY);
                 input.intake = true;
                 if (isAtTarget(robot, targetX, targetY, 0.8) || phaseTimer > 6.0) {
@@ -632,7 +552,7 @@ public class AutonomousController {
                 }
                 break;
             case COLLECTING_FROM_DEPOT:
-                robot.currentCommand = "DepotClimb: Collect";
+                robot.currentCommand = "DepotScore: Collect";
                 input.intake = true;
                 if (robot.fuelCount >= 3 || phaseTimer > 2.0) {
                     double[] sp = getShootingPosition(robot);
@@ -641,39 +561,20 @@ public class AutonomousController {
                 }
                 break;
             case SCORING_COLLECTED:
-                robot.currentCommand = "DepotClimb: Shoot";
+                robot.currentCommand = "DepotScore: Shoot";
                 if (!isAtTarget(robot, targetX, targetY, 0.5)) driveToTarget(robot, input, targetX, targetY);
                 else {
                     input.shoot = true; input.spinUp = true;
-                    if (robot.fuelCount == 0 || phaseTimer > 5.0) {
-                        setTowerTarget(robot);
-                        transitionToPhase(AutoPhase.DRIVING_TO_TOWER);
-                    }
+                    if (robot.fuelCount == 0 || phaseTimer > 5.0) transitionToPhase(AutoPhase.COMPLETE);
                 }
                 break;
-            case DRIVING_TO_TOWER:
-                robot.currentCommand = "DepotClimb: Drive tower";
-                driveToTarget(robot, input, targetX, targetY);
-                if (isAtTarget(robot, targetX, targetY, 1.5) || phaseTimer > DRIVE_TO_TOWER_TIME) {
-                    transitionToPhase(AutoPhase.CLIMBING);
-                }
-                break;
-            case CLIMBING:
-                robot.currentCommand = "DepotClimb: Climb";
-                input.level1 = true; input.climberUp = true;
-                if (robot.climbComplete || phaseTimer > CLIMB_TIMEOUT) transitionToPhase(AutoPhase.HOLDING);
-                break;
-            case HOLDING: break;
+            case COMPLETE: break;
             default: break;
         }
     }
 
     private void updateMaxPoints(RobotState robot, InputState input, double dt) {
         updateScoreCollectClimb(robot, input, dt);
-    }
-
-    private void updateSafeClimb(RobotState robot, InputState input, double dt) {
-        updateScoreThenClimb(robot, input, dt);
     }
 
     private void updateDualCycle(RobotState robot, InputState input, double dt) {
@@ -721,8 +622,6 @@ public class AutonomousController {
     private void clearInputs(InputState input) {
         input.forward = 0; input.strafe = 0; input.turn = 0;
         input.shoot = false; input.intake = false; input.spinUp = false;
-        input.climberUp = false; input.climberDown = false;
-        input.level1 = false; input.level2 = false; input.level3 = false;
         input.shooterPower = 0;
     }
 
@@ -850,9 +749,4 @@ public class AutonomousController {
         return new double[]{ Constants.Field.BLUE_HUB_X, Constants.Field.BLUE_HUB_Y };
     }
 
-    private void setTowerTarget(RobotState robot) {
-        boolean isRed = (robot.alliance == MatchState.Alliance.RED);
-        targetX = isRed ? Constants.Field.RED_TOWER_X  - 1.0 : Constants.Field.BLUE_TOWER_X + 1.0;
-        targetY = isRed ? Constants.Field.RED_TOWER_Y       : Constants.Field.BLUE_TOWER_Y;
-    }
 }

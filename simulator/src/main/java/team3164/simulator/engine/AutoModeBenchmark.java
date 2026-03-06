@@ -17,14 +17,14 @@ public class AutoModeBenchmark {
     // Actual 4 robot modes from AutoConstants
     private static final int[] BENCHMARK_MODES = {
         AutonomousController.AUTO_DO_NOTHING,       // 0
-        AutonomousController.AUTO_SCORE_COLLECT_CLIMB, // 10 = Mode 1 (Score, Collect & Climb)
-        AutonomousController.AUTO_QUICK_CLIMB,       // 2
+        AutonomousController.AUTO_SCORE_AND_COLLECT, // 1 = Score & Collect
+        AutonomousController.AUTO_SCORE_ONLY,        // 2 = Score Only
         AutonomousController.AUTO_PRELOAD_ONLY       // 6 = Mode 3 (Preload Only)
     };
     private static final String[] BENCHMARK_MODE_NAMES = {
         "Do Nothing",
-        "Score, Collect & Climb",
-        "Quick Climb",
+        "Score & Collect",
+        "Score Only",
         "Preload Only"
     };
 

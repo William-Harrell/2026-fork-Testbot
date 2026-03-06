@@ -59,12 +59,6 @@ public final class OI {
 
     Trigger maintainDeployed();
 
-    Trigger climbUp();
-
-    Trigger climbDown();
-
-    Trigger climbLevel2();
-
     Trigger orientAndShoot();
   }
 
@@ -135,21 +129,6 @@ public final class OI {
     @Override
     public Trigger maintainDeployed() {
       return stick.rightTrigger();
-    }
-
-    @Override
-    public Trigger climbUp() {
-      return stick.povUp();
-    }
-
-    @Override
-    public Trigger climbDown() {
-      return stick.povDown();
-    }
-
-    @Override
-    public Trigger climbLevel2() {
-      return stick.povLeft();
     }
 
     @Override

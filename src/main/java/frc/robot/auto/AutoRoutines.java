@@ -71,6 +71,20 @@ public final class AutoRoutines {
   }
 
   // ================================================================
+  // MODE 2: SCORE ONLY (shoot preload, hold)
+  // ================================================================
+
+  public static Command scoreOnlyAuto(SwerveDrive swerve, Intake intake, Shooter shooter) {
+    return Commands.sequence(
+            AutoCommands.logMessage("Mode 2: Score Only"),
+            AutoCommands.shootAllFuel(shooter, intake),
+            AutoCommands.stopDriving(swerve),
+            AutoCommands.holdPosition(swerve, 10.0),
+            AutoCommands.logMessage("Mode 2 Complete"))
+        .withName("2: Score Only");
+  }
+
+  // ================================================================
   // MODE 1: SCORE & COLLECT
   // ================================================================
 
@@ -124,8 +138,11 @@ public final class AutoRoutines {
     switch (selection) {
       case AutoConstants.AUTO_DO_NOTHING:
         return doNothing();
-      case AutoConstants.AUTO_SCORE_COLLECT_CLIMB:
+      case AutoConstants.AUTO_SCORE_COLLECT:
         routine = scoreCollectAuto(swerve, intake, shooter);
+        break;
+      case AutoConstants.AUTO_SCORE_ONLY:
+        routine = scoreOnlyAuto(swerve, intake, shooter);
         break;
       case AutoConstants.AUTO_PRELOAD_ONLY:
         routine = preloadOnlyAuto(swerve, intake, shooter);

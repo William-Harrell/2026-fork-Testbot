@@ -138,6 +138,6 @@ public class DipSwitchSelector {
 
     // Highlight if optimal mode is selected
     SmartDashboard.putBoolean(
-        "Auto/Optimal Mode Selected", selection == AutoConstants.AUTO_SCORE_COLLECT_CLIMB);
+        "Auto/Optimal Mode Selected", selection == AutoConstants.AUTO_SCORE_COLLECT);
   }
 }

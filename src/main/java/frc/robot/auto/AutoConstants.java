@@ -17,8 +17,8 @@ public final class AutoConstants {
   // AUTO MODE IDENTIFIERS
   // ================================================================
   public static final int AUTO_DO_NOTHING = 0;
-  public static final int AUTO_SCORE_COLLECT_CLIMB = 1;
-  public static final int AUTO_QUICK_CLIMB = 2;
+  public static final int AUTO_SCORE_COLLECT = 1;
+  public static final int AUTO_SCORE_ONLY = 2;
   public static final int AUTO_PRELOAD_ONLY = 3;
 
   // ================================================================
@@ -26,8 +26,8 @@ public final class AutoConstants {
   // ================================================================
   public static final String[] AUTO_MODE_NAMES = {
     "0: Do Nothing",
-    "1: Score, Collect & Climb",
-    "2: Quick Climb",
+    "1: Score & Collect",
+    "2: Score Only",
     "3: Preload Only",
   };
 
@@ -35,7 +35,6 @@ public final class AutoConstants {
   // TIMING CONSTANTS (seconds)
   // ================================================================
   public static final double INTAKE_TIMEOUT = 4.0;
-  public static final double CLIMB_TIMEOUT = 12.0;
   public static final double DEPOT_COLLECTION_TIME = 3.0;
 
   // ================================================================

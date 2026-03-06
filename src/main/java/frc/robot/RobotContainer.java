@@ -51,7 +51,7 @@ package frc.robot;
  *
  *   SUBSYSTEM = A physical mechanism
  *   ---------
- *   Examples: SwerveDrive, Shooter, Intake, Climber
+ *   Examples: SwerveDrive, Shooter, Intake
  *   Contains: Motors, sensors, and methods to control them
  *   Rule: Only ONE command can use a subsystem at a time!
  *
@@ -194,7 +194,7 @@ public class RobotContainer {
    * option was chosen.
    *
    * <p>+-----------------------------+ | Auto Chooser: [v] | | --------------------- | | > 0: Do
-   * Nothing | | 1: Score & Collect | | 2: Quick Climb | | ... | +-----------------------------+
+   * Nothing | | 1: Score & Collect | | 2: Score Only | | ... | +-----------------------------+
    */
   private final SendableChooser<Command> autoChooser;
 
@@ -480,14 +480,10 @@ public class RobotContainer {
    * <p>[WHAT THIS DOES] Adds all available auto modes to the SmartDashboard dropdown. During a
    * match, the driver (or pit crew) selects one before enabling.
    *
-   * <p>[OPTIMIZATION NOTE] These modes were optimized using simulator benchmarking with 1000+
-   * simulated matches each. Mode 13 (Depot+Climb) is the optimal strategy.
+   * <p>[SCORING REFERENCE] - FUEL in hub: 1 point each - Preload: 3 FUEL (3 pts)
    *
-   * <p>[SCORING REFERENCE] - FUEL in hub: 1 point each - L1 Climb in AUTO: 15 points - Preload: 3
-   * FUEL (3 pts)
-   *
-   * <p>[STRATEGY CONSIDERATIONS] - Climb modes are reliable and high-scoring (15+ pts) - FUEL-only
-   * modes depend on collection success - Strategic modes (Deny, Center Control) affect opponents
+   * <p>[STRATEGY CONSIDERATIONS] - Score & Collect maximizes FUEL points - Preload Only is safest
+   * fallback - Strategic modes (Deny, Center Control) affect opponents
    *
    * <p>[HOW TO ADD A NEW AUTO] 1. Create the routine in AutoRoutines.java 2. Add it here with
    * autoChooser.addOption() 3. Add a case in getAutoFromSelection() if using DIP switch

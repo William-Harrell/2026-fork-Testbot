@@ -497,53 +497,14 @@ public class RobotContainer {
    * autoChooser.addOption() 3. Add a case in getAutoFromSelection() if using DIP switch
    */
   private void registerAutoRoutines() {
-    // ================================================================
-    // ORIGINAL MODES (0-9)
-    // ================================================================
     autoChooser.setDefaultOption("0: Do Nothing", AutoRoutines.doNothing());
-    // TODO: Re-enable when intake is fixed (Spark Max ID 9)
-    // autoChooser.addOption("1: Score & Collect (8 pts)", AutoRoutines.scoreAndCollectAuto(swerve,
-    // intake, shooter));
-    // autoChooser.addOption("2: Quick Climb (18 pts)", AutoRoutines.quickClimbAuto(swerve, climber,
-    // intake, shooter));
-    // autoChooser.addOption("3: Score Then Climb (18 pts)", AutoRoutines.scoreThenClimbAuto(swerve,
-    // intake, shooter, climber));
-    // autoChooser.addOption("4: Depot Raid (5 pts)", AutoRoutines.depotRaidAuto(swerve, intake,
-    // shooter));
-    // autoChooser.addOption("5: Far Neutral (3-4 pts)", AutoRoutines.farNeutralAuto(swerve, intake,
-    // shooter));
-    // autoChooser.addOption("6: Preload Only (3 pts)", AutoRoutines.preloadOnlyAuto(swerve, intake,
-    // shooter));
-    // autoChooser.addOption("7: Max Cycles (8 pts)", AutoRoutines.maxCyclesAuto(swerve, intake,
-    // shooter));
-    // autoChooser.addOption("8: Climb Support (3 pts)", AutoRoutines.climbSupportAuto(swerve,
-    // intake, shooter));
-    // autoChooser.addOption("9: Win AUTO (4 pts)", AutoRoutines.winAutoAuto(swerve, intake,
-    // shooter));
-
-    // ================================================================
-    // STRATEGIC MODES (15-19)
-    // ================================================================
-    // TODO: Re-enable when intake is fixed (Spark Max ID 9)
-    // autoChooser.addOption("16: Dual Cycle (6-8 pts)", AutoRoutines.dualCycleAuto(swerve, intake,
-    // shooter));
-    // autoChooser.addOption("17: Deny FUEL (strategic)", AutoRoutines.denyFuelAuto(swerve, intake,
-    // shooter));
-    // autoChooser.addOption("18: Center Control (strategic)",
-    // AutoRoutines.centerControlAuto(swerve, intake, shooter));
-    // autoChooser.addOption("19: Alliance Support (strategic)",
-    // AutoRoutines.allianceSupportAuto(swerve, intake, shooter));
-
-    // ================================================================
-    // TEST ROUTINES (Not DIP selectable)
-    // ================================================================
-    autoChooser.addOption("TEST: Drive Forward", AutoRoutines.driveForwardAuto(swerve));
-    autoChooser.addOption("TEST: Drive Backward", AutoRoutines.driveBackwardAuto(swerve));
-    // TODO: Re-enable when intake is fixed (Spark Max ID 9)
-    // autoChooser.addOption("TEST: Drive and Intake", AutoRoutines.driveAndIntakeAuto(swerve,
-    // intake));
-    // autoChooser.addOption("TEST: Two FUEL Auto", AutoRoutines.twoFuelAuto(swerve, intake,
-    // shooter));
+    autoChooser.addOption(
+        "1: Score, Collect & Climb",
+        AutoRoutines.scoreCollectAndClimbAuto(swerve, intake, shooter, climber));
+    autoChooser.addOption(
+        "2: Quick Climb", AutoRoutines.quickClimbAuto(swerve, intake, shooter, climber));
+    autoChooser.addOption(
+        "3: Preload Only", AutoRoutines.preloadOnlyAuto(swerve, intake, shooter));
   }
 
   // ================================================================
@@ -575,7 +536,7 @@ public class RobotContainer {
       // Lock the selection at the start of auto to prevent mid-match changes
       dipSwitchSelector.lockSelection();
       int selection = dipSwitchSelector.getSelection();
-      return AutoRoutines.getAutoFromSelection(selection, swerve, intake, shooter, vision);
+      return AutoRoutines.getAutoFromSelection(selection, swerve, intake, shooter, climber, vision);
     } else {
       return autoChooser.getSelected();
     }

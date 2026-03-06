@@ -18,4 +18,18 @@ public final class ClimberCommands {
     if (climber == null) return Commands.none();
     return Commands.startEnd(climber::retract, climber::stop, climber).withName("Climber Retract");
   }
+
+  /** Move climber to Level 2 position (bumpers above low rung). */
+  public static Command climbToLevel2Command(Climber climber) {
+    if (climber == null) return Commands.none();
+    return Commands.startEnd(climber::climbToLevel2, climber::stop, climber)
+        .withName("Climber Level 2");
+  }
+
+  /** Move climber to Level 3 position (bumpers above mid rung). */
+  public static Command climbToLevel3Command(Climber climber) {
+    if (climber == null) return Commands.none();
+    return Commands.startEnd(climber::climbToLevel3, climber::stop, climber)
+        .withName("Climber Level 3");
+  }
 }

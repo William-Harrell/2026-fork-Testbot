@@ -16,10 +16,6 @@ public class Vision {
       double avgDistanceMeters,
       double avgAmbiguity) {}
 
-      public static void ieasnd() {
-
-      }
-
   private final AprilTagFieldLayout fieldLayout;
   private Photon photon;
   private Limelight limelight;
@@ -64,7 +60,6 @@ public class Vision {
    * @return 3D pose if available
    */
   public Optional<Pose3d> getPose3d(Pose2d robotPose) {
-     // return 
     return photon.getBestVisionUpdate(robotPose).map(VisionUpdate::pose3d);
   }
 

@@ -116,7 +116,12 @@ public class ShooterCommands {
     return Commands.sequence(
             Commands.runOnce(shooter::prepareDefaultShot, shooter),
             Commands.waitUntil(shooter.getF()::isReadyToShoot),
-            Commands.run(intake.getR()::feedToShooter, intake))
+            // G407: only feed if robot is inside the alliance zone
+            Commands.either(
+                Commands.run(intake.getR()::feedToShooter, intake),
+                Commands.runOnce(
+                    () -> SmartDashboard.putString("Shooter/Warning", "G407: NOT IN ALLIANCE ZONE")),
+                shooter.getP()::isInAllianceZone))
         .finallyDo(
             interrupted -> {
               shooter.stop();

@@ -63,6 +63,8 @@ public final class OI {
 
     Trigger climbDown();
 
+    Trigger climbLevel2();
+
     Trigger orientAndShoot();
   }
 
@@ -143,6 +145,11 @@ public final class OI {
     @Override
     public Trigger climbDown() {
       return stick.povDown();
+    }
+
+    @Override
+    public Trigger climbLevel2() {
+      return stick.povLeft();
     }
 
     @Override

@@ -316,10 +316,13 @@ public class Physics {
 
     double g = ShooterConstants.G_ACCEL;
 
-    // Estimate launch velocity from flywheel RPM (this needs calibration)
-    // Assuming linear relationship between RPM and ball exit velocity
+    // Estimate ball exit velocity from flywheel surface speed
+    // v = (RPM / 60) * 2π * r * efficiency
     double estimatedVelocity =
-        ShooterConstants.FLYWHEEL_SHOOT_RPM * 0.001; // (placeholder TODO - calibrate)
+        (ShooterConstants.FLYWHEEL_SHOOT_RPM / 60.0)
+            * 2 * Math.PI
+            * ShooterConstants.FLYWHEEL_WHEEL_RADIUS_M
+            * ShooterConstants.FLYWHEEL_EFFICIENCY;
 
     // Use high arc solution (+ sqrt term) for better accuracy
     double v2 = estimatedVelocity * estimatedVelocity;

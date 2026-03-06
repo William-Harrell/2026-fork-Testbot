@@ -11,21 +11,21 @@ public final class ShooterConstants {
 
   public static final double HUB_RIM_HEIGHT = 1.8288;
 
-  public static final double LAUNCH_ANGLE = 60.0; // degrees (placeholder TODO)
+  public static final double LAUNCH_ANGLE = 45.0; // degrees — tune on real robot
   public static final double G_ACCEL = 9.8067; // acceleration due to gravity (g) m/s^2
-  public static final double Z_OFFSET = 0.5; // meters (placeholder TODO)
+  public static final double Z_OFFSET = 0.5; // meters — height of shooter above floor, measure on robot
 
-  public static final double ANGLE_TOLERANCE = 10.0; // degrees (placeholder TODO)
+  public static final double ANGLE_TOLERANCE = 3.0; // degrees
 
   // ================================================================
   // SHOOTER HARDWARE
   // ================================================================
 
   /** CAN ID for flywheel motor */
-  public static final int FLYWHEEL_MOTOR_ID = 11; // (placeholder TODO)
+  public static final int FLYWHEEL_MOTOR_ID = 11;
 
   /** CAN ID for hood motor */
-  public static final int HOOD_MOTOR_ID = 12; // (placeholder TODO)
+  public static final int HOOD_MOTOR_ID = 12;
 
   // Hex encoder (REV Through Bore, 8192 CPR)
   public static final int ENCODER_CPR = 8192;
@@ -33,8 +33,8 @@ public final class ShooterConstants {
   /** Degrees per encoder rotation (based on hood gear ratio) — TODO: measure on real robot */
   public static final double HOOD_DEGREES_PER_ROTATION = 10.0;
 
-  /** Hood PID gains */
-  public static final double HOOD_kP = 0.05; // TODO: tune
+  /** Hood PID gains — tune on real robot */
+  public static final double HOOD_kP = 0.05;
   public static final double HOOD_kI = 0.0;
   public static final double HOOD_kD = 0.0;
 
@@ -50,27 +50,39 @@ public final class ShooterConstants {
   public static final double PITCH_MAX_ANGLE = 60.0 - (PITCH_TOLERANCE + 1.5);
 
   /** Default/resting pitch angle */
-  public static final double PITCH_STOW_ANGLE = 45.0; // (placeholder TODO)
+  public static final double PITCH_STOW_ANGLE = 45.0; // degrees — tune on real robot
 
   // ================================================================
   // FLYWHEEL CONFIGURATION
   // ================================================================
 
-  /** Flywheel velocity for scoring (RPM) */
-  public static final double FLYWHEEL_SHOOT_RPM = 4000.0; // (placeholder TODO)
+  /** Flywheel velocity for scoring (RPM) — tune on real robot */
+  public static final double FLYWHEEL_SHOOT_RPM = 4000.0;
 
   /** Flywheel idle/warmup velocity (RPM) */
-  public static final double FLYWHEEL_IDLE_RPM = 1000.0; // (placeholder TODO)
+  public static final double FLYWHEEL_IDLE_RPM = 1000.0;
 
   /** Tolerance for flywheel at target speed */
-  public static final double FLYWHEEL_RPM_TOLERANCE = 100.0; // (placeholder TODO)
+  public static final double FLYWHEEL_RPM_TOLERANCE = 100.0;
 
-  /** Flywheel PID gains */
-  public static final double FLYWHEEL_kP = 0.0005; // (placeholder TODO)
+  /** Flywheel PID gains — tune on real robot (kFF ≈ 1/maxRPM for NEO) */
+  public static final double FLYWHEEL_kP = 0.0005;
 
   public static final double FLYWHEEL_kI = 0.0;
   public static final double FLYWHEEL_kD = 0.0;
-  public static final double FLYWHEEL_kFF = 0.000175; // (placeholder TODO)
+  public static final double FLYWHEEL_kFF = 0.000175; // 1/5700 for NEO
+
+  /**
+   * Flywheel wheel radius for exit velocity calculation (meters).
+   * Assumes a 4-inch (0.1016m diameter) compliant wheel — measure on real robot.
+   */
+  public static final double FLYWHEEL_WHEEL_RADIUS_M = 0.0508;
+
+  /**
+   * Fraction of flywheel surface speed that transfers to the ball (~80-90% is typical).
+   * Tune this with a chronograph or measured shot data.
+   */
+  public static final double FLYWHEEL_EFFICIENCY = 0.85;
 
   /** Flywheel current limit */
   public static final int FLYWHEEL_CURRENT_LIMIT = 40; // Amps

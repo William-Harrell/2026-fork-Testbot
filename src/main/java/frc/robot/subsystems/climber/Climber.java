@@ -9,6 +9,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
@@ -76,6 +77,14 @@ public class Climber extends SubsystemBase {
     setPosition(ClimberConstants.RETRACTED_POSITION);
   }
 
+  public void climbToLevel2() {
+    setPosition(ClimberConstants.LEVEL_2_POSITION);
+  }
+
+  public void climbToLevel3() {
+    setPosition(ClimberConstants.LEVEL_3_POSITION);
+  }
+
   public void setPosition(double rotations) {
     leftController.setSetpoint(rotations, SparkMax.ControlType.kPosition);
     rightController.setSetpoint(rotations, SparkMax.ControlType.kPosition);
@@ -117,5 +126,13 @@ public class Climber extends SubsystemBase {
 
   public double getRightPosition() {
     return rightEncoder.getPosition();
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("Climber/LeftPosition", getLeftPosition());
+    SmartDashboard.putNumber("Climber/RightPosition", getRightPosition());
+    SmartDashboard.putBoolean("Climber/IsExtended", isExtended());
+    SmartDashboard.putBoolean("Climber/IsRetracted", isRetracted());
   }
 }

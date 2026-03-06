@@ -102,6 +102,8 @@ import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.hopper.Hopper;
+import frc.robot.subsystems.rollerbelt.RollerBelt;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
@@ -168,6 +170,12 @@ public class RobotContainer {
 
   /** Climber subsystem - extends and retracts the climbing arms. */
   private final Climber climber;
+
+  /** Hopper subsystem - feeds FUEL from storage to shooter. */
+  private final Hopper hopper;
+
+  /** RollerBelt subsystem - moves FUEL along the belt to the hopper. */
+  private final RollerBelt rollerBelt;
 
   /**
    * Superstructure - coordinates multiple subsystems.
@@ -275,6 +283,8 @@ public class RobotContainer {
     shooter = new Shooter(vision, swerve); // Shooter needs vision for targeting
     intake = new Intake();
     climber = new Climber();
+    hopper = new Hopper();
+    rollerBelt = new RollerBelt();
 
     // Superstructure holds references to all subsystems for coordination
     superstructure = new Superstructure(swerve, vision, shooter, intake, climber);
@@ -452,15 +462,20 @@ public class RobotContainer {
     // CLIMBER CONTROLS
     // ----------------------------------------------------------------
 
-    // D-pad up: extend climber while held
+    // D-pad up: climb to Level 3 while held
     driverJoystick
         .climbUp()
-        .whileTrue(ClimberCommands.extendCommand(superstructure.getClimber()));
+        .whileTrue(ClimberCommands.climbToLevel3Command(superstructure.getClimber()));
 
     // D-pad down: retract climber while held
     driverJoystick
         .climbDown()
         .whileTrue(ClimberCommands.retractCommand(superstructure.getClimber()));
+
+    // D-pad left: climb to Level 2 while held
+    driverJoystick
+        .climbLevel2()
+        .whileTrue(ClimberCommands.climbToLevel2Command(superstructure.getClimber()));
 
     // ----------------------------------------------------------------
     // SHOOTER CONTROLS

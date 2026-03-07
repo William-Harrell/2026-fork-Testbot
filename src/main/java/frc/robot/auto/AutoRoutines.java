@@ -39,7 +39,9 @@ public final class AutoRoutines {
             + (isRedAlliance()
                 ? -FieldConstants.NEUTRAL_CLOSE_OFFSET
                 : FieldConstants.NEUTRAL_CLOSE_OFFSET);
-    return new Pose2d(x, FieldConstants.CENTER_Y, Rotation2d.fromDegrees(0));
+    // Heading matches alliance facing direction so robot doesn't spin 180°
+    return new Pose2d(x, FieldConstants.CENTER_Y,
+        Rotation2d.fromDegrees(isRedAlliance() ? 180 : 0));
   }
 
   private static Pose2d getTowerPose() {
@@ -94,10 +96,6 @@ public final class AutoRoutines {
 
   public static Command scoreCollectAuto(
       SwerveDrive swerve, Intake intake, Shooter shooter, Hopper hopper, RollerBelt rollerBelt) {
-    // Drive direction: Blue faces +X (0°), Red faces -X (180°)
-    double intakeDriveSpeed =
-        isRedAlliance() ? -AutoConstants.AUTO_INTAKE_DRIVE_SPEED : AutoConstants.AUTO_INTAKE_DRIVE_SPEED;
-
     return Commands.sequence(
             AutoCommands.logMessage("Mode 1: Score & Collect"),
 
@@ -107,11 +105,14 @@ public final class AutoRoutines {
             // Phase 2: Drive to neutral, collect FUEL (belt+hopper run to stage FUEL)
             AutoCommands.driveToPose(swerve, getNeutralPose()).withTimeout(4.0),
             Commands.parallel(
+                    // Robot-relative +X = "forward" from robot's perspective.
+                    // Both alliances face toward neutral after driveToPose, so
+                    // positive speed always drives toward FUEL.
                     new SwerveCommands.DriveDistanceCommand(
-                        swerve, intakeDriveSpeed, 0, 2.0),
+                        swerve, AutoConstants.AUTO_INTAKE_DRIVE_SPEED, 0, 2.0),
                     Commands.sequence(
                         Commands.runOnce(intake::deployIntakeMechanism, intake),
-                        Commands.waitUntil(intake.getD()::isDeployed),
+                        Commands.waitUntil(intake.getD()::isDeployed).withTimeout(1.0),
                         Commands.run(intake.getR()::runIntake, intake)),
                     Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt),
                     Commands.startEnd(hopper::feed, hopper::stop, hopper))

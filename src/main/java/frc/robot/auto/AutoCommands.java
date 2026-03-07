@@ -197,13 +197,14 @@ public final class AutoCommands {
     return Commands.sequence(
         // Set pitch angle + spin up to shoot RPM
         Commands.runOnce(shooter::prepareDefaultShot, shooter),
-        // Wait until flywheel is at speed AND pitch is at target
-        Commands.waitUntil(shooter.getF()::isReadyToShoot),
-        // Feed all FUEL through belt → hopper → shooter
+        // Wait until flywheel is at speed (3s timeout prevents hanging if motor fails)
+        Commands.waitUntil(shooter.getF()::isReadyToShoot).withTimeout(3.0),
+        // Feed all FUEL through belt → hopper → shooter (2s is enough to clear preload)
         Commands.parallel(
             IntakeCommands.feedCommand(intake),
             Commands.startEnd(hopper::feed, hopper::stop, hopper),
-            Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt)),
+            Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt))
+            .withTimeout(2.0),
         // Give last FUEL time to exit barrel
         Commands.waitSeconds(0.3),
         // Stop shooter
@@ -222,11 +223,12 @@ public final class AutoCommands {
       Shooter shooter, Intake intake, Hopper hopper, RollerBelt rollerBelt) {
     return Commands.sequence(
         Commands.runOnce(shooter::prepareDefaultShot, shooter),
-        Commands.waitUntil(shooter.getF()::isReadyToShoot),
+        Commands.waitUntil(shooter.getF()::isReadyToShoot).withTimeout(3.0),
         Commands.parallel(
             IntakeCommands.feedCommand(intake),
             Commands.startEnd(hopper::feed, hopper::stop, hopper),
-            Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt)),
+            Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt))
+            .withTimeout(1.0),
         Commands.waitSeconds(0.3),
         Commands.runOnce(shooter::stop, shooter))
         .withName("Shoot One FUEL");

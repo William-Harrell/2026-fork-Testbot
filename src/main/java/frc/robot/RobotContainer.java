@@ -506,16 +506,26 @@ public class RobotContainer {
    * autoChooser.addOption() 3. Add a case in getAutoFromSelection() if using DIP switch
    */
   private void registerAutoRoutines() {
+    // Each non-trivial mode is prefixed with a vision pose seed so odometry
+    // starts from a reliable position even when using the SmartDashboard chooser.
+    Command visionSeed = AutoRoutines.seedPoseFromVision(swerve, vision);
+
     autoChooser.setDefaultOption("0: Do Nothing", AutoRoutines.doNothing());
     autoChooser.addOption(
         "1: Score & Collect",
-        AutoRoutines.scoreCollectAuto(swerve, intake, shooter, hopper, rollerBelt));
+        Commands.sequence(
+            visionSeed,
+            AutoRoutines.scoreCollectAuto(swerve, intake, shooter, hopper, rollerBelt)));
     autoChooser.addOption(
         "2: Score Only",
-        AutoRoutines.scoreOnlyAuto(swerve, intake, shooter, hopper, rollerBelt));
+        Commands.sequence(
+            AutoRoutines.seedPoseFromVision(swerve, vision),
+            AutoRoutines.scoreOnlyAuto(swerve, intake, shooter, hopper, rollerBelt)));
     autoChooser.addOption(
         "3: Preload Only",
-        AutoRoutines.preloadOnlyAuto(swerve, intake, shooter, hopper, rollerBelt));
+        Commands.sequence(
+            AutoRoutines.seedPoseFromVision(swerve, vision),
+            AutoRoutines.preloadOnlyAuto(swerve, intake, shooter, hopper, rollerBelt)));
   }
 
   // ================================================================

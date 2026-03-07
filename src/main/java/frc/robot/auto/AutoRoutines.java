@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.rollerbelt.RollerBelt;
@@ -52,7 +53,7 @@ public final class AutoRoutines {
   // VISION POSE SEEDING
   // ================================================================
 
-  static Command seedPoseFromVision(SwerveDrive swerve, Vision vision) {
+  public static Command seedPoseFromVision(SwerveDrive swerve, Vision vision) {
     return Commands.runOnce(
             () ->
                 vision
@@ -93,26 +94,33 @@ public final class AutoRoutines {
 
   public static Command scoreCollectAuto(
       SwerveDrive swerve, Intake intake, Shooter shooter, Hopper hopper, RollerBelt rollerBelt) {
+    // Drive direction: Blue faces +X (0°), Red faces -X (180°)
+    double intakeDriveSpeed =
+        isRedAlliance() ? -AutoConstants.AUTO_INTAKE_DRIVE_SPEED : AutoConstants.AUTO_INTAKE_DRIVE_SPEED;
+
     return Commands.sequence(
             AutoCommands.logMessage("Mode 1: Score & Collect"),
 
             // Phase 1: Shoot preload
             AutoCommands.shootAllFuel(shooter, intake, hopper, rollerBelt),
 
-            // Phase 2: Drive to neutral, collect FUEL
-            AutoCommands.driveToPose(swerve, getNeutralPose()),
+            // Phase 2: Drive to neutral, collect FUEL (belt+hopper run to stage FUEL)
+            AutoCommands.driveToPose(swerve, getNeutralPose()).withTimeout(4.0),
             Commands.parallel(
-                    AutoCommands.driveForward(swerve, 2.0, AutoConstants.AUTO_INTAKE_DRIVE_SPEED),
+                    new SwerveCommands.DriveDistanceCommand(
+                        swerve, intakeDriveSpeed, 0, 2.0),
                     Commands.sequence(
                         Commands.runOnce(intake::deployIntakeMechanism, intake),
                         Commands.waitUntil(intake.getD()::isDeployed),
-                        Commands.run(intake.getR()::runIntake, intake)))
+                        Commands.run(intake.getR()::runIntake, intake)),
+                    Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt),
+                    Commands.startEnd(hopper::feed, hopper::stop, hopper))
                 .withTimeout(AutoConstants.INTAKE_TIMEOUT),
             Commands.runOnce(intake.getR()::stopRollers, intake),
             Commands.runOnce(intake::retractIntakeMechanism, intake),
 
             // Phase 3: Return and shoot
-            AutoCommands.driveToPose(swerve, getShootingPose()),
+            AutoCommands.driveToPose(swerve, getShootingPose()).withTimeout(4.0),
             AutoCommands.shootAllFuel(shooter, intake, hopper, rollerBelt),
             AutoCommands.logMessage("Mode 1 Complete"))
         .withName("1: Score & Collect");

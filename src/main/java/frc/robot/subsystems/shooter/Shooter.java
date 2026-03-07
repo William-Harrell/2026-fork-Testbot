@@ -9,6 +9,7 @@ import frc.robot.subsystems.shooter.Physics.VisionAimedShot;
 import frc.robot.subsystems.shooter.ShooterState.shooter_state;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.Elastic;
 
 public class Shooter extends SubsystemBase {
   // Sub-subsystems
@@ -16,6 +17,9 @@ public class Shooter extends SubsystemBase {
   private Physics physics;
   private ShooterState state_machine;
   private Flywheel flywheel;
+
+  // Track hub active state for shift change notifications
+  private boolean lastHubActive = true;
 
   public Shooter(Vision vision, SwerveDrive swerve) {
     // Intra (w/ overload constructors)
@@ -80,6 +84,27 @@ public class Shooter extends SubsystemBase {
     state_machine.update();
     orientation.updateDashboard();
     updateDashboard();
+
+    // Notify driver when hub active status changes
+    boolean hubActive = physics.isHubActive();
+    if (hubActive != lastHubActive) {
+      if (hubActive) {
+        Elastic.sendNotification(
+            new Elastic.Notification()
+                .withLevel(Elastic.NotificationLevel.INFO)
+                .withTitle("HUB ACTIVE")
+                .withDescription("Your hub is now scoring!")
+                .withDisplaySeconds(3.0));
+      } else {
+        Elastic.sendNotification(
+            new Elastic.Notification()
+                .withLevel(Elastic.NotificationLevel.WARNING)
+                .withTitle("HUB INACTIVE")
+                .withDescription("Your hub is off — hold fire!")
+                .withDisplaySeconds(5.0));
+      }
+      lastHubActive = hubActive;
+    }
   }
 
   // Like a mini superstructure, if you will...

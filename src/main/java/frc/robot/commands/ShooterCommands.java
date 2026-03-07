@@ -7,6 +7,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Physics.VisionAimedShot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.util.Elastic;
 
 public class ShooterCommands {
   private ShooterCommands() {}
@@ -116,11 +117,31 @@ public class ShooterCommands {
     return Commands.sequence(
             Commands.runOnce(shooter::prepareDefaultShot, shooter),
             Commands.waitUntil(shooter.getF()::isReadyToShoot),
+            // Check hub active status
+            Commands.runOnce(
+                () -> {
+                  if (!shooter.getP().isHubActive()) {
+                    Elastic.sendNotification(
+                        new Elastic.Notification()
+                            .withLevel(Elastic.NotificationLevel.WARNING)
+                            .withTitle("HUB INACTIVE")
+                            .withDescription("Your hub is off this shift — 0 pts!")
+                            .withDisplaySeconds(3.0));
+                  }
+                }),
             // G407: only feed if robot is inside the alliance zone
             Commands.either(
                 Commands.run(intake.getR()::feedToShooter, intake),
                 Commands.runOnce(
-                    () -> SmartDashboard.putString("Shooter/Warning", "G407: NOT IN ALLIANCE ZONE")),
+                    () -> {
+                      SmartDashboard.putString("Shooter/Warning", "G407: NOT IN ALLIANCE ZONE");
+                      Elastic.sendNotification(
+                          new Elastic.Notification()
+                              .withLevel(Elastic.NotificationLevel.ERROR)
+                              .withTitle("G407 VIOLATION")
+                              .withDescription("Not in alliance zone — cannot shoot!")
+                              .withDisplaySeconds(5.0));
+                    }),
                 shooter.getP()::isInAllianceZone))
         .finallyDo(
             interrupted -> {

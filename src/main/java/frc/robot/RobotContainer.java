@@ -108,6 +108,7 @@ import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.DipSwitchSelector;
+import frc.robot.util.Elastic;
 import frc.robot.util.constants.DrivingConstants;
 
 /**
@@ -290,6 +291,30 @@ public class RobotContainer {
     // then zeros their encoders. Times out after 3s if switches don't trigger.
     Commands.parallel(intake.getD().homeCommand(), shooter.getO().homeCommand())
         .withTimeout(3.0)
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  boolean intakeOk = intake.getD().isHomed();
+                  boolean hoodOk = shooter.getO().isHomed();
+                  if (intakeOk && hoodOk) {
+                    Elastic.sendNotification(
+                        new Elastic.Notification()
+                            .withLevel(Elastic.NotificationLevel.INFO)
+                            .withTitle("Homing Complete")
+                            .withDescription("Intake and hood encoders zeroed")
+                            .withDisplaySeconds(3.0));
+                  } else {
+                    Elastic.sendNotification(
+                        new Elastic.Notification()
+                            .withLevel(Elastic.NotificationLevel.ERROR)
+                            .withTitle("Homing Failed")
+                            .withDescription(
+                                (!intakeOk ? "Intake " : "")
+                                    + (!hoodOk ? "Hood " : "")
+                                    + "limit switch not triggered")
+                            .withNoAutoDismiss());
+                  }
+                }))
         .withName("Home Mechanisms")
         .schedule();
 

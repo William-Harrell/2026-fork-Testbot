@@ -95,4 +95,8 @@ public final class ShooterConstants {
 
   /** Ramp rate for closed-loop spinup (seconds from 0 to full output) — limits inrush current */
   public static final double FLYWHEEL_RAMP_RATE = 0.75; // seconds
+
+  // Limit switch for hood homing (roboRIO DIO port)
+  public static final int HOOD_LIMIT_SWITCH_DIO = 6;
+  public static final double HOOD_HOMING_SPEED = -0.1; // slow toward stow
 }

@@ -8,7 +8,10 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 /** Two Vortex (SparkFlex) motors that deploy/retract the intake mechanism */
 public class Deploy {
@@ -16,7 +19,9 @@ public class Deploy {
   private final SparkFlex deployMotor2;
   private final RelativeEncoder deployEncoder;
   private final SparkClosedLoopController deployController;
+  private final DigitalInput limitSwitch;
   private double targetPosition;
+  private boolean homed = false;
 
   /** {@code motor1} is the leader, {@code motor2} follows it */
   public Deploy(SparkFlex motor1, SparkFlex motor2) {
@@ -41,7 +46,13 @@ public class Deploy {
     deployMotor2.configure(
         followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    deployEncoder.setPosition(0);
+    limitSwitch = new DigitalInput(IntakeConstants.DEPLOY_LIMIT_SWITCH_DIO);
+
+    // If already at home position on boot, zero immediately
+    if (isAtHome()) {
+      deployEncoder.setPosition(0);
+      homed = true;
+    }
   }
 
   public SparkFlex get() {
@@ -70,9 +81,47 @@ public class Deploy {
     return deployEncoder.getPosition();
   }
 
+  /** True when the limit switch is triggered (mechanism at stow/home position). */
+  public boolean isAtHome() {
+    return !limitSwitch.get(); // active-low: grounded = false = triggered
+  }
+
+  /** Whether the encoder has been homed since boot. */
+  public boolean isHomed() {
+    return homed;
+  }
+
+  /**
+   * Command that slowly retracts toward stow until the limit switch triggers,
+   * then zeros the encoder. If already at home, zeros immediately.
+   */
+  public Command homeCommand() {
+    return Commands.either(
+        // Already home — just zero
+        Commands.runOnce(() -> { deployEncoder.setPosition(0); homed = true; }),
+        // Not home — drive slowly toward stow until switch triggers
+        Commands.run(() -> deployMotor.set(IntakeConstants.HOMING_SPEED))
+            .until(this::isAtHome)
+            .andThen(Commands.runOnce(() -> {
+              deployMotor.set(0);
+              deployEncoder.setPosition(0);
+              homed = true;
+            })),
+        this::isAtHome)
+        .withName("Home Intake Deploy");
+  }
+
   public void update() {
+    // Auto-correct encoder drift: if limit switch triggers, re-zero
+    if (isAtHome() && Math.abs(deployEncoder.getPosition()) > IntakeConstants.POSITION_TOLERANCE) {
+      deployEncoder.setPosition(0);
+      homed = true;
+    }
+
     SmartDashboard.putNumber("Intake/Position", deployEncoder.getPosition());
     SmartDashboard.putBoolean("Intake/IsDeployed", isDeployed());
     SmartDashboard.putBoolean("Intake/IsStowed", isStowed());
+    SmartDashboard.putBoolean("Intake/LimitSwitch", isAtHome());
+    SmartDashboard.putBoolean("Intake/Homed", homed);
   }
 }

@@ -77,8 +77,8 @@ public class Shooter extends SubsystemBase {
 
   // Runs every ~20 ms
   public void periodic() {
-    // Ctrl + click (or symbol search) to see details
     state_machine.update();
+    orientation.updateDashboard();
     updateDashboard();
   }
 

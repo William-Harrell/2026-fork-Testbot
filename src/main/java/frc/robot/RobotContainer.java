@@ -285,6 +285,14 @@ public class RobotContainer {
     superstructure = new Superstructure(swerve, vision, shooter, intake);
     superstructure.doNothing(); // Just to get rid of the java warning temporarily
 
+    // Home mechanisms that use relative encoders.
+    // Slowly retracts intake deploy and shooter hood until limit switches trigger,
+    // then zeros their encoders. Times out after 3s if switches don't trigger.
+    Commands.parallel(intake.getD().homeCommand(), shooter.getO().homeCommand())
+        .withTimeout(3.0)
+        .withName("Home Mechanisms")
+        .schedule();
+
     // ================================================================
     // STEP 4: SET DEFAULT COMMANDS
     // ================================================================

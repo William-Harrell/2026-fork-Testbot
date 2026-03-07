@@ -8,12 +8,18 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 
 public class Orientation {
   private final SparkFlex hoodMotor;
   private final RelativeEncoder hoodEncoder;
   private final SparkClosedLoopController hoodController;
+  private final DigitalInput limitSwitch;
   private double targetPitchAngle;
+  private boolean homed = false;
 
   public Orientation(SparkFlex motor) {
     hoodMotor = motor;
@@ -30,8 +36,14 @@ public class Orientation {
 
     hoodMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
+    limitSwitch = new DigitalInput(ShooterConstants.HOOD_LIMIT_SWITCH_DIO);
     targetPitchAngle = ShooterConstants.PITCH_STOW_ANGLE;
+
+    // If already at home on boot, zero to stow angle immediately
+    if (isAtHome()) {
+      hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
+      homed = true;
+    }
   }
 
   /**
@@ -65,6 +77,54 @@ public class Orientation {
   /** Set pitch to stow position. */
   public void stowPitch() {
     setPitchAngle(ShooterConstants.PITCH_STOW_ANGLE);
+  }
+
+  /** True when the limit switch is triggered (hood at stow/home position). */
+  public boolean isAtHome() {
+    return !limitSwitch.get(); // active-low: grounded = false = triggered
+  }
+
+  /** Whether the encoder has been homed since boot. */
+  public boolean isHomed() {
+    return homed;
+  }
+
+  /**
+   * Command that slowly drives the hood toward stow until the limit switch triggers,
+   * then zeros the encoder to the stow angle. If already home, zeros immediately.
+   */
+  public Command homeCommand() {
+    return Commands.either(
+        // Already home — just zero
+        Commands.runOnce(() -> {
+          hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
+          homed = true;
+        }),
+        // Not home — drive slowly toward stow until switch triggers
+        Commands.run(() -> hoodMotor.set(ShooterConstants.HOOD_HOMING_SPEED))
+            .until(this::isAtHome)
+            .andThen(Commands.runOnce(() -> {
+              hoodMotor.set(0);
+              hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
+              homed = true;
+            })),
+        this::isAtHome)
+        .withName("Home Shooter Hood");
+  }
+
+  /** Call from Shooter.periodic() to update dashboard and auto-correct drift. */
+  public void updateDashboard() {
+    // Auto-correct: if limit switch triggers, re-zero to stow angle
+    if (isAtHome()) {
+      double stowRot = degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE);
+      if (Math.abs(hoodEncoder.getPosition() - stowRot) > degreesToRotations(ShooterConstants.PITCH_TOLERANCE)) {
+        hoodEncoder.setPosition(stowRot);
+        homed = true;
+      }
+    }
+
+    SmartDashboard.putBoolean("Shooter/HoodLimitSwitch", isAtHome());
+    SmartDashboard.putBoolean("Shooter/HoodHomed", homed);
   }
 
   private double degreesToRotations(double degrees) {

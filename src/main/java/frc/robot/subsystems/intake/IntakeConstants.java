@@ -15,4 +15,8 @@ public final class IntakeConstants {
   public static final double DEPLOY_kP = 0.1;
   public static final double INTAKE_SPEED = 0.8;
   public static final double OUTTAKE_SPEED = -0.5;
+
+  // Limit switch for deploy homing (roboRIO DIO port)
+  public static final int DEPLOY_LIMIT_SWITCH_DIO = 0;
+  public static final double HOMING_SPEED = -0.15; // slow retract toward stow
 }

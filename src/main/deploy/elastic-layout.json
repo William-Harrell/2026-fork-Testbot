@@ -1,0 +1,884 @@
+{
+  "version": 1.0,
+  "grid_size": 128.0,
+  "tabs": [
+    {
+      "name": "Match",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Field",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 6.0,
+            "height": 3.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Ready To Shoot",
+            "x": 6.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/ReadyToShoot",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Hub Active",
+            "x": 8.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/HubActive",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "In Alliance Zone",
+            "x": 6.0,
+            "y": 1.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/InAllianceZone",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Aim Locked",
+            "x": 8.0,
+            "y": 1.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Aim/Locked",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Shooter State",
+            "x": 6.0,
+            "y": 2.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/State",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Intake State",
+            "x": 8.0,
+            "y": 2.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/State",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Slow Speed",
+            "x": 10.0,
+            "y": 0.0,
+            "width": 1.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Slow Speed",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Vision Available",
+            "x": 10.0,
+            "y": 1.0,
+            "width": 1.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/VisionAvailable",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Auto Mode",
+            "x": 0.0,
+            "y": 3.0,
+            "width": 3.0,
+            "height": 1.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Auto Selected",
+            "x": 3.0,
+            "y": 3.0,
+            "width": 3.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/Selected Mode",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Front Camera",
+            "x": 0.0,
+            "y": 4.0,
+            "width": 4.0,
+            "height": 3.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/front_cam",
+              "period": 0.06
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Shooter",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "State",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/State",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Ready To Shoot",
+            "x": 2.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/ReadyToShoot",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Hub Active",
+            "x": 4.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/HubActive",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "In Alliance Zone",
+            "x": 6.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/InAllianceZone",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Flywheel RPM",
+            "x": 0.0,
+            "y": 1.0,
+            "width": 4.0,
+            "height": 2.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/FlywheelRPM",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Target RPM",
+            "x": 4.0,
+            "y": 1.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/TargetRPM",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "At Speed",
+            "x": 6.0,
+            "y": 1.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/AtSpeed",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Pitch Angle",
+            "x": 4.0,
+            "y": 2.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/PitchAngle",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Hub Distance",
+            "x": 6.0,
+            "y": 2.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/HubDistance",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Hood Homed",
+            "x": 8.0,
+            "y": 0.0,
+            "width": 1.5,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/HoodHomed",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Hood Limit Switch",
+            "x": 9.5,
+            "y": 0.0,
+            "width": 1.5,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/HoodLimitSwitch",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Vision Available",
+            "x": 0.0,
+            "y": 3.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/VisionAvailable",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Vision Tag Count",
+            "x": 2.0,
+            "y": 3.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Vision/TagCount",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Vision Ambiguity",
+            "x": 4.0,
+            "y": 3.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Vision/Ambiguity",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Vision Distance",
+            "x": 6.0,
+            "y": 3.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Vision/Distance",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Vision High Confidence",
+            "x": 8.0,
+            "y": 3.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Vision/HighConfidence",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Recommended Pitch",
+            "x": 8.0,
+            "y": 1.0,
+            "width": 3.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Shooter/Vision/RecommendedPitch",
+              "period": 0.06
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Intake",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "State",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 3.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/State",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Position",
+            "x": 0.0,
+            "y": 1.0,
+            "width": 4.0,
+            "height": 2.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/Position",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Is Deployed",
+            "x": 3.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/IsDeployed",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Is Stowed",
+            "x": 5.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/IsStowed",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Limit Switch",
+            "x": 7.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/LimitSwitch",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Homed",
+            "x": 9.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Intake/Homed",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Vision",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Front Cam Tags",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/front_cam/TagCount",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Front Cam Ambiguity",
+            "x": 2.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/front_cam/AvgAmbiguity",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Front Cam Distance",
+            "x": 4.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/front_cam/AvgDistance",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Back Left Tags",
+            "x": 0.0,
+            "y": 1.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/back_left_cam/TagCount",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Back Left Ambiguity",
+            "x": 2.0,
+            "y": 1.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/back_left_cam/AvgAmbiguity",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Back Left Distance",
+            "x": 4.0,
+            "y": 1.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/back_left_cam/AvgDistance",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Back Right Tags",
+            "x": 0.0,
+            "y": 2.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/back_right_cam/TagCount",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Back Right Ambiguity",
+            "x": 2.0,
+            "y": 2.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/back_right_cam/AvgAmbiguity",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Back Right Distance",
+            "x": 4.0,
+            "y": 2.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Vision/back_right_cam/AvgDistance",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Aim Locked",
+            "x": 6.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Aim/Locked",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Aim Vision Available",
+            "x": 8.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Aim/VisionAvailable",
+              "period": 0.06,
+              "true_color": 4283215696,
+              "false_color": 4294198070
+            }
+          },
+          {
+            "title": "Aim Error (deg)",
+            "x": 6.0,
+            "y": 1.0,
+            "width": 4.0,
+            "height": 2.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/SmartDashboard/Aim/ErrorDeg",
+              "period": 0.06
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Swerve",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Field",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 6.0,
+            "height": 3.0,
+            "type": "Field",
+            "properties": {
+              "topic": "/SmartDashboard/Field",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "FL Angle",
+            "x": 6.0,
+            "y": 0.0,
+            "width": 2.5,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Module0/Angle",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "FL Velocity",
+            "x": 8.5,
+            "y": 0.0,
+            "width": 2.5,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Module0/Velocity",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "FR Angle",
+            "x": 6.0,
+            "y": 1.0,
+            "width": 2.5,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Module1/Angle",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "FR Velocity",
+            "x": 8.5,
+            "y": 1.0,
+            "width": 2.5,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Module1/Velocity",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "RL Angle",
+            "x": 6.0,
+            "y": 2.0,
+            "width": 2.5,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Module2/Angle",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "RL Velocity",
+            "x": 8.5,
+            "y": 2.0,
+            "width": 2.5,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Module2/Velocity",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "RR Angle",
+            "x": 6.0,
+            "y": 3.0,
+            "width": 2.5,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Module3/Angle",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "RR Velocity",
+            "x": 8.5,
+            "y": 3.0,
+            "width": 2.5,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Swerve/Module3/Velocity",
+              "period": 0.06
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Auto",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Auto Chooser",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 4.0,
+            "height": 1.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Auto Chooser",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Selected Mode",
+            "x": 4.0,
+            "y": 0.0,
+            "width": 3.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/Selected Mode",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Using DIP Switch",
+            "x": 7.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/Using DIP Switch",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Selection Locked",
+            "x": 9.0,
+            "y": 0.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/Selection Locked",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "DIP Switch Value",
+            "x": 0.0,
+            "y": 1.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/DIP Switch Value",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "DIP Binary",
+            "x": 2.0,
+            "y": 1.0,
+            "width": 2.0,
+            "height": 1.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/DIP Binary",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Bit 0 (1)",
+            "x": 0.0,
+            "y": 2.0,
+            "width": 1.5,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/DIP Bit 0 (1)",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Bit 1 (2)",
+            "x": 1.5,
+            "y": 2.0,
+            "width": 1.5,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/DIP Bit 1 (2)",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Bit 2 (4)",
+            "x": 3.0,
+            "y": 2.0,
+            "width": 1.5,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/DIP Bit 2 (4)",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Bit 3 (8)",
+            "x": 4.5,
+            "y": 2.0,
+            "width": 1.5,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/DIP Bit 3 (8)",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Bit 4 (16)",
+            "x": 6.0,
+            "y": 2.0,
+            "width": 1.5,
+            "height": 1.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/SmartDashboard/Auto/DIP Bit 4 (16)",
+              "period": 0.06
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

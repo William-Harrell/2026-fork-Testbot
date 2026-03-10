@@ -14,34 +14,35 @@ public class Vision {
       double timestampSeconds,
       int tagCount,
       double avgDistanceMeters,
-      double avgAmbiguity) {}
+      double avgAmbiguity) {
+  }
 
   private final AprilTagFieldLayout fieldLayout;
   private Photon photon;
-  private Limelight limelight;
+  // private Limelight limelight;
 
   public Vision() {
     // Load tags and let us know if it fails. don't screw w/ program @ runtime.
     try {
-      fieldLayout =
-          new AprilTagFieldLayout(
-              Filesystem.getDeployDirectory().toPath().resolve("2026-rebuilt-welded.json"));
+      fieldLayout = new AprilTagFieldLayout(
+          Filesystem.getDeployDirectory().toPath().resolve("2026-rebuilt-welded.json"));
     } catch (IOException e) {
       throw new RuntimeException("Failed to load AprilTag layout", e);
     }
 
     photon = new Photon(Optional.of(fieldLayout));
-    limelight = new Limelight(VisionConstants.LIMELIGHT_NAME);
+    // limelight = new Limelight(VisionConstants.LIMELIGHT_NAME);
   }
 
   public Photon getP() {
     return photon;
   }
 
-  public Limelight getL() {
-    return limelight;
-  }
-
+  /*
+   * public Limelight getL() {
+   * return limelight;
+   * }
+   */
   /**
    * Get the robot's 2D pose from AprilTag detection.
    *
@@ -70,7 +71,7 @@ public class Vision {
    * @return Complete vision update with confidence metrics
    */
   public Optional<VisionUpdate> getBestVisionUpdateRaw(Pose2d robotPose) {
-     // TODO LIMELIGHT VERSION HERE
+    // TODO LIMELIGHT VERSION HERE
     return photon.getBestVisionUpdate(robotPose);
   }
 }

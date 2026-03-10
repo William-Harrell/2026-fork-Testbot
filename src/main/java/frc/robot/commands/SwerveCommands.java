@@ -449,8 +449,11 @@ public final class SwerveCommands {
     public void execute() {
       double omega = 0.0;
 
+      // SOLVED C-03
+      double rth = physics.robotToHub();
+
       if (physics.hasReliableVisionTarget()) {
-        double errorDeg = physics.robotToHub();
+        double errorDeg = rth;
         omega = thetaController.calculate(errorDeg);
       }
 
@@ -463,7 +466,7 @@ public final class SwerveCommands {
 
       SmartDashboard.putBoolean("Aim/Locked", thetaController.atSetpoint());
       SmartDashboard.putBoolean("Aim/VisionAvailable", physics.hasReliableVisionTarget());
-      SmartDashboard.putNumber("Aim/ErrorDeg", physics.robotToHub());
+      SmartDashboard.putNumber("Aim/ErrorDeg", rth);
     }
 
     @Override

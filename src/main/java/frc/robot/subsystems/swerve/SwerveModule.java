@@ -402,8 +402,9 @@ public class SwerveModule {
    * both encoders agree on the current position.
    */
   public void resetToAbsolute() {
-    // Get the absolute angle (already offset-corrected)
-    double absolutePosition = getAbsoluteAngle().getDegrees();
+    // Get the absolute angle (already offset-corrected) <-- SYBAU 😌
+    // SOLVED C-04
+    double absolutePosition = getAbsoluteAngle().getDegrees() + 180;
 
     // Set the relative encoder to match
     azimuthEncoder.setPosition(absolutePosition);

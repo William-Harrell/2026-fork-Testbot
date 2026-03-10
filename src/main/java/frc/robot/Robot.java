@@ -209,6 +209,8 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
     // Nothing special needed when entering disabled
     // Commands will be cancelled automatically
+    // SOLVED C-01
+    robotContainer.onDisabled();
   }
 
   /**

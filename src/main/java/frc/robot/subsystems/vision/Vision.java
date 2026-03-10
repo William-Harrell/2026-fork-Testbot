@@ -4,10 +4,12 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import java.io.IOException;
 import java.util.Optional;
 
-public class Vision {
+public class Vision extends SubsystemBase{
   public record VisionUpdate(
       Pose3d pose3d,
       Pose2d pose2d,
@@ -73,5 +75,11 @@ public class Vision {
   public Optional<VisionUpdate> getBestVisionUpdateRaw(Pose2d robotPose) {
     // TODO LIMELIGHT VERSION HERE
     return photon.getBestVisionUpdate(robotPose);
+  }
+
+  @Override
+  public void periodic() {
+    // SOLVED C-02
+    photon.clearUpdateCache();
   }
 }

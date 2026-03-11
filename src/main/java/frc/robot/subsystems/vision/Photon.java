@@ -6,11 +6,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.vision.Config.CameraConfig;
 import frc.robot.subsystems.vision.Vision.VisionUpdate;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
@@ -23,41 +20,33 @@ public class Photon {
   private final List<PhotonCamera> cameras = new ArrayList<>();
   private final List<PhotonPoseEstimator> estimators = new ArrayList<>();
   private AprilTagFieldLayout field;
-  private Map<String, Optional<VisionUpdate>> updateCache = new HashMap<>();
+
+  // Per-loop cache: computed once by the first caller, reused by all subsequent
+  // callers within the same 20ms loop. Cleared each loop by calling invalidateCache().
+  private Optional<VisionUpdate> cachedUpdate = Optional.empty();
+  private boolean cacheValid = false;
 
   public Photon(Optional<AprilTagFieldLayout> layout) {
     // Initialize cameras & estimators w/ config data
     for (CameraConfig cfg : Config.cameraConfigs) {
       PhotonCamera cam = new PhotonCamera(cfg.name());
       field = layout.orElse(null); // honestly dk what to do here if we can't get the tags
-      PhotonPoseEstimator estimator = new PhotonPoseEstimator(field, cfg.strategy(), cfg.robotToCamera());
+      PhotonPoseEstimator estimator =
+          new PhotonPoseEstimator(field, cfg.strategy(), cfg.robotToCamera());
 
       cameras.add(cam);
       estimators.add(estimator);
     }
   }
 
-  // SOLVED C-02
-  public void clearUpdateCache() {
-    updateCache.clear();
-  }
-
   /** Makes a vision update record based on the specified camera */
-  private Optional<VisionUpdate> getSingleCameraUpdate(PhotonCamera camera, PhotonPoseEstimator estimator,
-      Pose2d robotPose) {
-
-    // SOLVED C-02
-    Optional<VisionUpdate> temp = updateCache.get(camera.getName());
-
-    if (temp.isPresent()) {
-      return temp;
-    }
+  private Optional<VisionUpdate> getSingleCameraUpdate(
+      PhotonCamera camera, PhotonPoseEstimator estimator, Pose2d robotPose) {
 
     List<PhotonPipelineResult> results = camera.getAllUnreadResults();
     if (results.isEmpty()) {
       return Optional.empty();
     }
-
     PhotonPipelineResult result = results.get(results.size() - 1);
 
     /* FILTERS */
@@ -74,7 +63,8 @@ public class Photon {
 
     List<PhotonTrackedTarget> targets = result.getTargets();
     int tagCount = targets.size();
-    double avgAmbiguity = targets.stream().mapToDouble(PhotonTrackedTarget::getPoseAmbiguity).average().orElse(1.0);
+    double avgAmbiguity =
+        targets.stream().mapToDouble(PhotonTrackedTarget::getPoseAmbiguity).average().orElse(1.0);
 
     // Can't validate tags without a field layout
     if (field == null) {
@@ -94,8 +84,7 @@ public class Photon {
     }
 
     // Are there enough tags for us to make a good guess?
-    if (tagCount < VisionConstants.MIN_TAG_COUNT)
-      return Optional.empty();
+    if (tagCount < VisionConstants.MIN_TAG_COUNT) return Optional.empty();
 
     // Does data meet our custom, personal standards?
     if (avgAmbiguity > VisionConstants.AMBIGUITY_THRESHOLD) {
@@ -115,25 +104,26 @@ public class Photon {
     Pose2d pose2d = est.estimatedPose.toPose2d();
 
     // Did we do a crazy change from our last position?
-    if (pose2d.getTranslation().getDistance(robotPose.getTranslation()) > VisionConstants.MAX_POSE_DIFFERENCE) {
+    if (pose2d.getTranslation().getDistance(robotPose.getTranslation())
+        > VisionConstants.MAX_POSE_DIFFERENCE) {
       return Optional.empty();
     }
 
-    double avgDistance = targets.stream()
-        .mapToDouble(t -> t.getBestCameraToTarget().getTranslation().getNorm())
-        .average()
-        .orElse(VisionConstants.MAX_TAG_DISTANCE);
-    if (avgDistance > VisionConstants.MAX_TAG_DISTANCE)
-      return Optional.empty();
+    double avgDistance =
+        targets.stream()
+            .mapToDouble(t -> t.getBestCameraToTarget().getTranslation().getNorm())
+            .average()
+            .orElse(VisionConstants.MAX_TAG_DISTANCE);
+    if (avgDistance > VisionConstants.MAX_TAG_DISTANCE) return Optional.empty();
 
     SmartDashboard.putNumber("Vision/" + camera.getName() + "/TagCount", tagCount);
     SmartDashboard.putNumber("Vision/" + camera.getName() + "/AvgAmbiguity", avgAmbiguity);
     SmartDashboard.putNumber("Vision/" + camera.getName() + "/AvgDistance", avgDistance);
     SmartDashboard.putNumberArray(
         "Vision/" + camera.getName() + "/Pose2d",
-        new double[] { pose2d.getX(), pose2d.getY(), pose2d.getRotation().getDegrees() });
+        new double[] {pose2d.getX(), pose2d.getY(), pose2d.getRotation().getDegrees()});
 
-    var t2 = Optional.of(
+    return Optional.of(
         new VisionUpdate(
             est.estimatedPose,
             est.estimatedPose.toPose2d(),
@@ -141,14 +131,16 @@ public class Photon {
             tagCount,
             avgDistance,
             avgAmbiguity));
-
-    updateCache.put("String", t2);
-
-    return t2;
   }
 
   /** Returns the best one based on our "custom" ranking routine */
   public Optional<VisionUpdate> getBestVisionUpdate(Pose2d robotPose) {
+    // Return cached result if already computed this loop.
+    // Cache is invalidated each loop via invalidateCache() called from Vision.periodic().
+    if (cacheValid) {
+      return cachedUpdate;
+    }
+
     VisionUpdate best = null;
     double bestScore = Double.NEGATIVE_INFINITY;
 
@@ -169,7 +161,8 @@ public class Photon {
       score += 1.5 * (1.0 / (update.avgDistanceMeters() + 0.1)); // less distance is good
       score += 1.0 * (1.0 - Math.min(update.avgAmbiguity(), 1.0)); // certainty is good
 
-      double odomDistance = update.pose2d().getTranslation().getDistance(robotPose.getTranslation());
+      double odomDistance =
+          update.pose2d().getTranslation().getDistance(robotPose.getTranslation());
       score -= odomDistance / 2; // Difference when compared to 'official' odometry results
 
       if (score > bestScore) {
@@ -178,6 +171,17 @@ public class Photon {
       }
     }
 
-    return Optional.ofNullable(best);
+    cachedUpdate = Optional.ofNullable(best);
+    cacheValid = true;
+    return cachedUpdate;
+  }
+
+  /**
+   * Invalidate the per-loop cache. Call once per loop from Vision.periodic() so that
+   * the next call to getBestVisionUpdate() re-reads from the camera queue.
+   */
+  public void invalidateCache() {
+    cacheValid = false;
+    cachedUpdate = Optional.empty();
   }
 }

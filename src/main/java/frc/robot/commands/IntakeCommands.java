@@ -10,7 +10,8 @@ public final class IntakeCommands {
 
   public static Command toggleDirection(Intake intake) {
     if (intake == null) return Commands.none();
-    return Commands.runOnce(intake.getR()::toggleIntakeOutake);
+    // Declare intake as a requirement so the scheduler prevents conflicting commands.
+    return Commands.runOnce(intake.getR()::toggleIntakeOutake, intake);
   }
 
   /**
@@ -82,22 +83,13 @@ public final class IntakeCommands {
 
   /**
    * Deploy intake and run continuously until cancelled.
+   * Identical behaviour to holdToIntakeCommand — delegates to it.
    *
    * @param intake The intake subsystem
    * @return Command that runs until interrupted
    */
   public static Command continuousIntakeCommand(Intake intake) {
-    if (intake == null) return Commands.none();
-    return Commands.sequence(
-        Commands.runOnce(intake::deployIntakeMechanism, intake),
-        Commands.waitUntil(intake.getD()::isDeployed),
-        Commands.run(intake.getR()::runIntake, intake))
-        .finallyDo(
-            interrupted -> {
-              intake.getR().stopRollers();
-              intake.retractIntakeMechanism();
-            })
-        .withName("Continuous Intake");
+    return holdToIntakeCommand(intake).withName("Continuous Intake");
   }
 
   /**

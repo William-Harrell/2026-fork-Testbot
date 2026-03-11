@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Orientation {
   private final SparkFlex hoodMotor;
@@ -93,21 +94,25 @@ public class Orientation {
    * Command that slowly drives the hood toward stow until the limit switch triggers,
    * then zeros the encoder to the stow angle. If already home, zeros immediately.
    */
-  public Command homeCommand() {
+  /**
+   * @param owner The subsystem that owns this mechanism (passed so the CommandScheduler
+   *              can prevent concurrent commands from fighting over this motor).
+   */
+  public Command homeCommand(SubsystemBase owner) {
     return Commands.either(
         // Already home — just zero
         Commands.runOnce(() -> {
           hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
           homed = true;
-        }),
+        }, owner),
         // Not home — drive slowly toward stow until switch triggers
-        Commands.run(() -> hoodMotor.set(ShooterConstants.HOOD_HOMING_SPEED))
+        Commands.run(() -> hoodMotor.set(ShooterConstants.HOOD_HOMING_SPEED), owner)
             .until(this::isAtHome)
             .andThen(Commands.runOnce(() -> {
               hoodMotor.set(0);
               hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
               homed = true;
-            })),
+            }, owner)),
         this::isAtHome)
         .withName("Home Shooter Hood");
   }

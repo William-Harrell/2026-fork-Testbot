@@ -55,15 +55,24 @@ public final class SwerveConstants {
   public static final double RR_ENCODER_OFFSET = 217.529297 - 180.0;
 
   // DRIVE MOTOR PID - Tuning for wheel speed control
-
-  // These values were found using SysId characterization
-  public static final double DRIVE_kP = 0.064395;
+  //
+  // !!!! IMPORTANT — UNIT MISMATCH — MUST RE-CHARACTERIZE !!!!
+  // These gains were characterized on SparkMax controllers (units: % output / (m/s) error).
+  // The drive motors are now TalonFX (Kraken), whose closed-loop units are VOLTS per RPS error.
+  // Running these SparkMax gains on TalonFX will produce incorrect closed-loop behavior.
+  //
+  // ACTION REQUIRED: Run SysId with the TalonFX drive motors and replace these values.
+  //   Typical starting point for Kraken: kP=0.1 (V/RPS), kV=0.12 (V/RPS).
+  //   DrivingConstants.OPEN_LOOP is currently true so closed-loop is not active in teleop.
+  //   Closed-loop IS needed for accurate auto path following — fix before competition.
+  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  public static final double DRIVE_kP = 0.0;   // ZEROED — SparkMax value was 0.064395; re-characterize for TalonFX
   public static final double DRIVE_kI = 0.0;
   public static final double DRIVE_kD = 0.0;
 
   // Feedforward values (physics-based compensation)
   public static final double DRIVE_kS = 0.18656; // Static friction
-  public static final double DRIVE_kV = 2.5833; // Velocity factor
+  public static final double DRIVE_kV = 2.5833; // Velocity factor — also needs TalonFX re-characterization
   public static final double DRIVE_kA = 0.40138; // Acceleration factor
 
   // AZIMUTH MOTOR PID - Tuning for wheel angle control

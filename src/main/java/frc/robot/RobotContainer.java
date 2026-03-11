@@ -112,17 +112,23 @@ import frc.robot.util.Elastic;
 import frc.robot.util.constants.DrivingConstants;
 
 /**
- * ======================================================================== ROBOTCONTAINER CLASS -
+ * ========================================================================
+ * ROBOTCONTAINER CLASS -
  * Creates and connects everything
  * ========================================================================
  *
- * <p>This class is instantiated once in Robot.robotInit().
+ * <p>
+ * This class is instantiated once in Robot.robotInit().
  *
- * <p>[THE CONSTRUCTOR DOES ALL THE WORK] When RobotContainer is created, it: 1. Creates all
- * subsystems 2. Sets default commands 3. Configures button bindings 4. Registers autonomous
+ * <p>
+ * [THE CONSTRUCTOR DOES ALL THE WORK] When RobotContainer is created, it: 1.
+ * Creates all
+ * subsystems 2. Sets default commands 3. Configures button bindings 4.
+ * Registers autonomous
  * routines
  *
- * <p>After that, everything runs automatically via the CommandScheduler!
+ * <p>
+ * After that, everything runs automatically via the CommandScheduler!
  */
 public class RobotContainer {
 
@@ -133,11 +139,16 @@ public class RobotContainer {
   /**
    * Interface to the driver's controller (joystick/gamepad).
    *
-   * <p>[WHAT IS DriverActionSet?] It's an interface that defines all the driver inputs we need: -
-   * forward(), strafe(), turn(): Movement commands - intake(), outtake(): Game piece control -
+   * <p>
+   * [WHAT IS DriverActionSet?] It's an interface that defines all the driver
+   * inputs we need: -
+   * forward(), strafe(), turn(): Movement commands - intake(), outtake(): Game
+   * piece control -
    * resetGyro(), toggleFieldRelative(): Utility buttons
    *
-   * <p>XboxDriver implements this interface for an Xbox controller. We could create other
+   * <p>
+   * XboxDriver implements this interface for an Xbox controller. We could create
+   * other
    * implementations for different controllers.
    */
   private final DriverActionSet driverJoystick;
@@ -149,7 +160,9 @@ public class RobotContainer {
   /**
    * Swerve drive subsystem - controls the drivetrain.
    *
-   * <p>[WHAT IS SWERVE DRIVE?] A drivetrain where each wheel can spin AND rotate independently.
+   * <p>
+   * [WHAT IS SWERVE DRIVE?] A drivetrain where each wheel can spin AND rotate
+   * independently.
    * This allows the robot to move in any direction while facing any way!
    */
   private final SwerveDrive swerve;
@@ -157,7 +170,9 @@ public class RobotContainer {
   /**
    * Vision subsystem - processes camera data.
    *
-   * <p>[WHAT DOES VISION DO?] Uses cameras (like Limelight or PhotonVision) to: - Detect AprilTags
+   * <p>
+   * [WHAT DOES VISION DO?] Uses cameras (like Limelight or PhotonVision) to: -
+   * Detect AprilTags
    * for field positioning - Track game pieces - Align to targets
    */
   private final Vision vision;
@@ -177,8 +192,11 @@ public class RobotContainer {
   /**
    * Superstructure - coordinates multiple subsystems.
    *
-   * <p>[WHY HAVE A SUPERSTRUCTURE?] Sometimes you need to coordinate multiple mechanisms. For
-   * example: "Only shoot if intake is retracted and shooter is spun up" The superstructure holds
+   * <p>
+   * [WHY HAVE A SUPERSTRUCTURE?] Sometimes you need to coordinate multiple
+   * mechanisms. For
+   * example: "Only shoot if intake is retracted and shooter is spun up" The
+   * superstructure holds
    * references to everything and can orchestrate.
    */
   private final Superstructure superstructure;
@@ -190,29 +208,40 @@ public class RobotContainer {
   /**
    * SmartDashboard chooser for selecting autonomous mode.
    *
-   * <p>[HOW SENDABLECHOOSER WORKS] It creates a dropdown menu on SmartDashboard/Shuffleboard. You
-   * add options with addOption(), and the driver can select one. getSelected() returns whichever
+   * <p>
+   * [HOW SENDABLECHOOSER WORKS] It creates a dropdown menu on
+   * SmartDashboard/Shuffleboard. You
+   * add options with addOption(), and the driver can select one. getSelected()
+   * returns whichever
    * option was chosen.
    *
-   * <p>+-----------------------------+ | Auto Chooser: [v] | | --------------------- | | > 0: Do
-   * Nothing | | 1: Score & Collect | | 2: Score Only | | ... | +-----------------------------+
+   * <p>
+   * +-----------------------------+ | Auto Chooser: [v] | | ---------------------
+   * | | > 0: Do
+   * Nothing | | 1: Score & Collect | | 2: Score Only | | ... |
+   * +-----------------------------+
    */
   private final SendableChooser<Command> autoChooser;
 
   /**
    * DIP switch selector for hardware-based auto selection.
    *
-   * <p>[WHY DIP SWITCHES?] SmartDashboard is great, but what if WiFi is flaky? Physical DIP
-   * switches on the robot are more reliable. Flip the switches to select auto mode 0-31.
+   * <p>
+   * [WHY DIP SWITCHES?] SmartDashboard is great, but what if WiFi is flaky?
+   * Physical DIP
+   * switches on the robot are more reliable. Flip the switches to select auto
+   * mode 0-31.
    *
-   * <p>+-----------------------------------+ | DIP SWITCHES (5 bits = 0-31) | | | |
+   * <p>
+   * +-----------------------------------+ | DIP SWITCHES (5 bits = 0-31) | | | |
    * [1][2][4][8][16] | | v v ^ ^ v = 4+8 = 12 | | on off on on off |
    * +-----------------------------------+
    */
   private final DipSwitchSelector dipSwitchSelector;
 
   /**
-   * Whether to use DIP switch (true) or SmartDashboard chooser (false). Set to true for
+   * Whether to use DIP switch (true) or SmartDashboard chooser (false). Set to
+   * true for
    * competition, false for development.
    */
   private static final boolean USE_DIP_SWITCH = false;
@@ -224,13 +253,20 @@ public class RobotContainer {
   /**
    * Exponent for speed curve (1 = linear, 2 = squared, 3 = cubic).
    *
-   * <p>[WHY A SPEED CURVE?] Raw joystick values (-1 to 1) can feel twitchy. Squaring the input
-   * makes small movements more precise while still allowing full speed at full deflection.
+   * <p>
+   * [WHY A SPEED CURVE?] Raw joystick values (-1 to 1) can feel twitchy. Squaring
+   * the input
+   * makes small movements more precise while still allowing full speed at full
+   * deflection.
    *
-   * <p>LINEAR (exponent=1): SQUARED (exponent=2): Speed Speed | / | ___/ | / | / | / | / +---------
+   * <p>
+   * LINEAR (exponent=1): SQUARED (exponent=2): Speed Speed | / | ___/ | / | / | /
+   * | / +---------
    * Stick +--------- Stick
    *
-   * <p>Squared feels better for most drivers - small movements are more precise, but you can still
+   * <p>
+   * Squared feels better for most drivers - small movements are more precise, but
+   * you can still
    * go full speed.
    */
   private int speedExponent = 2;
@@ -242,11 +278,16 @@ public class RobotContainer {
   /**
    * Creates the RobotContainer.
    *
-   * <p>This is called ONCE when the robot powers on (from Robot.robotInit()). By the time this
+   * <p>
+   * This is called ONCE when the robot powers on (from Robot.robotInit()). By the
+   * time this
    * constructor finishes, the robot is ready to go!
    *
-   * <p>[ORDER OF OPERATIONS] 1. Set up driver input 2. Set up auto selection 3. Create all
-   * subsystems 4. Set default commands 5. Configure button bindings 6. Register autonomous routines
+   * <p>
+   * [ORDER OF OPERATIONS] 1. Set up driver input 2. Set up auto selection 3.
+   * Create all
+   * subsystems 4. Set default commands 5. Configure button bindings 6. Register
+   * autonomous routines
    */
   public RobotContainer() {
     // ================================================================
@@ -286,37 +327,11 @@ public class RobotContainer {
     superstructure = new Superstructure(swerve, vision, shooter, intake);
     superstructure.doNothing(); // Just to get rid of the java warning temporarily
 
-    // Home mechanisms that use relative encoders.
-    // Slowly retracts intake deploy and shooter hood until limit switches trigger,
-    // then zeros their encoders. Times out after 3s if switches don't trigger.
-    Commands.parallel(intake.getD().homeCommand(), shooter.getO().homeCommand())
-        .withTimeout(3.0)
-        .andThen(
-            Commands.runOnce(
-                () -> {
-                  boolean intakeOk = intake.getD().isHomed();
-                  boolean hoodOk = shooter.getO().isHomed();
-                  if (intakeOk && hoodOk) {
-                    Elastic.sendNotification(
-                        new Elastic.Notification()
-                            .withLevel(Elastic.NotificationLevel.INFO)
-                            .withTitle("Homing Complete")
-                            .withDescription("Intake and hood encoders zeroed")
-                            .withDisplaySeconds(3.0));
-                  } else {
-                    Elastic.sendNotification(
-                        new Elastic.Notification()
-                            .withLevel(Elastic.NotificationLevel.ERROR)
-                            .withTitle("Homing Failed")
-                            .withDescription(
-                                (!intakeOk ? "Intake " : "")
-                                    + (!hoodOk ? "Hood " : "")
-                                    + "limit switch not triggered")
-                            .withNoAutoDismiss());
-                  }
-                }))
-        .withName("Home Mechanisms")
-        .schedule();
+    // ----------------------------------------------------------------
+    // HOMING: DO NOT schedule here — robot is disabled at this point and motors
+    // receive zero output. Homing is triggered via onEnabled() when the robot
+    // first becomes enabled (teleop or autonomous). See onEnabled() below.
+    // ----------------------------------------------------------------
 
     // ================================================================
     // STEP 4: SET DEFAULT COMMANDS
@@ -338,25 +353,22 @@ public class RobotContainer {
     // We pass suppliers (not values) so the command can read CURRENT joystick
     // values on each loop, not just the values at construction time.
     //
-    //   WRONG: swerve.teleopCommand(driverJoystick.forward(), ...)
-    //          This would capture the joystick value ONCE (probably 0)
+    // WRONG: swerve.teleopCommand(driverJoystick.forward(), ...)
+    // This would capture the joystick value ONCE (probably 0)
     //
-    //   RIGHT: swerve.teleopCommand(() -> driverJoystick.forward(), ...)
-    //          This captures HOW to get the value, called every loop
+    // RIGHT: swerve.teleopCommand(() -> driverJoystick.forward(), ...)
+    // This captures HOW to get the value, called every loop
 
-    Command teleopDriveCommand =
-        swerve.teleopCommand(
-            () -> applySpeedCurve(driverJoystick.forward()), // Forward/back input
-            () -> applySpeedCurve(driverJoystick.strafe()), // Left/right input
-            () -> applySpeedCurve(driverJoystick.turn())); // Rotation input
+    Command teleopDriveCommand = swerve.teleopCommand(
+        () -> applySpeedCurve(driverJoystick.forward()), // Forward/back input
+        () -> applySpeedCurve(driverJoystick.strafe()), // Left/right input
+        () -> applySpeedCurve(driverJoystick.turn())); // Rotation input
     swerve.setDefaultCommand(teleopDriveCommand);
 
     // Set initial gyro heading based on alliance
     // Blue alliance: 180° (robot faces your driver station, forward = toward red)
     // Red alliance: 0° (mirrored field, forward = toward blue)
-    boolean isRed =
-        DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
-            == DriverStation.Alliance.Red;
+    boolean isRed = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
     swerve.resetYaw(Rotation2d.fromDegrees(isRed ? 0 : 180));
 
     // Put the teleop command on SmartDashboard for debugging
@@ -376,18 +388,28 @@ public class RobotContainer {
   /**
    * Apply a speed curve to joystick input for better control feel.
    *
-   * <p>[THE MATH] output = sign(input) * |input|^exponent
+   * <p>
+   * [THE MATH] output = sign(input) * |input|^exponent
    *
-   * <p>exponent = 1: Linear (raw joystick values) exponent = 2: Squared (more precise at low
+   * <p>
+   * exponent = 1: Linear (raw joystick values) exponent = 2: Squared (more
+   * precise at low
    * speeds) exponent = 3: Cubed (even more precise)
    *
-   * <p>[WHY THIS HELPS] Joysticks are most sensitive in the middle of their range. By squaring the
-   * input, small movements stay small, but you can still reach full speed at full deflection.
+   * <p>
+   * [WHY THIS HELPS] Joysticks are most sensitive in the middle of their range.
+   * By squaring the
+   * input, small movements stay small, but you can still reach full speed at full
+   * deflection.
    *
-   * <p>Input: 0.5 (half joystick) Linear: 0.5 (half speed) Squared: 0.25 (quarter speed - more
+   * <p>
+   * Input: 0.5 (half joystick) Linear: 0.5 (half speed) Squared: 0.25 (quarter
+   * speed - more
    * precise!)
    *
-   * <p>Input: 1.0 (full joystick) Linear: 1.0 (full speed) Squared: 1.0 (still full speed!)
+   * <p>
+   * Input: 1.0 (full joystick) Linear: 1.0 (full speed) Squared: 1.0 (still full
+   * speed!)
    *
    * @param input The raw joystick value (-1 to 1)
    * @return The curved output value (-1 to 1)
@@ -414,23 +436,37 @@ public class RobotContainer {
   /**
    * Configure all button bindings for the driver controller.
    *
-   * <p>[TRIGGER TYPES]
+   * <p>
+   * [TRIGGER TYPES]
    *
-   * <p>onTrue(command) - Run command once when button is PRESSED | (rising edge - button goes from
-   * up to down) | whileTrue(command) - Run command while button is HELD | Command ends when button
-   * is released | onFalse(command) - Run command once when button is RELEASED | (falling edge -
-   * button goes from down to up) | toggleOnTrue() - Toggle command on/off each press
+   * <p>
+   * onTrue(command) - Run command once when button is PRESSED | (rising edge -
+   * button goes from
+   * up to down) | whileTrue(command) - Run command while button is HELD | Command
+   * ends when button
+   * is released | onFalse(command) - Run command once when button is RELEASED |
+   * (falling edge -
+   * button goes from down to up) | toggleOnTrue() - Toggle command on/off each
+   * press
    *
-   * <p>[VISUAL TIMELINE]
+   * <p>
+   * [VISUAL TIMELINE]
    *
-   * <p>Button State: ________________ ^ ^ PRESSED RELEASED (onTrue) (onFalse) | | whileTrue:
+   * <p>
+   * Button State: ________________ ^ ^ PRESSED RELEASED (onTrue) (onFalse) | |
+   * whileTrue:
    * <-----------> (runs entire time button is held)
    *
-   * <p>[INSTANT vs CONTINUOUS]
+   * <p>
+   * [INSTANT vs CONTINUOUS]
    *
-   * <p>InstantCommand: Runs once and immediately finishes Example: Toggle a flag, reset a sensor
+   * <p>
+   * InstantCommand: Runs once and immediately finishes Example: Toggle a flag,
+   * reset a sensor
    *
-   * <p>RunCommand: Runs repeatedly until cancelled Example: Drive while button held, spin a motor
+   * <p>
+   * RunCommand: Runs repeatedly until cancelled Example: Drive while button held,
+   * spin a motor
    */
   private void configureButtonBindings() {
 
@@ -461,17 +497,19 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
     /*
-    How intake is going to work:
-    > Hold right trigger to deploy
-      - Retract when you release
-    > While deployed, click left bumper to toggle intake/outake (motor spin direction)
-    */
+     * How intake is going to work:
+     * > Hold right trigger to deploy
+     * - Retract when you release
+     * > While deployed, click left bumper to toggle intake/outake (motor spin
+     * direction)
+     */
 
     // ----------------------------------------------------------------
     // INTAKE CONTROLS
     // ----------------------------------------------------------------
 
-    // A button: toggle deploy/retract (press once to extend, press again to retract)
+    // A button: toggle deploy/retract (press once to extend, press again to
+    // retract)
     driverJoystick
         .toggleDeploy()
         .onTrue(IntakeCommands.toggleDeployCommand(superstructure.getIntake()));
@@ -527,27 +565,34 @@ public class RobotContainer {
   /**
    * Register all autonomous routines with the auto chooser.
    *
-   * <p>[WHAT THIS DOES] Adds all available auto modes to the SmartDashboard dropdown. During a
+   * <p>
+   * [WHAT THIS DOES] Adds all available auto modes to the SmartDashboard
+   * dropdown. During a
    * match, the driver (or pit crew) selects one before enabling.
    *
-   * <p>[SCORING REFERENCE] - FUEL in hub: 1 point each - Preload: 3 FUEL (3 pts)
+   * <p>
+   * [SCORING REFERENCE] - FUEL in hub: 1 point each - Preload: 3 FUEL (3 pts)
    *
-   * <p>[STRATEGY CONSIDERATIONS] - Score & Collect maximizes FUEL points - Preload Only is safest
+   * <p>
+   * [STRATEGY CONSIDERATIONS] - Score & Collect maximizes FUEL points - Preload
+   * Only is safest
    * fallback - Strategic modes (Deny, Center Control) affect opponents
    *
-   * <p>[HOW TO ADD A NEW AUTO] 1. Create the routine in AutoRoutines.java 2. Add it here with
-   * autoChooser.addOption() 3. Add a case in getAutoFromSelection() if using DIP switch
+   * <p>
+   * [HOW TO ADD A NEW AUTO] 1. Create the routine in AutoRoutines.java 2. Add it
+   * here with
+   * autoChooser.addOption() 3. Add a case in getAutoFromSelection() if using DIP
+   * switch
    */
   private void registerAutoRoutines() {
     // Each non-trivial mode is prefixed with a vision pose seed so odometry
     // starts from a reliable position even when using the SmartDashboard chooser.
-    Command visionSeed = AutoRoutines.seedPoseFromVision(swerve, vision);
-
+    AutoRoutines.seedPoseFromVision(swerve, vision);
     autoChooser.setDefaultOption("0: Do Nothing", AutoRoutines.doNothing());
     autoChooser.addOption(
         "1: Score & Collect",
         Commands.sequence(
-            visionSeed,
+            AutoRoutines.seedPoseFromVision(swerve, vision),
             AutoRoutines.scoreCollectAuto(swerve, intake, shooter, hopper, rollerBelt)));
     autoChooser.addOption(
         "2: Score Only",
@@ -568,19 +613,29 @@ public class RobotContainer {
   /**
    * Get the autonomous command to run.
    *
-   * <p>Called by Robot.autonomousInit() when the autonomous period begins. Returns whichever auto
+   * <p>
+   * Called by Robot.autonomousInit() when the autonomous period begins. Returns
+   * whichever auto
    * routine was selected (either by DIP switch or SmartDashboard chooser).
    *
-   * <p>[DIP SWITCH vs SMARTDASHBOARD]
+   * <p>
+   * [DIP SWITCH vs SMARTDASHBOARD]
    *
-   * <p>DIP SWITCH (USE_DIP_SWITCH = true): - Physical switches on the robot - More reliable (no
+   * <p>
+   * DIP SWITCH (USE_DIP_SWITCH = true): - Physical switches on the robot - More
+   * reliable (no
    * WiFi needed) - Used in competition - Selection is "locked" at start of auto
    *
-   * <p>SMARTDASHBOARD (USE_DIP_SWITCH = false): - Dropdown menu on computer - Easier to change -
+   * <p>
+   * SMARTDASHBOARD (USE_DIP_SWITCH = false): - Dropdown menu on computer - Easier
+   * to change -
    * Used in development/testing
    *
-   * <p>[WHY LOCK THE SELECTION?] Once autonomous starts, we don't want the selection to change
-   * mid-routine if someone accidentally bumps the switches. lockSelection() freezes the current
+   * <p>
+   * [WHY LOCK THE SELECTION?] Once autonomous starts, we don't want the selection
+   * to change
+   * mid-routine if someone accidentally bumps the switches. lockSelection()
+   * freezes the current
    * reading.
    *
    * @return The selected autonomous command
@@ -600,11 +655,67 @@ public class RobotContainer {
   /**
    * Called when robot is disabled.
    *
-   * <p>[WHAT THIS DOES] Unlocks the DIP switch selection so it can be changed for the next match.
+   * <p>
+   * [WHAT THIS DOES] Unlocks the DIP switch selection so it can be changed for
+   * the next match.
    * During a match, the selection was locked to prevent accidental changes.
    */
   public void onDisabled() {
     dipSwitchSelector.unlockSelection();
+    // Reset the homed flag so homing re-runs if the robot is re-enabled after a
+    // reset.
+    hasHomed = false;
+  }
+
+  // Tracks whether homing has already been triggered this enable cycle.
+  private boolean hasHomed = false;
+
+  /**
+   * Called once the first time the robot becomes enabled (from teleopInit or
+   * autonomousInit).
+   *
+   * <p>
+   * Schedules the homing sequence now that motors actually receive power. Runs
+   * only once per
+   * enable cycle — won't re-home if the robot switches between teleop and auto
+   * modes mid-match.
+   */
+  public void onEnabled() {
+    if (hasHomed)
+      return;
+    hasHomed = true;
+
+    // Home mechanisms that use relative encoders.
+    // Slowly retracts intake deploy and shooter hood until limit switches trigger,
+    // then zeros their encoders. Times out after 3s if switches don't trigger.
+    Commands.parallel(intake.getD().homeCommand(intake), shooter.getO().homeCommand(shooter))
+        .withTimeout(3.0)
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  boolean intakeOk = intake.getD().isHomed();
+                  boolean hoodOk = shooter.getO().isHomed();
+                  if (intakeOk && hoodOk) {
+                    Elastic.sendNotification(
+                        new Elastic.Notification()
+                            .withLevel(Elastic.NotificationLevel.INFO)
+                            .withTitle("Homing Complete")
+                            .withDescription("Intake and hood encoders zeroed")
+                            .withDisplaySeconds(3.0));
+                  } else {
+                    Elastic.sendNotification(
+                        new Elastic.Notification()
+                            .withLevel(Elastic.NotificationLevel.ERROR)
+                            .withTitle("Homing Failed")
+                            .withDescription(
+                                (!intakeOk ? "Intake " : "")
+                                    + (!hoodOk ? "Hood " : "")
+                                    + "limit switch not triggered")
+                            .withNoAutoDismiss());
+                  }
+                }))
+        .withName("Home Mechanisms")
+        .schedule();
   }
 
   // ================================================================
@@ -614,12 +725,17 @@ public class RobotContainer {
   /**
    * Log telemetry data to SmartDashboard.
    *
-   * <p>Called from Robot.robotPeriodic() every 20ms.
+   * <p>
+   * Called from Robot.robotPeriodic() every 20ms.
    *
-   * <p>[WHAT IS TELEMETRY?] Data sent from the robot to the driver station for display. Helps
+   * <p>
+   * [WHAT IS TELEMETRY?] Data sent from the robot to the driver station for
+   * display. Helps
    * drivers and programmers see what the robot is doing.
    *
-   * <p>[SMARTDASHBOARD vs SHUFFLEBOARD] Both display NetworkTables data. Shuffleboard is newer and
+   * <p>
+   * [SMARTDASHBOARD vs SHUFFLEBOARD] Both display NetworkTables data.
+   * Shuffleboard is newer and
    * more customizable, but SmartDashboard is simpler. This code works with both!
    */
   public void logData() {

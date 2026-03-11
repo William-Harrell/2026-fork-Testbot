@@ -30,26 +30,26 @@ public final class FieldUtil {
   /**
    * Flip a translation (X, Y position) for Red alliance.
    *
-   * <p>[WHEN TO USE] Call this on any position that's defined for Blue alliance before using it. If
-   * we're Blue, it returns unchanged.
+   * <p>Convention used in this codebase: only X is mirrored (reflected across the vertical
+   * center line). Y is left unchanged. This matches how AutoRoutines and SwerveDrive compute
+   * Red-alliance positions. A full 180° flip (mirroring both X and Y) would be correct for a
+   * rotation, but this field uses a simple X-mirror convention — do not flip Y here.
    *
    * @param translation The position (Blue alliance origin)
    * @return The flipped position if Red, original if Blue
    */
   public static Translation2d flipAlliance(Translation2d translation) {
-    // Check our alliance color (default to Blue if unknown)
     boolean shouldFlip =
         DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
             == DriverStation.Alliance.Red;
 
     if (shouldFlip) {
-      // Mirror position to opposite side of field
+      // Mirror X across the field center line; Y is unchanged.
       return new Translation2d(
-          FieldConstants.FIELD_LENGTH - translation.getX(), // Flip X
-          FieldConstants.FIELD_WIDTH - translation.getY() // Flip Y
-          );
+          FieldConstants.FIELD_LENGTH - translation.getX(),
+          translation.getY());
     }
-    return translation; // Blue alliance - no change
+    return translation;
   }
 
   /**
@@ -75,6 +75,7 @@ public final class FieldUtil {
 
   /**
    * Flip a complete pose (position + rotation) for Red alliance.
+   * Only X is mirrored; Y is left unchanged. Rotation is flipped 180°.
    *
    * @param pose The pose (Blue alliance reference)
    * @return The flipped pose if Red, original if Blue
@@ -86,10 +87,9 @@ public final class FieldUtil {
 
     if (shouldFlip) {
       return new Pose2d(
-          // Flip position
           new Translation2d(
-              FieldConstants.FIELD_LENGTH - pose.getX(), FieldConstants.FIELD_WIDTH - pose.getY()),
-          // Flip rotation
+              FieldConstants.FIELD_LENGTH - pose.getX(),
+              pose.getY()),  // Y unchanged — matches X-mirror convention
           new Rotation2d(-pose.getRotation().getCos(), -pose.getRotation().getSin()));
     }
     return pose;

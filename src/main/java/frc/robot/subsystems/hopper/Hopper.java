@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Hopper extends SubsystemBase {
@@ -18,6 +19,12 @@ public class Hopper extends SubsystemBase {
     config.idleMode(IdleMode.kBrake).smartCurrentLimit(HopperConstants.CURRENT_LIMIT);
 
     motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+  }
+
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("Hopper/Current", motor.getOutputCurrent());
+    SmartDashboard.putNumber("Hopper/Output", motor.get());
   }
 
   public void feed() {

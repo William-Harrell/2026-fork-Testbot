@@ -94,6 +94,8 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.auto.AutoSetup;
+import frc.robot.auto.CSPPathing;
 
 /**
  * ======================================================================== ROBOT CLASS - The Main
@@ -207,9 +209,8 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
-    // Nothing special needed when entering disabled
-    // Commands will be cancelled automatically
-    // SOLVED C-01
+    // Unlock DIP switch selection so it can be updated for the next match.
+    // Also cancels any lingering commands.
     robotContainer.onDisabled();
   }
 
@@ -244,6 +245,17 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
+    // Trigger homing on first enable so motors are actually powered.
+    robotContainer.onEnabled();
+
+    // Configure CSPPathing (path constraints + robot config). Must happen before
+    // getAutonomousCommand() so any CSPPathing.generatePath() calls don't throw.
+    AutoSetup.configure();
+
+    // Clear CSPPathing static state so path generation isn't poisoned by the
+    // previous match's lastPose / runBefore values.
+    CSPPathing.reset();
+
     // Get the auto command that was selected before the match
     autonomousCommand = robotContainer.getAutonomousCommand();
 
@@ -286,6 +298,9 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopInit() {
+    // Trigger homing on first enable so motors are actually powered.
+    robotContainer.onEnabled();
+
     // Stop the autonomous command when teleop starts
     // This gives the driver full control immediately
     if (autonomousCommand != null) {

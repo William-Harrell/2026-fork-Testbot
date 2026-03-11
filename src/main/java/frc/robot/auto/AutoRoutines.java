@@ -44,6 +44,8 @@ public final class AutoRoutines {
         Rotation2d.fromDegrees(isRedAlliance() ? 180 : 0));
   }
 
+  // getTowerPose() is correct but currently unreferenced by any auto routine.
+  // Wire it up when a climb auto is implemented. Leave in place to avoid losing the logic.
   private static Pose2d getTowerPose() {
     double towerX = isRedAlliance() ? FieldConstants.RED_TOWER_X : FieldConstants.BLUE_TOWER_X;
     double towerY = isRedAlliance() ? FieldConstants.RED_TOWER_Y : FieldConstants.BLUE_TOWER_Y;

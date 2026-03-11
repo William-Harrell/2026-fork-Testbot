@@ -5,9 +5,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 public final class ShooterConstants {
   public static final Alliance DEFAULT_ALLIANCE = Alliance.Blue; // Default alliance
 
-  public static final double BLUE_X = 11.915394;
-  public static final double RED_X = 4.625594;
-  public static final double UNIV_Y = 4.034663;
+  // Hub X/Y positions were removed — Physics.java now uses FieldConstants.BLUE_HUB_X,
+  // BLUE_HUB_Y, RED_HUB_X, RED_HUB_Y directly to avoid duplicate / swapped coordinates.
 
   public static final double HUB_RIM_HEIGHT = 1.8288;
 
@@ -68,7 +67,8 @@ public final class ShooterConstants {
   /** Tolerance for flywheel at target speed */
   public static final double FLYWHEEL_RPM_TOLERANCE = 100.0;
 
-  /** Flywheel PID gains — tune on real robot for TalonFX (units: V/RPS_error for kP, V/RPS for kV) */
+  /** Flywheel PID gains — TalonFX units (kP: V/RPS error, kFF/kV: V/RPS).
+   *  Starting estimates only — characterize with SysId on real robot. */
   public static final double FLYWHEEL_kP = 0.0005;
 
   public static final double FLYWHEEL_kI = 0.0;

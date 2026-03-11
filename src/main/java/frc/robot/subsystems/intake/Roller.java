@@ -14,7 +14,7 @@ public class Roller {
   private final IntakeState state_machine;
   private final Deploy deploy;
 
-  /** {@code myRM} is the deploy motor */
+  /** {@code myRM} is the roller motor */
   public Roller(SparkMax myRM, IntakeState mySM, Deploy myD) {
     // Instance variables
     rollerMotor = myRM;
@@ -30,6 +30,12 @@ public class Roller {
         rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
+  /**
+   * @deprecated Do NOT call set() directly on the returned controller — doing so bypasses the
+   *     state machine and will desync physical and logical state. Use the methods on {@link Roller}
+   *     or {@link IntakeCommands} instead. This accessor exists only for legacy telemetry reads.
+   */
+  @Deprecated
   public SparkMax get() {
     return rollerMotor;
   }

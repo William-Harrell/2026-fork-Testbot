@@ -32,6 +32,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.constants.DrivingConstants;
 import java.util.function.DoubleSupplier;
 
 public class SwerveDrive extends SubsystemBase {
@@ -97,7 +98,10 @@ public class SwerveDrive extends SubsystemBase {
    * <p>[WHEN TO USE WHICH] - Teleop: Often open-loop for responsiveness - Auto: Often closed-loop
    * for precision
    */
-  private boolean openLoop = SwerveConstants.DRIVE_OPEN_LOOP_RAMP > 0;
+  // openLoop is read from DrivingConstants so the intent is explicit and configurable
+  // from one place. Previously this was set via (DRIVE_OPEN_LOOP_RAMP > 0) which
+  // was always true and could never be changed without modifying SwerveDrive itself.
+  private boolean openLoop = DrivingConstants.OPEN_LOOP;
 
   // CONSTRUCTOR - Initialize all swerve drive components
 
@@ -551,6 +555,14 @@ public class SwerveDrive extends SubsystemBase {
    * @return A command that resets the gyro (runs once, instantly)
    */
   public Command resetGyroCommand() {
-    return runOnce(() -> resetYaw(Rotation2d.fromDegrees(180)));
+    return runOnce(
+        () -> {
+          // Blue: robot faces our driver station at 180°.
+          // Red:  robot faces our driver station at 0°.
+          boolean isRed =
+              DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
+                  == DriverStation.Alliance.Red;
+          resetYaw(Rotation2d.fromDegrees(isRed ? 0.0 : 180.0));
+        });
   }
 } // End of SwerveDrive class

@@ -39,7 +39,7 @@ public final class VisionConstants {
   // Filters
   public static final double MAX_TAG_DISTANCE = 5.0; // meters
   public static final double MAX_FRAME_AGE = 0.3; // seconds
-  public static final double MIN_TAG_COUNT = 1;
+  public static final int MIN_TAG_COUNT = 1;
   public static final double MIN_AREA = 0.05; // meters squared
   public static final double MAX_POSE_DIFFERENCE = 1.5; // meters
 

@@ -9,6 +9,7 @@ import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.DataLogManager;
 import java.util.*;
 
 // https://github.com/PriyanshuB09/CSPPathing/blob/main/CSPPathing.java
@@ -47,6 +48,16 @@ public final class CSPPathing {
     public static void configureConstraints(PathConstraints constraints, RobotConfig config) {
         globalConstraints = Objects.requireNonNull(constraints, "PathConstraints required");
         globalConfig = Objects.requireNonNull(config, "RobotConfig required");
+    }
+
+    /**
+     * Reset per-match path state. Call this from autonomousInit() to prevent stale
+     * lastPose / runBefore values from match 1 poisoning path generation in match 2
+     * (both matches run in the same roboRIO JVM session).
+     */
+    public static void reset() {
+        runBefore = false;
+        lastPose = null;
     }
 
     /**
@@ -118,6 +129,10 @@ public final class CSPPathing {
     }
 
     public static List<Waypoint> generatePath(Pose2d start, Pose2d... midAndEnd) {
+        // Guard FIRST — before any array access to prevent NPE/ArrayIndexOutOfBoundsException.
+        if (midAndEnd == null || midAndEnd.length == 0)
+            throw new IllegalArgumentException("Must provide at least end Pose2d");
+
         if (!runBefore) {
             lastPose = midAndEnd[midAndEnd.length - 1];
             runBefore = true;
@@ -125,13 +140,14 @@ public final class CSPPathing {
             start = lastPose;
             lastPose = midAndEnd[midAndEnd.length - 1];
         }
-
-        if (midAndEnd == null || midAndEnd.length == 0)
-            throw new IllegalArgumentException("Must provide at least end Pose2d");
         return generatePathInternal(start, midAndEnd);
     }
 
     public static List<Waypoint> generatePath(Pose2d start, Translation2d... midAndEnd) {
+        // Guard FIRST — before any array access to prevent NPE/ArrayIndexOutOfBoundsException.
+        if (midAndEnd == null || midAndEnd.length == 0)
+            throw new IllegalArgumentException("Must provide at least end Pose2d");
+
         if (!runBefore) {
             lastPose = new Pose2d(midAndEnd[midAndEnd.length - 1], new Rotation2d());
             runBefore = true;
@@ -146,9 +162,6 @@ public final class CSPPathing {
             poses[i] = new Pose2d(translation, new Rotation2d());
             i++;
         }
-
-        if (midAndEnd == null || midAndEnd.length == 0)
-            throw new IllegalArgumentException("Must provide at least end Pose2d");
         return generatePathInternal(start, poses);
     }
 
@@ -156,8 +169,8 @@ public final class CSPPathing {
         if (globalConstraints == null)
             throw new IllegalStateException("Call configureConstraints(...) before generatePath");
 
-        if (globalConstraints == null)
-            throw new IllegalStateException("Call configureConstraints(...) before generatePath");
+        if (globalConfig == null)
+            throw new IllegalStateException("Call configureConstraints(...) with a RobotConfig before generatePath");
 
         List<Pose2d> requested = new ArrayList<>(1 + midAndEnd.length);
         requested.add(start);
@@ -257,14 +270,11 @@ public final class CSPPathing {
                                 traj = new PathPlannerTrajectory(
                                         path, new ChassisSpeeds(), new Rotation2d(), globalConfig);
                             } catch (Throwable ex) {
-                                try {
-                                    traj = new PathPlannerTrajectory(
-                                            path, new ChassisSpeeds(), new Rotation2d(), globalConfig);
-                                } catch (Throwable ex2) {
-                                    ev = new Evaluation(true, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
-                                    cache.put(key, ev);
-                                    continue;
-                                }
+                                // Trajectory construction failed — mark this candidate as a collision
+                                // and skip it rather than retrying with identical arguments.
+                                ev = new Evaluation(true, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY);
+                                cache.put(key, ev);
+                                continue;
                             }
                             ev = evaluateTrajectory(traj);
                         }
@@ -295,13 +305,8 @@ public final class CSPPathing {
         GoalEndState finalEnd = guessGoalEndStateFromWaypoints(finalWps);
         PathPlannerPath finalPath = new PathPlannerPath(finalWps, globalConstraints, null, finalEnd);
 
-        PathPlannerTrajectory finalTraj;
-        try {
-            finalTraj = new PathPlannerTrajectory(finalPath, new ChassisSpeeds(), new Rotation2d(), globalConfig);
-        } catch (Throwable ex) {
-            finalTraj = new PathPlannerTrajectory(finalPath, new ChassisSpeeds(), new Rotation2d(), globalConfig);
-        }
-
+        // The caller receives waypoints (used to construct the path for following).
+        // The trajectory is built at follow-time by AutoCommands, not here.
         return finalPath.getWaypoints();
     }
 
@@ -437,30 +442,30 @@ public final class CSPPathing {
         return a;
     }
 
-    // DOESN'T WORK I MESSED UP
+    /**
+     * Derive the goal end state (heading and velocity) from the last waypoint.
+     * PathPlanner's Waypoint is a record: Waypoint(prevControl, anchor, nextControl).
+     * We read those fields directly instead of reflection so this actually works.
+     */
     public static GoalEndState guessGoalEndStateFromWaypoints(List<Waypoint> waypoints) {
         if (waypoints == null || waypoints.isEmpty())
             return new GoalEndState(0.0, new Rotation2d());
-        try {
-            Waypoint last = waypoints.get(waypoints.size() - 1);
-            Translation2d anchor = extractAnchor(last);
 
-            Translation2d nextControl = extractControlPoint(last, "getNextControl", "nextControl", "next");
-            Translation2d prevControl = extractControlPoint(last, "getPrevControl", "prevControl", "prev");
-            if (anchor != null) {
-                if (nextControl != null)
-                    return new GoalEndState(0.0, headingFrom(anchor, nextControl));
-                if (prevControl != null)
-                    return new GoalEndState(0.0, headingFrom(prevControl, anchor));
-            }
+        Waypoint last = waypoints.get(waypoints.size() - 1);
+        Translation2d anchor = last.anchor();
 
-            if (waypoints.size() >= 2) {
-                Translation2d a1 = extractAnchor(waypoints.get(waypoints.size() - 2));
-                Translation2d a2 = extractAnchor(waypoints.get(waypoints.size() - 1));
-                if (a1 != null && a2 != null)
-                    return new GoalEndState(0.0, headingFrom(a1, a2));
-            }
-        } catch (Throwable ignored) {
+        // Use the outgoing control arm if present, else incoming arm, else
+        // the direction from the second-to-last anchor.
+        if (last.nextControl() != null) {
+            return new GoalEndState(0.0, headingFrom(anchor, last.nextControl()));
+        }
+        if (last.prevControl() != null) {
+            return new GoalEndState(0.0, headingFrom(last.prevControl(), anchor));
+        }
+        if (waypoints.size() >= 2) {
+            Translation2d prev = waypoints.get(waypoints.size() - 2).anchor();
+            if (prev != null)
+                return new GoalEndState(0.0, headingFrom(prev, anchor));
         }
         return new GoalEndState(0.0, new Rotation2d());
     }
@@ -473,48 +478,6 @@ public final class CSPPathing {
         if (Math.hypot(dx, dy) < 1e-9)
             return new Rotation2d();
         return new Rotation2d(dx, dy);
-    }
-
-    private static Translation2d extractAnchor(Waypoint wp) {
-        if (wp == null)
-            return null;
-        try {
-            java.lang.reflect.Method m = wp.getClass().getMethod("getAnchor");
-            Object res = m.invoke(wp);
-            if (res instanceof Translation2d)
-                return (Translation2d) res;
-        } catch (Throwable ignored) {
-        }
-        try {
-            java.lang.reflect.Field f = wp.getClass().getField("anchor");
-            Object res = f.get(wp);
-            if (res instanceof Translation2d)
-                return (Translation2d) res;
-        } catch (Throwable ignored) {
-        }
-        return null;
-    }
-
-    private static Translation2d extractControlPoint(Waypoint wp, String... names) {
-        if (wp == null)
-            return null;
-        for (String name : names) {
-            try {
-                java.lang.reflect.Method m = wp.getClass().getMethod(name);
-                Object res = m.invoke(wp);
-                if (res instanceof Translation2d)
-                    return (Translation2d) res;
-            } catch (Throwable ignored) {
-            }
-            try {
-                java.lang.reflect.Field f = wp.getClass().getField(name);
-                Object res = f.get(wp);
-                if (res instanceof Translation2d)
-                    return (Translation2d) res;
-            } catch (Throwable ignored) {
-            }
-        }
-        return null;
     }
 
     // my astar but its going to fail watch
@@ -567,7 +530,7 @@ public final class CSPPathing {
         try {
             String ns = (nearestToStart != null) ? nearestToStart.nav.id : "NULL";
             String ng = (nearestToGoal != null) ? nearestToGoal.nav.id : "NULL";
-            System.out.println("[NodePathGenerator] A* nearestStart: " + ns + " nearestGoal: " + ng);
+            DataLogManager.log("[NodePathGenerator] A* nearestStart: " + ns + " nearestGoal: " + ng);
         } catch (Throwable ignored) {
         }
 
@@ -673,7 +636,7 @@ public final class CSPPathing {
         }
 
         if (path == null) {
-            System.out.println(
+            DataLogManager.log(
                     "No path found - CSPPathing");
             List<Translation2d> direct = new ArrayList<>();
             direct.add(start);
@@ -693,7 +656,7 @@ public final class CSPPathing {
         }
 
         // Print the chosen node path
-        System.out.println("A* node path: " + sb.toString());
+        DataLogManager.log("A* node path: " + sb.toString());
 
         return result;
     }
@@ -702,8 +665,18 @@ public final class CSPPathing {
         return a.getDistance(b);
     }
 
+    /**
+     * Check whether the robot is still on its current path (within PATH_ERROR_METERS of lastPose).
+     *
+     * @param robotPose Current robot pose from odometry.
+     * @return true if the robot is within the tolerance of the path endpoint; false if off-path
+     *         or if no path has been generated yet.
+     */
     public static boolean robotOnPath(Pose2d robotPose) {
-        return (distance(robotPose.getTranslation(), lastPose.getTranslation()) > PATH_ERROR_METERS);
+        // Can't be on a path that was never generated.
+        if (lastPose == null) return false;
+        // Previously the comparison was inverted (> instead of <=), returning true when far away.
+        return (distance(robotPose.getTranslation(), lastPose.getTranslation()) <= PATH_ERROR_METERS);
     }
 
     public static void setLastPose(Pose2d pose) {

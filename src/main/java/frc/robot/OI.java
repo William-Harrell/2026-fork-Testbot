@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.util.constants.OIConstants;
 
 public final class OI {
   private OI() {}
@@ -75,19 +76,19 @@ public final class OI {
     @Override
     public double forward() {
       // Negative because Y axis is inverted on controllers
-      return deadband(-stick.getLeftY(), 0.08);
+      return deadband(-stick.getLeftY(), OIConstants.JOYSTICK_DEADBAND);
     }
 
     @Override
     public double strafe() {
       // Negative to match field coordinate system (left = positive Y)
-      return deadband(-stick.getLeftX(), 0.08);
+      return deadband(-stick.getLeftX(), OIConstants.JOYSTICK_DEADBAND);
     }
 
     @Override
     public double turn() {
       // 70% speed multiplier for more controlled turning
-      return deadband(-stick.getRightX(), 0.08) * 0.7;
+      return deadband(-stick.getRightX(), OIConstants.JOYSTICK_DEADBAND) * 0.7;
     }
 
     @Override

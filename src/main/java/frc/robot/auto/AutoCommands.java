@@ -131,10 +131,17 @@ public final class AutoCommands {
    * @return Command that follows the path, or does nothing if path not found
    */
   public static Command followPath(String pathName) {
-    // TODO: Implement PathPlanner integration
-    // return AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathName));
-    return Commands.print("PathPlanner path '" + pathName + "' not implemented yet")
-        .withName("Follow Path: " + pathName);
+    // TODO: Implement PathPlanner AutoBuilder integration.
+    // Uncomment once AutoBuilder.configureHolonomic() is wired up in RobotContainer:
+    //   return AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathName));
+    //
+    // Until then, throw at schedule-time so any accidental use is immediately visible
+    // rather than silently succeeding (a Commands.print would look like it worked).
+    return Commands.runOnce(() -> {
+      throw new IllegalStateException(
+          "followPath(\"" + pathName + "\") called but PathPlanner AutoBuilder is not configured. "
+          + "Implement AutoBuilder.configureHolonomic() in RobotContainer first.");
+    }).withName("Follow Path: " + pathName);
   }
 
   // ================================================================
@@ -195,6 +202,9 @@ public final class AutoCommands {
   public static Command shootAllFuel(
       Shooter shooter, Intake intake, Hopper hopper, RollerBelt rollerBelt) {
     return Commands.sequence(
+        // Gate: only proceed if the robot is in its alliance zone (G407).
+        // Matches the isInAllianceZone() guard in ShooterCommands.shootCommand (teleop).
+        Commands.waitUntil(shooter.getP()::isInAllianceZone).withTimeout(1.0),
         // Set pitch angle + spin up to shoot RPM
         Commands.runOnce(shooter::prepareDefaultShot, shooter),
         // Wait until flywheel is at speed (3s timeout prevents hanging if motor fails)

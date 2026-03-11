@@ -360,18 +360,17 @@ public class SwerveModule {
     // ----------------------------------------------------------------
     // PID GAINS with POSITION WRAPPING
     // ----------------------------------------------------------------
-    // Position wrapping makes 0 deg and 360 deg the same point
-    // This is essential for continuous rotation!
-    // Without it, going from 350 deg to 10 deg would go the long way (340 deg rotation)
-    // With it, we go the short way (20 deg rotation)
+    // Range is -180 to 180 to match Rotation2d.minus() normalization used
+    // in resetToAbsolute(). Using 0-360 would conflict because the encoder
+    // seed value comes from Rotation2d.minus() which always returns -180..180.
     azimuthConfig
         .closedLoop
         .p(SwerveConstants.AZIMUTH_kP)
         .i(SwerveConstants.AZIMUTH_kI)
         .d(SwerveConstants.AZIMUTH_kD)
-        .positionWrappingEnabled(true) // Enable wraparound
-        .positionWrappingMinInput(0) // Minimum is 0 deg
-        .positionWrappingMaxInput(360); // Maximum is 360 deg (wraps to 0 deg)
+        .positionWrappingEnabled(true)
+        .positionWrappingMinInput(-180)
+        .positionWrappingMaxInput(180);
 
     azimuthMotor.configure(
         azimuthConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -402,9 +401,8 @@ public class SwerveModule {
    * both encoders agree on the current position.
    */
   public void resetToAbsolute() {
-    // Get the absolute angle (already offset-corrected) <-- SYBAU 😌
-    // SOLVED C-04
-    double absolutePosition = getAbsoluteAngle().getDegrees() + 180;
+    // Get the absolute angle (already offset-corrected)
+    double absolutePosition = getAbsoluteAngle().getDegrees();
 
     // Set the relative encoder to match
     azimuthEncoder.setPosition(absolutePosition);

@@ -34,25 +34,40 @@ public class Physics {
     return swerve.getPose();
   }
 
-  /** Update hub location based on alliance. */
-  private void UpdateHubLocation() {
-    hub[1] = ShooterConstants.UNIV_Y;
-
-    hub[0] =
-        (alliance == Alliance.Blue)
-            ? ShooterConstants.BLUE_X
-            : (alliance == Alliance.Red)
-                ? ShooterConstants.RED_X
-                : -180.0; // it's called ternary operator. look it up.
+  /** Update hub location based on alliance using authoritative FieldConstants values. */
+  private void updateHubLocation() {
+    if (alliance == Alliance.Blue) {
+      hub[0] = FieldConstants.BLUE_HUB_X;
+      hub[1] = FieldConstants.BLUE_HUB_Y;
+    } else if (alliance == Alliance.Red) {
+      hub[0] = FieldConstants.RED_HUB_X;
+      hub[1] = FieldConstants.RED_HUB_Y;
+    } else {
+      hub[0] = FieldConstants.BLUE_HUB_X; // safe fallback
+      hub[1] = FieldConstants.BLUE_HUB_Y;
+    }
   }
 
-  /** Check if scoring is allowed based on game state and position. */
-  private boolean canScore() {
+  /**
+   * Check if scoring is currently allowed.
+   * Requires: (1) the hub is active per FMS game data, AND
+   *           (2) the robot is within its alliance zone (G407).
+   *
+   * @param pose Current robot pose — passed in so we never read a stale cached field.
+   */
+  private boolean canScore(Pose2d pose) {
     String gameData = DriverStation.getGameSpecificMessage();
-    char active = (gameData.length() > 0) ? gameData.charAt(0) : 'Z';
+    // If no FMS data (practice/testing), assume active so shot calculations still run.
+    if (gameData.length() == 0) return true;
+    char active = gameData.charAt(0);
 
-    return ((active == 'B' && alliance.equals(Alliance.Blue) && x >= ShooterConstants.BLUE_X)
-        || (active == 'R' && alliance.equals(Alliance.Red) && x <= ShooterConstants.RED_X));
+    double robotX = pose.getX();
+    if (active == 'B' && alliance == Alliance.Blue) {
+      return robotX <= FieldConstants.BLUE_ALLIANCE_ZONE_MAX_X;
+    } else if (active == 'R' && alliance == Alliance.Red) {
+      return robotX >= FieldConstants.RED_ALLIANCE_ZONE_MIN_X;
+    }
+    return false;
   }
 
   /**
@@ -81,7 +96,7 @@ public class Physics {
    * @return Angle difference in degrees
    */
   public double robotToHub() {
-    UpdateHubLocation();
+    updateHubLocation();
 
     Optional<Pose3d> poseOpt = vision.getPose3d(getRobotPose());
     if (poseOpt.isEmpty()) {
@@ -101,16 +116,19 @@ public class Physics {
   /**
    * Calculate distance to hub.
    *
-   * @return Optional distance in meters, empty if scoring not allowed
+   * @return Optional distance in meters, empty if scoring not allowed or no vision
    */
   public Optional<Double> hubDistance() {
-    UpdateHubLocation();
+    refreshAlliance();
+    updateHubLocation();
 
-    if (!canScore()) {
+    // Get current pose FIRST so canScore() never reads a stale cached field.
+    Pose2d robotPose = getRobotPose();
+    if (!canScore(robotPose)) {
       return Optional.empty();
     }
 
-    Optional<Pose3d> poseOpt = vision.getPose3d(getRobotPose());
+    Optional<Pose3d> poseOpt = vision.getPose3d(robotPose);
     if (poseOpt.isEmpty()) {
       return Optional.empty();
     }
@@ -182,7 +200,7 @@ public class Physics {
    * @return VisionAimedShot containing pitch angle and confidence metrics
    */
   public VisionAimedShot calculateOptimalPitchWithVision() {
-    UpdateHubLocation();
+    updateHubLocation();
 
     // Try to get vision-based pose
     Optional<Vision.VisionUpdate> visionUpdateOpt =
@@ -284,11 +302,14 @@ public class Physics {
    * @return Pitch angle in degrees
    */
   private double calculatePitchFromDistance(double distance) {
-    // Interpolation table - tune based on testing
+    // Interpolation table — tune based on testing.
+    // closeAngle is capped at PITCH_MAX_ANGLE (56.5°) because the hood cannot
+    // physically exceed that angle. Previously this was 70°, which was silently
+    // clamped by setPitchAngle() with no indication that close shots were inaccurate.
     double minDistance = 2.0; // meters
     double maxDistance = 8.0; // meters
-    double closeAngle = 70.0; // degrees for close shots
-    double farAngle = 35.0; // degrees for far shots
+    double closeAngle = ShooterConstants.PITCH_MAX_ANGLE; // degrees — was 70, which exceeded hardware limit
+    double farAngle = 35.0;   // degrees for far shots
 
     if (distance <= minDistance) {
       return closeAngle;

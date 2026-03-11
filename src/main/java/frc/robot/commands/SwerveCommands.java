@@ -208,8 +208,6 @@ public final class SwerveCommands {
               new PIDConstants(SwerveConstants.AUTO_THETA_kP) // Rotation PID
               );
 
-      // Tell the command scheduler this command uses the swerve drive
-      addRequirements(swerve);
       setName("DriveToPose");
     }
 
@@ -330,7 +328,6 @@ public final class SwerveCommands {
       this.swerve = swerve;
       this.speeds = new Translation2d(xSpeed, ySpeed); // Combine into one object
       this.distance = distance;
-      addRequirements(swerve);
       setName("DriveDistance");
     }
 
@@ -436,7 +433,6 @@ public final class SwerveCommands {
       thetaController.setTolerance(SwerveConstants.AIM_TOLERANCE_DEG);
       thetaController.enableContinuousInput(-180.0, 180.0);
 
-      addRequirements(swerve);
       setName("OrientToHub");
     }
 
@@ -448,12 +444,10 @@ public final class SwerveCommands {
     @Override
     public void execute() {
       double omega = 0.0;
-
-      // SOLVED C-03
-      double rth = physics.robotToHub();
+      double errorDeg = 0.0;
 
       if (physics.hasReliableVisionTarget()) {
-        double errorDeg = rth;
+        errorDeg = physics.robotToHub();
         omega = thetaController.calculate(errorDeg);
       }
 
@@ -466,7 +460,7 @@ public final class SwerveCommands {
 
       SmartDashboard.putBoolean("Aim/Locked", thetaController.atSetpoint());
       SmartDashboard.putBoolean("Aim/VisionAvailable", physics.hasReliableVisionTarget());
-      SmartDashboard.putNumber("Aim/ErrorDeg", rth);
+      SmartDashboard.putNumber("Aim/ErrorDeg", errorDeg);
     }
 
     @Override

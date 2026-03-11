@@ -7,12 +7,18 @@ import frc.robot.auto.AutoConstants;
 /**
  * Reads a physical DIP switch to select autonomous mode.
  *
- * <p>Uses 5 DIO ports to read a 5-bit binary value (0-31): - Supports up to 32 auto modes (we use
- * 20) - Switch Position 0 (00000): Do Nothing - Switch Position 13 (01101): Depot+Climb (BEST - 20
- * pts) - See AutoConstants for full list
+ * <p>Uses 5 DIO ports to read a 5-bit binary value (0-31). Only values 0 through
+ * AutoConstants.NUM_AUTO_MODES-1 are valid; anything higher clamps to 0 (Do Nothing).
  *
- * <p>DIP switches are read as active-low (switch ON = LOW/false = 1). This is because DIP switches
- * typically connect the pin to ground when ON.
+ * <p>Current modes (see AutoConstants.AUTO_MODE_NAMES for the full list):
+ * <ul>
+ *   <li>0 (00000): Do Nothing
+ *   <li>1 (00001): Score Only
+ *   <li>2 (00010): Score &amp; Collect
+ *   <li>3 (00011): Deposit &amp; Climb
+ * </ul>
+ *
+ * <p>DIP switches are read as active-low (switch ON = LOW/false = 1).
  */
 public class DipSwitchSelector {
 

@@ -5,11 +5,10 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.io.IOException;
 import java.util.Optional;
 
-public class Vision extends SubsystemBase{
+public class Vision extends SubsystemBase {
   public record VisionUpdate(
       Pose3d pose3d,
       Pose2d pose2d,
@@ -24,20 +23,41 @@ public class Vision extends SubsystemBase{
   // private Limelight limelight;
 
   public Vision() {
-    // Load tags and let us know if it fails. don't screw w/ program @ runtime.
+    AprilTagFieldLayout layout = null;
+
+    // First try the custom field JSON in the deploy directory.
     try {
-      fieldLayout = new AprilTagFieldLayout(
+      layout = new AprilTagFieldLayout(
           Filesystem.getDeployDirectory().toPath().resolve("2026-rebuilt-welded.json"));
     } catch (IOException e) {
-      throw new RuntimeException("Failed to load AprilTag layout", e);
+      // Custom file missing or unreadable — log and fall back.
+      System.err.println("[Vision] WARNING: Could not load 2026-rebuilt-welded.json: " + e.getMessage());
     }
 
-    photon = new Photon(Optional.of(fieldLayout));
+    // If the custom file failed, try the WPILib built-in layout for the current game.
+    if (layout == null) {
+      try {
+        layout = AprilTagFieldLayout.loadField(edu.wpi.first.apriltag.AprilTagFields.kDefaultField);
+        System.err.println("[Vision] Using WPILib default AprilTag field layout as fallback.");
+      } catch (Exception e2) {
+        // Still failed — vision pose estimation will be disabled but robot won't crash.
+        System.err.println("[Vision] ERROR: Could not load any AprilTag field layout. Vision pose estimation disabled.");
+      }
+    }
+
+    fieldLayout = layout;
+    photon = new Photon(Optional.ofNullable(fieldLayout));
     // limelight = new Limelight(VisionConstants.LIMELIGHT_NAME);
   }
 
   public Photon getP() {
     return photon;
+  }
+
+  /** Called every 20ms by the CommandScheduler via SubsystemBase. Clears the
+   *  per-loop vision cache so the next caller gets a fresh read from cameras. */
+  public void periodic() {
+    photon.invalidateCache();
   }
 
   /*
@@ -75,11 +95,5 @@ public class Vision extends SubsystemBase{
   public Optional<VisionUpdate> getBestVisionUpdateRaw(Pose2d robotPose) {
     // TODO LIMELIGHT VERSION HERE
     return photon.getBestVisionUpdate(robotPose);
-  }
-
-  @Override
-  public void periodic() {
-    // SOLVED C-02
-    photon.clearUpdateCache();
   }
 }

@@ -13,7 +13,7 @@ public class ShooterCommands {
   private ShooterCommands() {}
 
   /** Command to spin up flywheel and wait until ready. */
-  public Command spinUpCommand(Shooter shooter) {
+  public static Command spinUpCommand(Shooter shooter) {
     return Commands.sequence(
             Commands.runOnce(shooter.getF()::spinUp, shooter),
             Commands.waitUntil(shooter.getF()::isFlywheelAtSpeed))
@@ -24,7 +24,7 @@ public class ShooterCommands {
    * Command to prepare shooter with automatic pitch calculation. Uses trajectory calculation to
    * determine optimal pitch angle.
    */
-  public Command prepareAutoShotCommand(Shooter shooter) {
+  public static Command prepareAutoShotCommand(Shooter shooter) {
     return Commands.sequence(
             Commands.runOnce(
                 () -> {
@@ -40,7 +40,7 @@ public class ShooterCommands {
    * Command to prepare shooter using vision-assisted targeting. Uses AprilTags for more precise
    * distance/angle calculation. Falls back to odometry if no tags visible.
    */
-  public Command prepareVisionShotCommand(Shooter shooter) {
+  public static Command prepareVisionShotCommand(Shooter shooter) {
     return Commands.sequence(
             Commands.runOnce(
                 () -> {
@@ -61,7 +61,7 @@ public class ShooterCommands {
    * Command to continuously track hub with vision and update pitch. Run this while waiting for a
    * shot opportunity.
    */
-  public Command trackHubCommand(Shooter shooter) {
+  public static Command trackHubCommand(Shooter shooter) {
     return Commands.run(
             () -> {
               if (shooter.getP().hasReliableVisionTarget()) {
@@ -77,7 +77,7 @@ public class ShooterCommands {
    * Command to spin up and aim using vision, then wait for driver trigger. Continuously updates
    * pitch based on AprilTag data.
    */
-  public Command aimAndSpinUpCommand(Shooter shooter) {
+  public static Command aimAndSpinUpCommand(Shooter shooter) {
     return Commands.parallel(
             // Keep flywheel spinning
             Commands.run(shooter.getF()::spinUp, shooter),
@@ -97,12 +97,12 @@ public class ShooterCommands {
   }
 
   /** Command to stop the shooter. */
-  public Command stopCommand(Shooter shooter) {
+  public static Command stopCommand(Shooter shooter) {
     return Commands.runOnce(shooter::stop, shooter).withName("Stop Shooter");
   }
 
   /** Command to hold flywheel at idle speed (for warmup). */
-  public Command idleCommand(Shooter shooter) {
+  public static Command idleCommand(Shooter shooter) {
     return Commands.run(shooter.getF()::spinUpIdle, shooter).withName("Idle Shooter");
   }
 

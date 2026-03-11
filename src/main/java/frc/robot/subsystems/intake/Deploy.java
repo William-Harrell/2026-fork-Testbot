@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /** Two Vortex (SparkFlex) motors that deploy/retract the intake mechanism */
 public class Deploy {
@@ -55,6 +56,12 @@ public class Deploy {
     }
   }
 
+  /**
+   * @deprecated Do NOT call set() directly on the returned controller — doing so bypasses the
+   *     state machine and will desync physical and logical state. Use the methods on {@link Deploy}
+   *     or {@link IntakeCommands} instead. This accessor exists only for legacy telemetry reads.
+   */
+  @Deprecated
   public SparkFlex get() {
     return deployMotor;
   }
@@ -95,18 +102,22 @@ public class Deploy {
    * Command that slowly retracts toward stow until the limit switch triggers,
    * then zeros the encoder. If already at home, zeros immediately.
    */
-  public Command homeCommand() {
+  /**
+   * @param owner The subsystem that owns this mechanism (passed so the CommandScheduler
+   *              can prevent concurrent commands from fighting over this motor).
+   */
+  public Command homeCommand(SubsystemBase owner) {
     return Commands.either(
         // Already home — just zero
-        Commands.runOnce(() -> { deployEncoder.setPosition(0); homed = true; }),
+        Commands.runOnce(() -> { deployEncoder.setPosition(0); homed = true; }, owner),
         // Not home — drive slowly toward stow until switch triggers
-        Commands.run(() -> deployMotor.set(IntakeConstants.HOMING_SPEED))
+        Commands.run(() -> deployMotor.set(IntakeConstants.HOMING_SPEED), owner)
             .until(this::isAtHome)
             .andThen(Commands.runOnce(() -> {
               deployMotor.set(0);
               deployEncoder.setPosition(0);
               homed = true;
-            })),
+            }, owner)),
         this::isAtHome)
         .withName("Home Intake Deploy");
   }

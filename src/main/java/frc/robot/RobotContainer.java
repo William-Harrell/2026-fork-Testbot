@@ -325,7 +325,6 @@ public class RobotContainer {
 
     // Superstructure holds references to all subsystems for coordination
     superstructure = new Superstructure(swerve, vision, shooter, intake);
-    superstructure.doNothing(); // Just to get rid of the java warning temporarily
 
     // ----------------------------------------------------------------
     // HOMING: DO NOT schedule here — robot is disabled at this point and motors

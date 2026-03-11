@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import java.util.Objects;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -113,7 +115,9 @@ public class ShooterCommands {
    * On release: stops shooter and rollers.
    */
   public static Command shootCommand(Shooter shooter, Intake intake) {
-    if (shooter == null || intake == null) return Commands.none();
+    Objects.requireNonNull(shooter, "Shooter must not be null");
+    Objects.requireNonNull(intake,  "Intake must not be null");
+    
     return Commands.sequence(
             Commands.runOnce(shooter::prepareDefaultShot, shooter),
             Commands.waitUntil(shooter.getF()::isReadyToShoot),

@@ -18,10 +18,13 @@ public class RollerBelt extends SubsystemBase {
     motor2 = new SparkFlex(RollerBeltConstants.BELT_MOTOR_2_ID, MotorType.kBrushless);
 
     SparkFlexConfig config = new SparkFlexConfig();
+    SparkFlexConfig follower = new SparkFlexConfig();
+
     config.idleMode(IdleMode.kBrake).smartCurrentLimit(RollerBeltConstants.CURRENT_LIMIT);
+    follower.follow(motor1, /* inverted= */ true); // verify invert on real robot
 
     motor1.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    motor2.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    motor2.configure(follower, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   @Override
@@ -32,18 +35,16 @@ public class RollerBelt extends SubsystemBase {
     SmartDashboard.putNumber("RollerBelt/Motor2/Output", motor2.get());
   }
 
+  // Then only command motor1:
   public void run() {
     motor1.set(RollerBeltConstants.BELT_SPEED);
-    motor2.set(RollerBeltConstants.BELT_SPEED);
   }
 
   public void reverse() {
     motor1.set(RollerBeltConstants.REVERSE_SPEED);
-    motor2.set(RollerBeltConstants.REVERSE_SPEED);
   }
 
   public void stop() {
     motor1.set(0);
-    motor2.set(0);
   }
 }

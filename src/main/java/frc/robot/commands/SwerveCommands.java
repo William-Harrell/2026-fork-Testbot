@@ -447,7 +447,7 @@ public final class SwerveCommands {
       double errorDeg = 0.0;
 
       if (physics.hasReliableVisionTarget()) {
-        errorDeg = physics.robotToHub();
+        errorDeg = physics.robotToHub().get();
         omega = thetaController.calculate(errorDeg);
       }
 

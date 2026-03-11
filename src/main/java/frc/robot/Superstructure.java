@@ -24,10 +24,6 @@ public class Superstructure {
     this.intake = intake;
   }
 
-  public void doNothing() { // lol
-    return;
-  }
-
   public SwerveDrive getSwerve() {
     return swerve;
   }

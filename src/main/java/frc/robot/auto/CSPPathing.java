@@ -105,14 +105,8 @@ public final class CSPPathing {
     }
 
     public static List<Waypoint> generatePath(Pose2d start, Pose2d end) {
-        if (!runBefore) {
-            lastPose = end;
-            runBefore = true;
-        } else {
-            start = lastPose;
-            lastPose = end;
-        }
-
+        lastPose = end;
+        runBefore = true;
         return generatePathInternal(start, new Pose2d[] { end });
     }
 
@@ -129,7 +123,8 @@ public final class CSPPathing {
     }
 
     public static List<Waypoint> generatePath(Pose2d start, Pose2d... midAndEnd) {
-        // Guard FIRST — before any array access to prevent NPE/ArrayIndexOutOfBoundsException.
+        // Guard FIRST — before any array access to prevent
+        // NPE/ArrayIndexOutOfBoundsException.
         if (midAndEnd == null || midAndEnd.length == 0)
             throw new IllegalArgumentException("Must provide at least end Pose2d");
 
@@ -144,7 +139,8 @@ public final class CSPPathing {
     }
 
     public static List<Waypoint> generatePath(Pose2d start, Translation2d... midAndEnd) {
-        // Guard FIRST — before any array access to prevent NPE/ArrayIndexOutOfBoundsException.
+        // Guard FIRST — before any array access to prevent
+        // NPE/ArrayIndexOutOfBoundsException.
         if (midAndEnd == null || midAndEnd.length == 0)
             throw new IllegalArgumentException("Must provide at least end Pose2d");
 
@@ -444,7 +440,8 @@ public final class CSPPathing {
 
     /**
      * Derive the goal end state (heading and velocity) from the last waypoint.
-     * PathPlanner's Waypoint is a record: Waypoint(prevControl, anchor, nextControl).
+     * PathPlanner's Waypoint is a record: Waypoint(prevControl, anchor,
+     * nextControl).
      * We read those fields directly instead of reflection so this actually works.
      */
     public static GoalEndState guessGoalEndStateFromWaypoints(List<Waypoint> waypoints) {
@@ -666,16 +663,20 @@ public final class CSPPathing {
     }
 
     /**
-     * Check whether the robot is still on its current path (within PATH_ERROR_METERS of lastPose).
+     * Check whether the robot is still on its current path (within
+     * PATH_ERROR_METERS of lastPose).
      *
      * @param robotPose Current robot pose from odometry.
-     * @return true if the robot is within the tolerance of the path endpoint; false if off-path
+     * @return true if the robot is within the tolerance of the path endpoint; false
+     *         if off-path
      *         or if no path has been generated yet.
      */
     public static boolean robotOnPath(Pose2d robotPose) {
         // Can't be on a path that was never generated.
-        if (lastPose == null) return false;
-        // Previously the comparison was inverted (> instead of <=), returning true when far away.
+        if (lastPose == null)
+            return false;
+        // Previously the comparison was inverted (> instead of <=), returning true when
+        // far away.
         return (distance(robotPose.getTranslation(), lastPose.getTranslation()) <= PATH_ERROR_METERS);
     }
 

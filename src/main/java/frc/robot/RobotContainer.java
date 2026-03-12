@@ -93,6 +93,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.OI.DriverActionSet;
@@ -687,34 +688,34 @@ public class RobotContainer {
     // Home mechanisms that use relative encoders.
     // Slowly retracts intake deploy and shooter hood until limit switches trigger,
     // then zeros their encoders. Times out after 3s if switches don't trigger.
-    Commands.parallel(intake.getD().homeCommand(intake), shooter.getO().homeCommand(shooter))
-        .withTimeout(3.0)
-        .andThen(
-            Commands.runOnce(
-                () -> {
-                  boolean intakeOk = intake.getD().isHomed();
-                  boolean hoodOk = shooter.getO().isHomed();
-                  if (intakeOk && hoodOk) {
-                    Elastic.sendNotification(
-                        new Elastic.Notification()
-                            .withLevel(Elastic.NotificationLevel.INFO)
-                            .withTitle("Homing Complete")
-                            .withDescription("Intake and hood encoders zeroed")
-                            .withDisplaySeconds(3.0));
-                  } else {
-                    Elastic.sendNotification(
-                        new Elastic.Notification()
-                            .withLevel(Elastic.NotificationLevel.ERROR)
-                            .withTitle("Homing Failed")
-                            .withDescription(
-                                (!intakeOk ? "Intake " : "")
-                                    + (!hoodOk ? "Hood " : "")
-                                    + "limit switch not triggered")
-                            .withNoAutoDismiss());
-                  }
-                }))
-        .withName("Home Mechanisms")
-        .schedule();
+    CommandScheduler.getInstance().schedule(
+        Commands.parallel(intake.getD().homeCommand(intake), shooter.getO().homeCommand(shooter))
+            .withTimeout(3.0)
+            .andThen(
+                Commands.runOnce(
+                    () -> {
+                      boolean intakeOk = intake.getD().isHomed();
+                      boolean hoodOk = shooter.getO().isHomed();
+                      if (intakeOk && hoodOk) {
+                        Elastic.sendNotification(
+                            new Elastic.Notification()
+                                .withLevel(Elastic.NotificationLevel.INFO)
+                                .withTitle("Homing Complete")
+                                .withDescription("Intake and hood encoders zeroed")
+                                .withDisplaySeconds(3.0));
+                      } else {
+                        Elastic.sendNotification(
+                            new Elastic.Notification()
+                                .withLevel(Elastic.NotificationLevel.ERROR)
+                                .withTitle("Homing Failed")
+                                .withDescription(
+                                    (!intakeOk ? "Intake " : "")
+                                        + (!hoodOk ? "Hood " : "")
+                                        + "limit switch not triggered")
+                                .withNoAutoDismiss());
+                      }
+                    }))
+            .withName("Home Mechanisms"));
   }
 
   // ================================================================

@@ -16,14 +16,10 @@ public class Roller {
 
   /** {@code myRM} is the roller motor */
   public Roller(SparkMax myRM, IntakeState mySM, Deploy myD) {
-    // Instance variables
     rollerMotor = myRM;
-
-    // Co subsystems
     state_machine = mySM;
     deploy = myD;
 
-    // Config stuff
     SparkMaxConfig rollerConfig = new SparkMaxConfig();
     rollerConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(30);
     rollerMotor.configure(
@@ -60,18 +56,30 @@ public class Roller {
     state_machine.set(intake_state.FEEDING);
   }
 
-  /** Stop the roller motors */
+  /**
+   * Stop the roller motors and update the state machine.
+   *
+   * <p>FIX: Previously, if the arm was mid-travel (neither isDeployed() nor isStowed()),
+   * state.set() was never called, leaving the state as DEPLOYING or RETRACTING. This caused the
+   * next intake command to read stale state. The else branch now resolves ambiguous mid-travel
+   * state to DEPLOYED so the arm finishes its motion cleanly before the next command runs.
+   */
   public void stopRollers() {
     rollerMotor.set(0);
     if (deploy.isDeployed()) {
       state_machine.set(intake_state.DEPLOYED);
     } else if (deploy.isStowed()) {
       state_machine.set(intake_state.STOWED);
+    } else {
+      // Arm is mid-travel (DEPLOYING or RETRACTING). Settle to DEPLOYED so the
+      // next command doesn't act on stale DEPLOYING/RETRACTING state.
+      // Intake.periodic() will auto-advance to STOWED once isStowed() becomes true.
+      state_machine.set(intake_state.DEPLOYED);
     }
   }
 
   public void toggleIntakeOutake() {
-    if (deploy.isDeployed() == false) return;
+    if (!deploy.isDeployed()) return;
 
     if (state_machine.get() == intake_state.INTAKING) {
       runOuttake();

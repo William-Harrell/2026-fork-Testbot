@@ -7,26 +7,30 @@ import frc.robot.auto.AutoConstants;
 /**
  * Reads a physical DIP switch to select autonomous mode.
  *
- * <p>Uses 5 DIO ports to read a 5-bit binary value (0-31). Only values 0 through
- * AutoConstants.NUM_AUTO_MODES-1 are valid; anything higher clamps to 0 (Do Nothing).
+ * <p>
+ * Uses 5 DIO ports to read a 5-bit binary value (0-31). Only values 0 through
+ * AutoConstants.NUM_AUTO_MODES-1 are valid; anything higher clamps to 0 (Do
+ * Nothing).
  *
- * <p>Current modes (see AutoConstants.AUTO_MODE_NAMES for the full list):
+ * <p>
+ * Current modes (see AutoConstants.AUTO_MODE_NAMES for the full list):
  * <ul>
- *   <li>0 (00000): Do Nothing
- *   <li>1 (00001): Score Only
- *   <li>2 (00010): Score &amp; Collect
- *   <li>3 (00011): Deposit &amp; Climb
+ * <li>0 (00000): Do Nothing
+ * <li>1 (00001): Score Only
+ * <li>2 (00010): Score &amp; Collect
+ * <li>3 (00011): Deposit &amp; Climb
  * </ul>
  *
- * <p>DIP switches are read as active-low (switch ON = LOW/false = 1).
+ * <p>
+ * DIP switches are read as active-low (switch ON = LOW/false = 1).
  */
 public class DipSwitchSelector {
 
-  private final DigitalInput bit0; // LSB (1)
-  private final DigitalInput bit1; // (2)
-  private final DigitalInput bit2; // (4)
-  private final DigitalInput bit3; // (8)
-  private final DigitalInput bit4; // MSB (16)
+  private final DigitalInput bit0;
+  private final DigitalInput bit1;
+  private final DigitalInput bit2;
+  private final DigitalInput bit3;
+  private final DigitalInput bit4;
 
   private int cachedSelection = -1;
   private boolean selectionLocked = false;
@@ -43,37 +47,38 @@ public class DipSwitchSelector {
   /**
    * Read the current DIP switch position.
    *
-   * <p>DIP switches are typically active-low: - Switch OFF (open) = HIGH (true) = 0 - Switch ON
+   * <p>
+   * DIP switches are typically active-low: - Switch OFF (open) = HIGH (true) = 0
+   * - Switch ON
    * (closed to ground) = LOW (false) = 1
    *
-   * @return Integer 0-31 representing the switch position (clamped to valid range)
+   * @return Integer 0-31 representing the switch position (clamped to valid
+   *         range)
    */
   public int getSelection() {
-    // If selection is locked (match started), return cached value
+
     if (selectionLocked && cachedSelection >= 0) {
       return cachedSelection;
     }
 
-    // Read switches (inverted because active-low)
-    int b0 = bit0.get() ? 0 : 1; // LSB (1)
-    int b1 = bit1.get() ? 0 : 1; // (2)
-    int b2 = bit2.get() ? 0 : 1; // (4)
-    int b3 = bit3.get() ? 0 : 1; // (8)
-    int b4 = bit4.get() ? 0 : 1; // MSB (16)
+    int b0 = bit0.get() ? 0 : 1;
+    int b1 = bit1.get() ? 0 : 1;
+    int b2 = bit2.get() ? 0 : 1;
+    int b3 = bit3.get() ? 0 : 1;
+    int b4 = bit4.get() ? 0 : 1;
 
-    // Combine bits: (b4 << 4) | (b3 << 3) | (b2 << 2) | (b1 << 1) | b0
     int selection = (b4 << 4) | (b3 << 3) | (b2 << 2) | (b1 << 1) | b0;
 
-    // Clamp to valid range (0 to NUM_AUTO_MODES-1)
     if (selection >= AutoConstants.NUM_AUTO_MODES) {
-      selection = 0; // Default to Do Nothing if invalid
+      selection = 0;
     }
 
     return selection;
   }
 
   /**
-   * Lock the current selection (call at start of autonomous). Prevents changes mid-match if someone
+   * Lock the current selection (call at start of autonomous). Prevents changes
+   * mid-match if someone
    * bumps the switch.
    */
   public void lockSelection() {
@@ -125,7 +130,8 @@ public class DipSwitchSelector {
   }
 
   /**
-   * Update SmartDashboard with current DIP switch status. Call this in robotPeriodic() or
+   * Update SmartDashboard with current DIP switch status. Call this in
+   * robotPeriodic() or
    * disabledPeriodic().
    */
   public void updateDashboard() {
@@ -135,15 +141,12 @@ public class DipSwitchSelector {
     SmartDashboard.putString("Auto/DIP Binary", getBinaryString());
     SmartDashboard.putBoolean("Auto/Selection Locked", selectionLocked);
 
-    // Show individual switch states for debugging
     SmartDashboard.putBoolean("Auto/DIP Bit 0 (1)", !bit0.get());
     SmartDashboard.putBoolean("Auto/DIP Bit 1 (2)", !bit1.get());
     SmartDashboard.putBoolean("Auto/DIP Bit 2 (4)", !bit2.get());
     SmartDashboard.putBoolean("Auto/DIP Bit 3 (8)", !bit3.get());
     SmartDashboard.putBoolean("Auto/DIP Bit 4 (16)", !bit4.get());
 
-    // Highlight if optimal mode is selected
-    SmartDashboard.putBoolean(
-        "Auto/Optimal Mode Selected", selection == AutoConstants.AUTO_SCORE_COLLECT);
+    SmartDashboard.putBoolean("Auto/Optimal Mode Selected", selection == AutoConstants.AUTO_SCORE_COLLECT);
   }
 }

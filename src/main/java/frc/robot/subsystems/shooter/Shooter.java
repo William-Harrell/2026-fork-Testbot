@@ -1,3 +1,5 @@
+// CHECK //
+
 package frc.robot.subsystems.shooter;
 
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -22,12 +24,10 @@ public class Shooter extends SubsystemBase {
   private boolean lastHubActive = true;
 
   public Shooter(Vision vision, SwerveDrive swerve) {
-    // Intra (w/ overload constructors)
-    // Investigate what u don't know (ctrl+click)
     orientation = new Orientation(new SparkFlex(ShooterConstants.HOOD_MOTOR_ID, MotorType.kBrushless));
-    physics = new Physics(vision, swerve); // this guy really just wants ALL the fancy stuff huh
+    physics = new Physics(vision, swerve);
     flywheel =
-        new Flywheel( // Just so its pretty
+        new Flywheel(
             new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID),
             new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_2_ID),
             orientation);
@@ -43,7 +43,17 @@ public class Shooter extends SubsystemBase {
     return physics;
   }
 
+  /** @deprecated Use {@link #getState()} — getS() is ambiguous next to getO()/getP()/getF(). */
+  @Deprecated
   public ShooterState getS() {
+    return state_machine;
+  }
+
+  /**
+   * Returns the ShooterState state machine.
+   * Use this to read or set the current shooter phase (IDLE, SPINNING_UP, READY, SHOOTING, etc.).
+   */
+  public ShooterState getState() {
     return state_machine;
   }
 
@@ -52,8 +62,6 @@ public class Shooter extends SubsystemBase {
   }
 
   private void updateDashboard() {
-    // Main stats (Hover for Javadocs explanations)
-    // Too many methods? Nah.
     SmartDashboard.putString("Shooter/State", state_machine.get().toString());
     SmartDashboard.putNumber("Shooter/PitchAngle", orientation.getTargetPitchAngle());
     SmartDashboard.putNumber("Shooter/FlywheelRPM", flywheel.getFlywheelRPM());
@@ -62,12 +70,9 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putBoolean("Shooter/ReadyToShoot", flywheel.isReadyToShoot());
     physics.hubDistance().ifPresent(d -> SmartDashboard.putNumber("Shooter/HubDistance", d));
 
-    // Hub active/inactive (FMS game-specific message)
     SmartDashboard.putBoolean("Shooter/HubActive", physics.isHubActive());
-    // G407 alliance zone (robot must be inside to score)
     SmartDashboard.putBoolean("Shooter/InAllianceZone", physics.isInAllianceZone());
 
-    // Vision-related (can-shoot? & what the shot would look like)
     SmartDashboard.putBoolean("Shooter/VisionAvailable", physics.hasReliableVisionTarget());
     if (physics.hasReliableVisionTarget()) {
       VisionAimedShot visionShot = physics.calculateOptimalPitchWithVision();
@@ -79,13 +84,11 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  // Runs every ~20 ms
   public void periodic() {
     state_machine.update();
     orientation.updateDashboard();
     updateDashboard();
 
-    // Notify driver when hub active status changes
     boolean hubActive = physics.isHubActive();
     if (hubActive != lastHubActive) {
       if (hubActive) {
@@ -107,8 +110,6 @@ public class Shooter extends SubsystemBase {
     }
   }
 
-  // Like a mini superstructure, if you will...
-  // porbably all commands. will touch them later...
   public void prepareShot(double pitchDegrees, double flywheelRPM) {
     orientation.setPitchAngle(pitchDegrees);
     flywheel.setFlywheelRPM(flywheelRPM);
@@ -118,7 +119,7 @@ public class Shooter extends SubsystemBase {
     prepareShot(ShooterConstants.LAUNCH_ANGLE, ShooterConstants.FLYWHEEL_SHOOT_RPM);
   }
 
-  public void stop() { // no idea what this is for tbh. prolly cmds.
+  public void stop() {
     flywheel.stopFlywheel();
     orientation.stowPitch();
     state_machine.set(shooter_state.IDLE);

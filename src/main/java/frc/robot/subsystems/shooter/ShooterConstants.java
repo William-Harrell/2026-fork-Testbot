@@ -1,3 +1,5 @@
+// CHECK //
+
 package frc.robot.subsystems.shooter;
 
 import edu.wpi.first.wpilibj.DriverStation.Alliance;

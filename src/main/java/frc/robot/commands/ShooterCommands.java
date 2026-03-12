@@ -9,6 +9,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Physics.VisionAimedShot;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.shooter.ShooterState.shooter_state;
 import frc.robot.util.Elastic;
 
 public class ShooterCommands {
@@ -18,7 +19,7 @@ public class ShooterCommands {
   public static Command spinUpCommand(Shooter shooter) {
     return Commands.sequence(
             Commands.runOnce(shooter.getF()::spinUp, shooter),
-            Commands.waitUntil(shooter.getF()::isFlywheelAtSpeed))
+            Commands.waitUntil(shooter.getF()::isReadyToShoot))
         .withName("Spin Up Shooter");
   }
 
@@ -49,7 +50,6 @@ public class ShooterCommands {
                   VisionAimedShot shot = shooter.getP().calculateOptimalPitchWithVision();
                   shooter.prepareShot(shot.pitchAngle(), ShooterConstants.FLYWHEEL_SHOOT_RPM);
 
-                  // Log the shot info for driver feedback
                   SmartDashboard.putBoolean("Shooter/VisionAssisted", shot.visionAssisted());
                   SmartDashboard.putString("Shooter/ShotConfidence", shot.confidenceDescription());
                   SmartDashboard.putNumber("Shooter/VisionDistance", shot.distanceToHub());
@@ -81,15 +81,12 @@ public class ShooterCommands {
    */
   public static Command aimAndSpinUpCommand(Shooter shooter) {
     return Commands.parallel(
-            // Keep flywheel spinning
             Commands.run(shooter.getF()::spinUp, shooter),
-            // Continuously track the hub
             Commands.run(
                 () -> {
                   VisionAimedShot shot = shooter.getP().calculateOptimalPitchWithVision();
                   shooter.getO().setPitchAngle(shot.pitchAngle());
 
-                  // Update dashboard
                   SmartDashboard.putBoolean("Shooter/VisionAssisted", shot.visionAssisted());
                   SmartDashboard.putBoolean("Shooter/HighConfidence", shot.isHighConfidence());
                   SmartDashboard.putNumber("Shooter/AimPitch", shot.pitchAngle());
@@ -113,11 +110,15 @@ public class ShooterCommands {
    *
    * <p>While button is held: spins up flywheel + sets pitch, waits until ready, then feeds FUEL.
    * On release: stops shooter and rollers.
+   *
+   * <p>FIX: Sets ShooterState to SHOOTING when feed begins, making the SHOOTING state reachable
+   * and giving the state machine an accurate picture of the shooter's phase. This enables
+   * dashboard widgets and future logic gated on SHOOTING (e.g. per-shot counters, telemetry).
    */
   public static Command shootCommand(Shooter shooter, Intake intake) {
     Objects.requireNonNull(shooter, "Shooter must not be null");
-    Objects.requireNonNull(intake,  "Intake must not be null");
-    
+    Objects.requireNonNull(intake, "Intake must not be null");
+
     return Commands.sequence(
             Commands.runOnce(shooter::prepareDefaultShot, shooter),
             Commands.waitUntil(shooter.getF()::isReadyToShoot),
@@ -133,9 +134,15 @@ public class ShooterCommands {
                             .withDisplaySeconds(3.0));
                   }
                 }),
-            // G407: only feed if robot is inside the alliance zone
+            // G407: only feed if robot is inside the alliance zone.
+            // FIX: Commands.either resolves immediately (one-shot), so the state
+            // is set to SHOOTING before the feed command begins and returned to
+            // READY on the flywheel's next update() cycle once feeding stops.
             Commands.either(
-                Commands.run(intake.getR()::feedToShooter, intake),
+                Commands.sequence(
+                    Commands.runOnce(
+                        () -> shooter.getState().set(shooter_state.SHOOTING), shooter),
+                    Commands.run(intake.getR()::feedToShooter, intake)),
                 Commands.runOnce(
                     () -> {
                       SmartDashboard.putString("Shooter/Warning", "G407: NOT IN ALLIANCE ZONE");

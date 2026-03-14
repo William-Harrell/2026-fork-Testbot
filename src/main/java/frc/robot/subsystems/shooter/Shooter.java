@@ -15,7 +15,8 @@ import frc.robot.util.Elastic;
 
 public class Shooter extends SubsystemBase {
   // Sub-subsystems
-  private Orientation orientation;
+  private Orientation orientation1;
+  private Orientation orientation2;
   private Physics physics;
   private ShooterState state_machine;
   private Flywheel flywheel;
@@ -24,19 +25,20 @@ public class Shooter extends SubsystemBase {
   private boolean lastHubActive = true;
 
   public Shooter(Vision vision, SwerveDrive swerve) {
-    orientation = new Orientation(new SparkFlex(ShooterConstants.HOOD_MOTOR_ID, MotorType.kBrushless));
+    orientation1 = new Orientation(new SparkFlex(ShooterConstants.HOOD_MOTOR_ID1, MotorType.kBrushless));
+    orientation2 = new Orientation(new SparkFlex(ShooterConstants.HOOD_MOTOR_ID2, MotorType.kBrushless));
     physics = new Physics(vision, swerve);
     flywheel =
         new Flywheel(
             new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID),
             new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_2_ID),
-            orientation);
+            orientation1, orientation2);
     state_machine = new ShooterState(flywheel);
     flywheel.setStateMachine(state_machine);
   }
 
   public Orientation getO() {
-    return orientation;
+    return orientation1;
   }
 
   public Physics getP() {
@@ -63,7 +65,7 @@ public class Shooter extends SubsystemBase {
 
   private void updateDashboard() {
     SmartDashboard.putString("Shooter/State", state_machine.get().toString());
-    SmartDashboard.putNumber("Shooter/PitchAngle", orientation.getTargetPitchAngle());
+    SmartDashboard.putNumber("Shooter/PitchAngle", orientation1.getTargetPitchAngle());
     SmartDashboard.putNumber("Shooter/FlywheelRPM", flywheel.getFlywheelRPM());
     SmartDashboard.putNumber("Shooter/TargetRPM", flywheel.getTargetFlywheelRPM());
     SmartDashboard.putBoolean("Shooter/AtSpeed", flywheel.isFlywheelAtSpeed());
@@ -86,7 +88,7 @@ public class Shooter extends SubsystemBase {
 
   public void periodic() {
     state_machine.update();
-    orientation.updateDashboard();
+    orientation1.updateDashboard();
     updateDashboard();
 
     boolean hubActive = physics.isHubActive();
@@ -111,7 +113,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void prepareShot(double pitchDegrees, double flywheelRPM) {
-    orientation.setPitchAngle(pitchDegrees);
+    orientation1.setPitchAngle(pitchDegrees);
     flywheel.setFlywheelRPM(flywheelRPM);
   }
 
@@ -121,7 +123,7 @@ public class Shooter extends SubsystemBase {
 
   public void stop() {
     flywheel.stopFlywheel();
-    orientation.stowPitch();
+    orientation1.stowPitch();
     state_machine.set(shooter_state.IDLE);
   }
 }

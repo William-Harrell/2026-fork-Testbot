@@ -19,19 +19,18 @@ import frc.robot.subsystems.rollerbelt.RollerBelt;
 public class Superstructure {
   private final SwerveDrive swerve;
   private final Shooter shooter;
-  private final Vision vision;
+  // private final Vision vision;
   private final Intake intake;
-  private final Hopper hopper;
-  private final RollerBelt rollerbelt;
+  // private final Hopper hopper;
+  // private final RollerBelt rollerbelt;
 
-  public Superstructure(SwerveDrive swerve, Vision vision, Shooter shooter, Intake intake, Hopper hopper,
-      RollerBelt rollerbelt) {
+  public Superstructure(SwerveDrive swerve, Shooter shooter, Intake intake) {
     this.swerve = swerve;
     this.shooter = shooter;
-    this.vision = vision;
+    // this.vision = vision;
     this.intake = intake;
-    this.hopper = hopper;
-    this.rollerbelt = rollerbelt;
+    // this.hopper = hopper;
+    // this.rollerbelt = rollerbelt;
   }
 
   public SwerveDrive getSwerve() {
@@ -42,19 +41,19 @@ public class Superstructure {
     return shooter;
   }
 
-  public Vision getVision() {
-    return vision;
-  }
+  // public Vision getVision() {
+  //   return vision;
+  // }
 
   public Intake getIntake() {
     return intake;
   }
 
-  public Hopper getHopper() {
-    return hopper;
-  }
+  // public Hopper getHopper() {
+  //   return hopper;
+  // }
 
-  public RollerBelt getRollerBelt() {
-    return rollerbelt;
-  }
+  // public RollerBelt getRollerBelt() {
+  //   return rollerbelt;
+  // }
 }

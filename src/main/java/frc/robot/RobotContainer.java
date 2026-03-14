@@ -64,7 +64,7 @@ public class RobotContainer {
     hopper = new Hopper();
     rollerbelt = new RollerBelt();
 
-    superstructure = new Superstructure(swerve, vision, shooter, intake, hopper, rollerbelt);
+    superstructure = new Superstructure(swerve, shooter, intake);
 
     Command teleopDriveCommand = swerve.teleopCommand(
         () -> applySpeedCurve(driverJoystick.forward()),

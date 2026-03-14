@@ -1,3 +1,5 @@
+//CHECK//
+
 package frc.robot.subsystems.intake;
 
 import com.revrobotics.PersistMode;

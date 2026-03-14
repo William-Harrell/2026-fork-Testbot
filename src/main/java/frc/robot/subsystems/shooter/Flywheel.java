@@ -1,3 +1,5 @@
+//CHECK//
+
 package frc.robot.subsystems.shooter;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;

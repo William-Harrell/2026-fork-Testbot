@@ -18,7 +18,7 @@ public class Flywheel {
 
   private double targetFlywheelRPM = 0.0;
 
-  public Flywheel(TalonFX motor1, TalonFX motor2, Orientation myO, Orientation myO2) {
+  public Flywheel(TalonFX motor1, TalonFX motor2, Orientation myO) {
     flywheelMotor1 = motor1;
     flywheelMotor2 = motor2;
     orientation = myO;

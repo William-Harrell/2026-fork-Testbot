@@ -1,29 +1,26 @@
 package frc.robot.subsystems.intake;
 
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.subsystems.intake.IntakeState.intake_state;
 
 public class Roller {
   /** Motor that spins the rollers to intake/outtake FUEL */
-  private final SparkMax rollerMotor;
+  private final TalonFX rollerMotor;
 
   private final IntakeState state_machine;
   private final Deploy deploy;
 
   /** {@code myRM} is the roller motor */
-  public Roller(SparkMax myRM, IntakeState mySM, Deploy myD) {
+  public Roller(TalonFX myRM, IntakeState mySM, Deploy myD) {
     rollerMotor = myRM;
     state_machine = mySM;
     deploy = myD;
 
-    SparkMaxConfig rollerConfig = new SparkMaxConfig();
-    rollerConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(30);
-    rollerMotor.configure(
-        rollerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    TalonFXConfiguration rollerConfig = new TalonFXConfiguration();
+    rollerConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    rollerMotor.getConfigurator().apply(rollerConfig);
   }
 
   /**
@@ -32,7 +29,7 @@ public class Roller {
    *     or {@link IntakeCommands} instead. This accessor exists only for legacy telemetry reads.
    */
   @Deprecated
-  public SparkMax get() {
+  public TalonFX get() {
     return rollerMotor;
   }
 

@@ -1,8 +1,8 @@
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.intake.IntakeState.intake_state;
 
@@ -18,7 +18,7 @@ public class Intake extends SubsystemBase {
         new SparkFlex(IntakeConstants.DEPLOY_MOTOR_2_ID, MotorType.kBrushless));
     roller =
         new Roller(
-            new SparkMax(IntakeConstants.ROLLER_MOTOR_ID, MotorType.kBrushless),
+            new TalonFX(IntakeConstants.ROLLER_MOTOR_ID),
             state_machine,
             deploy);
   }

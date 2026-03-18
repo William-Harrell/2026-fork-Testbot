@@ -44,7 +44,9 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Array of all four swerve modules. Index order: [0]=FL, [1]=FR, [2]=RL, [3]=RR
    *
-   * <p>Each module contains: - A drive motor (spins the wheel) - An azimuth motor (steers the
+   * <p>
+   * Each module contains: - A drive motor (spins the wheel) - An azimuth motor
+   * (steers the
    * wheel) - An absolute encoder (tracks wheel angle)
    */
   private final SwerveModule[] modules;
@@ -62,7 +64,9 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Field2d - Displays robot position on a field diagram in Shuffleboard.
    *
-   * <p>[HOW TO VIEW] In Shuffleboard: Look for "Field" widget, shows top-down field view with robot
+   * <p>
+   * [HOW TO VIEW] In Shuffleboard: Look for "Field" widget, shows top-down field
+   * view with robot
    * icon showing current estimated position.
    */
   private final Field2d field;
@@ -70,7 +74,9 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * NetworkTables publishers for AdvantageScope.
    *
-   * <p>[WHAT IS ADVANTAGESCOPE?] A powerful data visualization tool for FRC. These publishers send
+   * <p>
+   * [WHAT IS ADVANTAGESCOPE?] A powerful data visualization tool for FRC. These
+   * publishers send
    * structured data that AdvantageScope can display in 3D views, graphs, etc.
    */
   private final StructPublisher<Pose2d> posePublisher;
@@ -82,11 +88,16 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Field-relative mode flag.
    *
-   * <p>true = Field-relative (default): "Forward" is toward the far end of field false =
+   * <p>
+   * true = Field-relative (default): "Forward" is toward the far end of field
+   * false =
    * Robot-relative: "Forward" is wherever the robot is facing
    *
-   * <p>[DRIVER PREFERENCE] Most drivers prefer field-relative because: - Pushing forward ALWAYS
-   * moves toward the opponent's side - Doesn't matter which way robot is facing - More intuitive
+   * <p>
+   * [DRIVER PREFERENCE] Most drivers prefer field-relative because: - Pushing
+   * forward ALWAYS
+   * moves toward the opponent's side - Doesn't matter which way robot is facing -
+   * More intuitive
    * for strafing
    */
   private boolean fieldRelative = true;
@@ -94,15 +105,21 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Open-loop vs closed-loop control.
    *
-   * <p>Open-loop: Set power directly (faster response, less accurate) Closed-loop: Use velocity PID
+   * <p>
+   * Open-loop: Set power directly (faster response, less accurate) Closed-loop:
+   * Use velocity PID
    * (more accurate, slight delay)
    *
-   * <p>[WHEN TO USE WHICH] - Teleop: Often open-loop for responsiveness - Auto: Often closed-loop
+   * <p>
+   * [WHEN TO USE WHICH] - Teleop: Often open-loop for responsiveness - Auto:
+   * Often closed-loop
    * for precision
    */
-  // openLoop is read from DrivingConstants so the intent is explicit and configurable
+  // openLoop is read from DrivingConstants so the intent is explicit and
+  // configurable
   // from one place. Previously this was set via (DRIVE_OPEN_LOOP_RAMP > 0) which
-  // was always true and could never be changed without modifying SwerveDrive itself.
+  // was always true and could never be changed without modifying SwerveDrive
+  // itself.
   private boolean openLoop = DrivingConstants.OPEN_LOOP;
 
   // CONSTRUCTOR - Initialize all swerve drive components
@@ -110,8 +127,11 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Creates a new SwerveDrive subsystem.
    *
-   * <p>This constructor: 1. Initializes the gyroscope 2. Defines where each wheel is located on the
-   * robot 3. Creates the kinematics object 4. Creates all four swerve modules 5. Sets up pose
+   * <p>
+   * This constructor: 1. Initializes the gyroscope 2. Defines where each wheel is
+   * located on the
+   * robot 3. Creates the kinematics object 4. Creates all four swerve modules 5.
+   * Sets up pose
    * estimation 6. Initializes visualization tools
    */
   public SwerveDrive(Vision vision) {
@@ -133,26 +153,26 @@ public class SwerveDrive extends SubsystemBase {
     //
     // Think of it like a coordinate system:
     //
-    //          +X (forward)
-    //           ^
-    //           |
-    //    +Y <----+----> -Y
-    //     (left)|    (right)
-    //           |
-    //           v
-    //          -X (backward)
+    // +X (forward)
+    // ^
+    // |
+    // +Y <----+----> -Y
+    // (left)| (right)
+    // |
+    // v
+    // -X (backward)
     //
     // WHEEL_BASE = front-to-back distance
     // TRACK_WIDTH = left-to-right distance
     Translation2d[] moduleLocations = {
-      // Front Left: forward half, left half
-      new Translation2d(SwerveConstants.WHEEL_BASE / 2, SwerveConstants.TRACK_WIDTH / 2),
-      // Front Right: forward half, right half (negative Y)
-      new Translation2d(SwerveConstants.WHEEL_BASE / 2, -SwerveConstants.TRACK_WIDTH / 2),
-      // Rear Left: backward half (negative X), left half
-      new Translation2d(-SwerveConstants.WHEEL_BASE / 2, SwerveConstants.TRACK_WIDTH / 2),
-      // Rear Right: backward half, right half
-      new Translation2d(-SwerveConstants.WHEEL_BASE / 2, -SwerveConstants.TRACK_WIDTH / 2)
+        // Front Left: forward half, left half
+        new Translation2d(SwerveConstants.WHEEL_BASE / 2, SwerveConstants.TRACK_WIDTH / 2),
+        // Front Right: forward half, right half (negative Y)
+        new Translation2d(SwerveConstants.WHEEL_BASE / 2, -SwerveConstants.TRACK_WIDTH / 2),
+        // Rear Left: backward half (negative X), left half
+        new Translation2d(-SwerveConstants.WHEEL_BASE / 2, SwerveConstants.TRACK_WIDTH / 2),
+        // Rear Right: backward half, right half
+        new Translation2d(-SwerveConstants.WHEEL_BASE / 2, -SwerveConstants.TRACK_WIDTH / 2)
     };
 
     // ----------------------------------------------------------------
@@ -166,55 +186,54 @@ public class SwerveDrive extends SubsystemBase {
     // STEP 4: Create all four swerve modules
     // ----------------------------------------------------------------
     // Each module needs:
-    //   - Index (0-3 for FL, FR, RL, RR)
-    //   - Drive motor CAN ID
-    //   - Azimuth (steering) motor CAN ID
-    //   - CANCoder ID (absolute encoder for wheel angle)
-    //   - Encoder offset (calibration value - what angle is "straight")
-    modules =
-        new SwerveModule[] {
-          // Front Left module
-          new SwerveModule(
-              0,
-              SwerveConstants.FL_DRIVE_ID,
-              SwerveConstants.FL_AZIMUTH_ID,
-              SwerveConstants.FL_CANCODER_ID,
-              SwerveConstants.FL_ENCODER_OFFSET),
-          // Front Right module
-          new SwerveModule(
-              1,
-              SwerveConstants.FR_DRIVE_ID,
-              SwerveConstants.FR_AZIMUTH_ID,
-              SwerveConstants.FR_CANCODER_ID,
-              SwerveConstants.FR_ENCODER_OFFSET),
-          // Rear Left module
-          new SwerveModule(
-              2,
-              SwerveConstants.RL_DRIVE_ID,
-              SwerveConstants.RL_AZIMUTH_ID,
-              SwerveConstants.RL_CANCODER_ID,
-              SwerveConstants.RL_ENCODER_OFFSET),
-          // Rear Right module
-          new SwerveModule(
-              3,
-              SwerveConstants.RR_DRIVE_ID,
-              SwerveConstants.RR_AZIMUTH_ID,
-              SwerveConstants.RR_CANCODER_ID,
-              SwerveConstants.RR_ENCODER_OFFSET)
-        };
+    // - Index (0-3 for FL, FR, RL, RR)
+    // - Drive motor CAN ID
+    // - Azimuth (steering) motor CAN ID
+    // - CANCoder ID (absolute encoder for wheel angle)
+    // - Encoder offset (calibration value - what angle is "straight")
+    modules = new SwerveModule[] {
+        // Front Left module
+        new SwerveModule(
+            0,
+            SwerveConstants.FL_DRIVE_ID,
+            SwerveConstants.FL_AZIMUTH_ID,
+            SwerveConstants.FL_CANCODER_ID,
+            SwerveConstants.FL_ENCODER_OFFSET),
+        // Front Right module
+        new SwerveModule(
+            1,
+            SwerveConstants.FR_DRIVE_ID,
+            SwerveConstants.FR_AZIMUTH_ID,
+            SwerveConstants.FR_CANCODER_ID,
+            SwerveConstants.FR_ENCODER_OFFSET),
+        // Rear Left module
+        new SwerveModule(
+            2,
+            SwerveConstants.RL_DRIVE_ID,
+            SwerveConstants.RL_AZIMUTH_ID,
+            SwerveConstants.RL_CANCODER_ID,
+            SwerveConstants.RL_ENCODER_OFFSET),
+        // Rear Right module
+        new SwerveModule(
+            3,
+            SwerveConstants.RR_DRIVE_ID,
+            SwerveConstants.RR_AZIMUTH_ID,
+            SwerveConstants.RR_CANCODER_ID,
+            SwerveConstants.RR_ENCODER_OFFSET)
+    };
 
     // ----------------------------------------------------------------
     // STEP 5: Create the pose estimator
     // ----------------------------------------------------------------
     // The pose estimator tracks our position on the field
-    // It needs: kinematics, initial gyro angle, initial wheel positions, initial pose
-    poseEstimator =
-        new SwerveDrivePoseEstimator(
-            kinematics,
-            getYaw(), // Current gyro reading
-            getModulePositions(), // Current wheel positions
-            new Pose2d() // Start at origin (0, 0) facing forward
-            );
+    // It needs: kinematics, initial gyro angle, initial wheel positions, initial
+    // pose
+    poseEstimator = new SwerveDrivePoseEstimator(
+        kinematics,
+        getYaw(), // Current gyro reading
+        getModulePositions(), // Current wheel positions
+        new Pose2d() // Start at origin (0, 0) facing forward
+    );
 
     // ----------------------------------------------------------------
     // STEP 6: Initialize visualization tools
@@ -235,8 +254,11 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Called periodically (every 20ms) to update odometry and logging.
    *
-   * <p>This method: 1. Updates pose estimation using latest sensor data 2. Updates the field
-   * visualization 3. Publishes data to NetworkTables for logging 4. Logs individual module states
+   * <p>
+   * This method: 1. Updates pose estimation using latest sensor data 2. Updates
+   * the field
+   * visualization 3. Publishes data to NetworkTables for logging 4. Logs
+   * individual module states
    */
   @Override
   public void periodic() {
@@ -247,8 +269,8 @@ public class SwerveDrive extends SubsystemBase {
     // Inject vision correction when a valid AprilTag reading is available.
     // The timestamp tells the estimator when the image was captured so it can
     // rewind and re-apply wheel odometry, compensating for camera latency.
-    vision.getBestVisionUpdateRaw(getPose()).ifPresent(update ->
-        addVisionMeasurement(update.pose2d(), update.timestampSeconds()));
+    vision.getBestVisionUpdateRaw(getPose())
+        .ifPresent(update -> addVisionMeasurement(update.pose2d(), update.timestampSeconds()));
 
     // Update the Field2d visualization in Shuffleboard
     field.setRobotPose(getPose());
@@ -270,16 +292,23 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Drive the robot with the given velocities.
    *
-   * <p>This is the main driving method used by teleop commands.
+   * <p>
+   * This is the main driving method used by teleop commands.
    *
-   * @param translation Translation velocity in m/s X = forward/backward (positive = forward) Y =
-   *     left/right (positive = left)
-   * @param rotation Rotational velocity in RADIANS per second Positive = counter-clockwise
-   * @param fieldRelative true = field-relative driving false = robot-relative driving
-   * @param openLoop true = direct power control (faster response) false = velocity PID control
-   *     (more accurate)
-   *     <p>EXAMPLE: // Drive forward at 2 m/s, strafe left at 1 m/s, rotate at 0.5 rad/s drive(new
-   *     Translation2d(2.0, 1.0), 0.5, true, false);
+   * @param translation   Translation velocity in m/s X = forward/backward
+   *                      (positive = forward) Y =
+   *                      left/right (positive = left)
+   * @param rotation      Rotational velocity in RADIANS per second Positive =
+   *                      counter-clockwise
+   * @param fieldRelative true = field-relative driving false = robot-relative
+   *                      driving
+   * @param openLoop      true = direct power control (faster response) false =
+   *                      velocity PID control
+   *                      (more accurate)
+   *                      <p>
+   *                      EXAMPLE: // Drive forward at 2 m/s, strafe left at 1
+   *                      m/s, rotate at 0.5 rad/s drive(new
+   *                      Translation2d(2.0, 1.0), 0.5, true, false);
    */
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean openLoop) {
@@ -287,14 +316,14 @@ public class SwerveDrive extends SubsystemBase {
 
     if (fieldRelative) {
       // FIELD-RELATIVE: Adjust for robot's current heading
-      // "Forward" means toward the far end of the field, regardless of robot orientation
-      speeds =
-          ChassisSpeeds.fromFieldRelativeSpeeds(
-              translation.getX(), // Field X velocity
-              translation.getY(), // Field Y velocity
-              rotation, // Rotation velocity
-              getYaw() // Current robot heading (to convert field->robot)
-              );
+      // "Forward" means toward the far end of the field, regardless of robot
+      // orientation
+      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+          translation.getX(), // Field X velocity
+          translation.getY(), // Field Y velocity
+          rotation, // Rotation velocity
+          getYaw() // Current robot heading (to convert field->robot)
+      );
     } else {
       // ROBOT-RELATIVE: No adjustment needed
       // "Forward" means wherever the robot is facing
@@ -308,9 +337,10 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Drive the robot with the given chassis speeds.
    *
-   * <p>This is the lower-level drive method that actually commands the modules.
+   * <p>
+   * This is the lower-level drive method that actually commands the modules.
    *
-   * @param speeds The desired chassis speeds (vx, vy, omega)
+   * @param speeds   The desired chassis speeds (vx, vy, omega)
    * @param openLoop Whether to use open-loop control
    */
   public void drive(ChassisSpeeds speeds, boolean openLoop) {
@@ -319,7 +349,8 @@ public class SwerveDrive extends SubsystemBase {
     // at the same time. Discretize adjusts for the 20ms time step.
     speeds = ChassisSpeeds.discretize(speeds, 0.02);
 
-    // CONVERT TO MODULE STATES: Use kinematics to calculate what each wheel should do
+    // CONVERT TO MODULE STATES: Use kinematics to calculate what each wheel should
+    // do
     // Input: "Robot should move at these speeds"
     // Output: "Each wheel should be at this angle going this fast"
     SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
@@ -338,10 +369,13 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Set the modules to an X pattern to resist pushing.
    *
-   * <p>This is called "ski stop" or "X-lock". The wheels point inward forming an X shape, which
+   * <p>
+   * This is called "ski stop" or "X-lock". The wheels point inward forming an X
+   * shape, which
    * makes it very hard for other robots to push us. Great for defense!
    *
-   * <p>X PATTERN: \ / \ / X / \ / \
+   * <p>
+   * X PATTERN: \ / \ / X / \ / \
    */
   public void setX() {
     // Set each wheel to point toward/away from center at 45 deg angles
@@ -363,7 +397,9 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Get the current yaw angle from the gyro.
    *
-   * <p>YAW = rotation around the vertical axis (spinning like a top) 0 deg typically means facing
+   * <p>
+   * YAW = rotation around the vertical axis (spinning like a top) 0 deg typically
+   * means facing
    * the far end of the field.
    *
    * @return The current yaw as a Rotation2d
@@ -375,11 +411,15 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Reset the gyro to a specific angle.
    *
-   * <p>[WHEN TO USE] - At the start of a match to set the correct heading - After repositioning the
+   * <p>
+   * [WHEN TO USE] - At the start of a match to set the correct heading - After
+   * repositioning the
    * robot manually - If the gyro drifts (rare with Pigeon2)
    *
    * @param angle The angle to set as the current heading
-   *     <p>EXAMPLE: resetYaw(Rotation2d.fromDegrees(180)); // Robot is facing our driver station
+   *              <p>
+   *              EXAMPLE: resetYaw(Rotation2d.fromDegrees(180)); // Robot is
+   *              facing our driver station
    */
   public void resetYaw(Rotation2d angle) {
     gyro.setYaw(angle.getDegrees());
@@ -390,8 +430,11 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Get the current estimated pose (position + rotation).
    *
-   * <p>[WHAT IS A POSE?] Pose2d contains: - X position (meters from origin, typically your alliance
-   * wall) - Y position (meters from origin) - Rotation (which way robot is facing)
+   * <p>
+   * [WHAT IS A POSE?] Pose2d contains: - X position (meters from origin,
+   * typically your alliance
+   * wall) - Y position (meters from origin) - Rotation (which way robot is
+   * facing)
    *
    * @return The current estimated pose on the field
    */
@@ -402,7 +445,9 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Reset the pose estimator to a specific pose.
    *
-   * <p>[WHEN TO USE] - At the start of autonomous to set initial position - After a vision system
+   * <p>
+   * [WHEN TO USE] - At the start of autonomous to set initial position - After a
+   * vision system
    * gives us a very confident reading
    *
    * @param pose The pose to set as current position
@@ -414,14 +459,20 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Add a vision measurement to the pose estimator.
    *
-   * <p>[WHAT IS THIS?] Vision systems (cameras with AprilTags) can give us position estimates. We
-   * "add" these measurements to the estimator, which combines them with wheel odometry for a better
+   * <p>
+   * [WHAT IS THIS?] Vision systems (cameras with AprilTags) can give us position
+   * estimates. We
+   * "add" these measurements to the estimator, which combines them with wheel
+   * odometry for a better
    * overall estimate.
    *
-   * <p>[WHY TIMESTAMP?] The vision measurement might be from slightly in the past (camera
-   * processing takes time). The timestamp helps the estimator account for this delay.
+   * <p>
+   * [WHY TIMESTAMP?] The vision measurement might be from slightly in the past
+   * (camera
+   * processing takes time). The timestamp helps the estimator account for this
+   * delay.
    *
-   * @param pose The measured pose from vision
+   * @param pose             The measured pose from vision
    * @param timestampSeconds When the measurement was taken (FPGA timestamp)
    */
   public void addVisionMeasurement(Pose2d pose, double timestampSeconds) {
@@ -433,7 +484,9 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Get the positions of all modules.
    *
-   * <p>Position = cumulative distance traveled by each wheel Used for odometry (tracking how far
+   * <p>
+   * Position = cumulative distance traveled by each wheel Used for odometry
+   * (tracking how far
    * we've moved)
    *
    * @return Array of 4 module positions [FL, FR, RL, RR]
@@ -449,7 +502,9 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Get the states of all modules.
    *
-   * <p>State = current speed + current angle of each wheel Used for logging and visualization
+   * <p>
+   * State = current speed + current angle of each wheel Used for logging and
+   * visualization
    *
    * @return Array of 4 module states [FL, FR, RL, RR]
    */
@@ -464,7 +519,9 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Get the kinematics object.
    *
-   * <p>[WHY EXPOSE THIS?] Other systems (like autonomous path following) need the kinematics to
+   * <p>
+   * [WHY EXPOSE THIS?] Other systems (like autonomous path following) need the
+   * kinematics to
    * convert robot speeds to wheel speeds.
    *
    * @return The SwerveDriveKinematics object
@@ -478,7 +535,8 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Toggle field-relative driving mode.
    *
-   * <p>Called when the driver presses a button to switch modes.
+   * <p>
+   * Called when the driver presses a button to switch modes.
    */
   public void toggleFieldRelative() {
     fieldRelative = !fieldRelative;
@@ -498,18 +556,26 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Create a teleop drive command.
    *
-   * <p>This is the main command that runs during teleop. It reads joystick inputs and drives the
+   * <p>
+   * This is the main command that runs during teleop. It reads joystick inputs
+   * and drives the
    * robot.
    *
    * @param forward Supplier for forward velocity (-1 to 1, from joystick)
-   * @param strafe Supplier for strafe velocity (-1 to 1, from joystick)
-   * @param turn Supplier for turn velocity (-1 to 1, from joystick)
+   * @param strafe  Supplier for strafe velocity (-1 to 1, from joystick)
+   * @param turn    Supplier for turn velocity (-1 to 1, from joystick)
    * @return A command that continuously drives the robot
-   *     <p>[HOW IT WORKS] 1. Read joystick values (suppliers return -1 to 1) 2. Multiply by max
-   *     speed to get actual velocity 3. Flip for red alliance (field is mirrored) 4. Send to
-   *     drive() method
-   *     <p>[WHY SUPPLIERS?] DoubleSupplier is like a function that returns a double. This lets us
-   *     pass in "how to get joystick value" rather than the value itself, so it updates every loop.
+   *         <p>
+   *         [HOW IT WORKS] 1. Read joystick values (suppliers return -1 to 1) 2.
+   *         Multiply by max
+   *         speed to get actual velocity 3. Flip for red alliance (field is
+   *         mirrored) 4. Send to
+   *         drive() method
+   *         <p>
+   *         [WHY SUPPLIERS?] DoubleSupplier is like a function that returns a
+   *         double. This lets us
+   *         pass in "how to get joystick value" rather than the value itself, so
+   *         it updates every loop.
    */
   public Command teleopCommand(DoubleSupplier forward, DoubleSupplier strafe, DoubleSupplier turn) {
     return new RunCommand(
@@ -522,8 +588,7 @@ public class SwerveDrive extends SubsystemBase {
           // ALLIANCE FLIP: On red alliance, the field is mirrored
           // So we flip the X and Y velocities
           // This way, "forward" always means "toward opponent's side"
-          if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
-              == DriverStation.Alliance.Red) {
+          if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
             vx = -vx;
             vy = -vy;
           }
@@ -537,7 +602,9 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Create a command to set modules to X pattern (ski stop).
    *
-   * <p>When this command runs, the wheels lock in an X pattern making the robot very hard to push.
+   * <p>
+   * When this command runs, the wheels lock in an X pattern making the robot very
+   * hard to push.
    * Great for defense!
    *
    * @return A command that continuously holds the X pattern
@@ -549,10 +616,14 @@ public class SwerveDrive extends SubsystemBase {
   /**
    * Create a command to reset the gyro to 180 degrees.
    *
-   * <p>[WHEN TO USE] When the robot starts a match facing YOUR driver station, you're looking at
-   * the robot from behind. From the robot's perspective, it's facing 180 deg (toward you).
+   * <p>
+   * [WHEN TO USE] When the robot starts a match facing YOUR driver station,
+   * you're looking at
+   * the robot from behind. From the robot's perspective, it's facing 180 deg
+   * (toward you).
    *
-   * <p>Press this at the start of a match when lined up.
+   * <p>
+   * Press this at the start of a match when lined up.
    *
    * @return A command that resets the gyro (runs once, instantly)
    */
@@ -560,11 +631,16 @@ public class SwerveDrive extends SubsystemBase {
     return runOnce(
         () -> {
           // Blue: robot faces our driver station at 180°.
-          // Red:  robot faces our driver station at 0°.
-          boolean isRed =
-              DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue)
-                  == DriverStation.Alliance.Red;
+          // Red: robot faces our driver station at 0°.
+          boolean isRed = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
           resetYaw(Rotation2d.fromDegrees(isRed ? 0.0 : 180.0));
         });
+  }
+
+  public void resetWheelsForward() {
+    SwerveModuleState forward = new SwerveModuleState(0, Rotation2d.fromDegrees(0));
+    for (SwerveModule module : modules) {
+      module.setDesiredState(forward, true);
+    }
   }
 } // End of SwerveDrive class

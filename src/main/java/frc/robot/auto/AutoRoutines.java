@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.rollerbelt.RollerBelt;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
@@ -82,10 +81,10 @@ public final class AutoRoutines {
   // ================================================================
 
   public static Command scoreOnlyAuto(
-      SwerveDrive swerve, Intake intake, Shooter shooter, Hopper hopper, RollerBelt rollerBelt) {
+      SwerveDrive swerve, Intake intake, Shooter shooter, Hopper hopper) {
     return Commands.sequence(
             AutoCommands.logMessage("Mode 2: Score Only"),
-            AutoCommands.shootAllFuel(shooter, intake, hopper, rollerBelt),
+            AutoCommands.shootAllFuel(shooter, intake, hopper),
             AutoCommands.stopDriving(swerve),
             AutoCommands.holdPosition(swerve, 10.0),
             AutoCommands.logMessage("Mode 2 Complete"))
@@ -97,12 +96,12 @@ public final class AutoRoutines {
   // ================================================================
 
   public static Command scoreCollectAuto(
-      SwerveDrive swerve, Intake intake, Shooter shooter, Hopper hopper, RollerBelt rollerBelt) {
+      SwerveDrive swerve, Intake intake, Shooter shooter, Hopper hopper) {
     return Commands.sequence(
             AutoCommands.logMessage("Mode 1: Score & Collect"),
 
             // Phase 1: Shoot preload
-            AutoCommands.shootAllFuel(shooter, intake, hopper, rollerBelt),
+            AutoCommands.shootAllFuel(shooter, intake, hopper),
 
             // Phase 2: Drive to neutral, collect FUEL (belt+hopper run to stage FUEL)
             AutoCommands.driveToPose(swerve, getNeutralPose()).withTimeout(4.0),
@@ -116,7 +115,6 @@ public final class AutoRoutines {
                         Commands.runOnce(intake::deployIntakeMechanism, intake),
                         Commands.waitUntil(intake.getD()::isDeployed).withTimeout(1.0),
                         Commands.run(intake.getR()::runIntake, intake)),
-                    Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt),
                     Commands.startEnd(hopper::feed, hopper::stop, hopper))
                 .withTimeout(AutoConstants.INTAKE_TIMEOUT),
             Commands.runOnce(intake.getR()::stopRollers, intake),
@@ -124,7 +122,7 @@ public final class AutoRoutines {
 
             // Phase 3: Return and shoot
             AutoCommands.driveToPose(swerve, getShootingPose()).withTimeout(4.0),
-            AutoCommands.shootAllFuel(shooter, intake, hopper, rollerBelt),
+            AutoCommands.shootAllFuel(shooter, intake, hopper),
             AutoCommands.logMessage("Mode 1 Complete"))
         .withName("1: Score & Collect");
   }
@@ -134,10 +132,10 @@ public final class AutoRoutines {
   // ================================================================
 
   public static Command preloadOnlyAuto(
-      SwerveDrive swerve, Intake intake, Shooter shooter, Hopper hopper, RollerBelt rollerBelt) {
+      SwerveDrive swerve, Intake intake, Shooter shooter, Hopper hopper) {
     return Commands.sequence(
             AutoCommands.logMessage("Mode 3: Preload Only"),
-            AutoCommands.shootAllFuel(shooter, intake, hopper, rollerBelt),
+            AutoCommands.shootAllFuel(shooter, intake, hopper),
             AutoCommands.stopDriving(swerve),
             AutoCommands.holdPosition(swerve, 10.0),
             AutoCommands.logMessage("Mode 3 Complete"))
@@ -154,20 +152,19 @@ public final class AutoRoutines {
       Intake intake,
       Shooter shooter,
       Vision vision,
-      Hopper hopper,
-      RollerBelt rollerBelt) {
+      Hopper hopper) {
     Command routine;
     switch (selection) {
       case AutoConstants.AUTO_DO_NOTHING:
         return doNothing();
       case AutoConstants.AUTO_SCORE_COLLECT:
-        routine = scoreCollectAuto(swerve, intake, shooter, hopper, rollerBelt);
+        routine = scoreCollectAuto(swerve, intake, shooter, hopper);
         break;
       case AutoConstants.AUTO_SCORE_ONLY:
-        routine = scoreOnlyAuto(swerve, intake, shooter, hopper, rollerBelt);
+        routine = scoreOnlyAuto(swerve, intake, shooter, hopper);
         break;
       case AutoConstants.AUTO_PRELOAD_ONLY:
-        routine = preloadOnlyAuto(swerve, intake, shooter, hopper, rollerBelt);
+        routine = preloadOnlyAuto(swerve, intake, shooter, hopper);
         break;
       default:
         return doNothing();

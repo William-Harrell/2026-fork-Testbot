@@ -11,6 +11,7 @@ import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -20,24 +21,36 @@ public class Orientation {
   private final SparkFlex hoodMotor;
   private final RelativeEncoder hoodEncoder;
   private final SparkClosedLoopController hoodController;
+  private final SparkFlex hoodMotor2;
+  private final SparkClosedLoopController hoodController2;
   private final DigitalInput limitSwitch;
   private double targetPitchAngle;
   private boolean homed = false;
 
-  public Orientation(SparkFlex motor) {
+  public Orientation(SparkFlex motor, SparkFlex motor2) {
     hoodMotor = motor;
+    hoodMotor2 = motor;
     hoodEncoder = hoodMotor.getEncoder();
     hoodController = hoodMotor.getClosedLoopController();
+    hoodController2 = hoodMotor2.getClosedLoopController();
 
     SparkFlexConfig config = new SparkFlexConfig();
+    SparkFlexConfig config2 = new SparkFlexConfig();
     config.idleMode(IdleMode.kBrake).smartCurrentLimit(20);
+    config2.idleMode(IdleMode.kBrake).smartCurrentLimit(20).inverted(true);
     config.closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .p(ShooterConstants.HOOD_kP)
+        .i(ShooterConstants.HOOD_kI)
+        .d(ShooterConstants.HOOD_kD);
+    config2.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(ShooterConstants.HOOD_kP)
         .i(ShooterConstants.HOOD_kI)
         .d(ShooterConstants.HOOD_kD);
 
     hoodMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    hoodMotor.configure(config2, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     limitSwitch = new DigitalInput(ShooterConstants.HOOD_LIMIT_SWITCH_DIO);
     targetPitchAngle = ShooterConstants.PITCH_STOW_ANGLE;
@@ -55,11 +68,11 @@ public class Orientation {
    * @param angleDegrees Target angle in degrees
    */
   public void setPitchAngle(double angleDegrees) {
-    targetPitchAngle =
-        Math.max(
-            ShooterConstants.PITCH_MIN_ANGLE,
-            Math.min(ShooterConstants.PITCH_MAX_ANGLE, angleDegrees));
+    targetPitchAngle = Math.max(
+        ShooterConstants.PITCH_MIN_ANGLE,
+        Math.min(ShooterConstants.PITCH_MAX_ANGLE, angleDegrees));
     hoodController.setSetpoint(degreesToRotations(targetPitchAngle), SparkFlex.ControlType.kPosition);
+    hoodController2.setSetpoint(degreesToRotations(targetPitchAngle), SparkFlex.ControlType.kPosition);
   }
 
   /** Get the target pitch angle. */
@@ -93,11 +106,13 @@ public class Orientation {
   }
 
   /**
-   * Command that slowly drives the hood toward stow until the limit switch triggers,
+   * Command that slowly drives the hood toward stow until the limit switch
+   * triggers,
    * then zeros the encoder to the stow angle. If already home, zeros immediately.
    */
   /**
-   * @param owner The subsystem that owns this mechanism (passed so the CommandScheduler
+   * @param owner The subsystem that owns this mechanism (passed so the
+   *              CommandScheduler
    *              can prevent concurrent commands from fighting over this motor).
    */
   public Command homeCommand(SubsystemBase owner) {
@@ -112,6 +127,7 @@ public class Orientation {
             .until(this::isAtHome)
             .andThen(Commands.runOnce(() -> {
               hoodMotor.set(0);
+              hoodMotor2.set(0);
               hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
               homed = true;
             }, owner)),

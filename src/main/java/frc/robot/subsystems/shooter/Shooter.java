@@ -15,8 +15,7 @@ import frc.robot.util.Elastic;
 
 public class Shooter extends SubsystemBase {
   // Sub-subsystems
-  private Orientation orientation1;
-  private Orientation orientation2;
+  private Orientation orientation;
   private Physics physics;
   private ShooterState state_machine;
   private Flywheel flywheel;
@@ -25,27 +24,29 @@ public class Shooter extends SubsystemBase {
   private boolean lastHubActive = true;
 
   public Shooter(Vision vision, SwerveDrive swerve) {
-    orientation1 = new Orientation(new SparkFlex(ShooterConstants.HOOD_MOTOR_ID1, MotorType.kBrushless));
-    orientation2 = new Orientation(new SparkFlex(ShooterConstants.HOOD_MOTOR_ID2, MotorType.kBrushless));
+    orientation = new Orientation(new SparkFlex(ShooterConstants.HOOD_MOTOR_ID1, MotorType.kBrushless),
+        new SparkFlex(ShooterConstants.HOOD_MOTOR_ID2, MotorType.kBrushless));
     physics = new Physics(vision, swerve);
-    flywheel =
-        new Flywheel(
-            new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID),
-            new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_2_ID),
-            orientation1, orientation2);
+    flywheel = new Flywheel(
+        new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID),
+        new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_2_ID),
+        orientation);
     state_machine = new ShooterState(flywheel);
     flywheel.setStateMachine(state_machine);
   }
 
   public Orientation getO() {
-    return orientation1;
+    return orientation;
   }
 
   public Physics getP() {
     return physics;
   }
 
-  /** @deprecated Use {@link #getState()} — getS() is ambiguous next to getO()/getP()/getF(). */
+  /**
+   * @deprecated Use {@link #getState()} — getS() is ambiguous next to
+   *             getO()/getP()/getF().
+   */
   @Deprecated
   public ShooterState getS() {
     return state_machine;
@@ -53,7 +54,8 @@ public class Shooter extends SubsystemBase {
 
   /**
    * Returns the ShooterState state machine.
-   * Use this to read or set the current shooter phase (IDLE, SPINNING_UP, READY, SHOOTING, etc.).
+   * Use this to read or set the current shooter phase (IDLE, SPINNING_UP, READY,
+   * SHOOTING, etc.).
    */
   public ShooterState getState() {
     return state_machine;
@@ -65,7 +67,7 @@ public class Shooter extends SubsystemBase {
 
   private void updateDashboard() {
     SmartDashboard.putString("Shooter/State", state_machine.get().toString());
-    SmartDashboard.putNumber("Shooter/PitchAngle", orientation1.getTargetPitchAngle());
+    SmartDashboard.putNumber("Shooter/PitchAngle", orientation.getTargetPitchAngle());
     SmartDashboard.putNumber("Shooter/FlywheelRPM", flywheel.getFlywheelRPM());
     SmartDashboard.putNumber("Shooter/TargetRPM", flywheel.getTargetFlywheelRPM());
     SmartDashboard.putBoolean("Shooter/AtSpeed", flywheel.isFlywheelAtSpeed());
@@ -88,7 +90,7 @@ public class Shooter extends SubsystemBase {
 
   public void periodic() {
     state_machine.update();
-    orientation1.updateDashboard();
+    orientation.updateDashboard();
     updateDashboard();
 
     boolean hubActive = physics.isHubActive();
@@ -113,7 +115,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public void prepareShot(double pitchDegrees, double flywheelRPM) {
-    orientation1.setPitchAngle(pitchDegrees);
+    orientation.setPitchAngle(pitchDegrees);
     flywheel.setFlywheelRPM(flywheelRPM);
   }
 
@@ -123,7 +125,7 @@ public class Shooter extends SubsystemBase {
 
   public void stop() {
     flywheel.stopFlywheel();
-    orientation1.stowPitch();
+    orientation.stowPitch();
     state_machine.set(shooter_state.IDLE);
   }
 }

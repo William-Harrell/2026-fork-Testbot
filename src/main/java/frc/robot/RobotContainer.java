@@ -2,6 +2,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -16,10 +17,10 @@ import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.hopper.Hopper;
-import frc.robot.subsystems.rollerbelt.RollerBelt;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.SwerveModule;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.DipSwitchSelector;
 import frc.robot.util.Elastic;
@@ -34,8 +35,7 @@ public class RobotContainer {
   private final Vision vision;
   private final Shooter shooter;
   private final Intake intake;
-  private final Hopper hopper;
-  private final RollerBelt rollerbelt;
+  // private final Hopper hopper;
 
   private final Superstructure superstructure;
 
@@ -61,8 +61,7 @@ public class RobotContainer {
     swerve = new SwerveDrive(vision);
     shooter = new Shooter(vision, swerve);
     intake = new Intake();
-    hopper = new Hopper();
-    rollerbelt = new RollerBelt();
+    // hopper = new Hopper();
 
     superstructure = new Superstructure(swerve, shooter, intake);
 
@@ -117,49 +116,50 @@ public class RobotContainer {
         .maintainDeployed()
         .whileTrue(
             Commands.parallel(
-                IntakeCommands.holdToIntakeCommand(intake),
-                Commands.startEnd(rollerbelt::run, rollerbelt::stop, rollerbelt)));
-
-    driverJoystick
-        .orientAndShoot()
-        .whileTrue(
-            Commands.parallel(
-                new SwerveCommands.OrientToHubCommand(
-                    swerve,
-                    shooter.getP(),
-                    () -> applySpeedCurve(driverJoystick.forward()),
-                    () -> applySpeedCurve(driverJoystick.strafe())),
-                ShooterCommands.shootCommand(
-                    superstructure.getShooter(), superstructure.getIntake()),
-                Commands.startEnd(hopper::feed, hopper::stop, hopper)));
-
-    driverJoystick
-        .reverseFeeder()
-        .whileTrue(
-            Commands.parallel(
-                Commands.startEnd(hopper::reverse, hopper::stop, hopper),
-                Commands.startEnd(rollerbelt::reverse, rollerbelt::stop, rollerbelt)));
+                IntakeCommands.holdToIntakeCommand(intake)));
+    /*
+     * driverJoystick
+     * .orientAndShoot()
+     * .whileTrue(
+     * Commands.parallel(
+     * new SwerveCommands.OrientToHubCommand(
+     * swerve,
+     * shooter.getP(),
+     * () -> applySpeedCurve(driverJoystick.forward()),
+     * () -> applySpeedCurve(driverJoystick.strafe())),
+     * ShooterCommands.shootCommand(
+     * superstructure.getShooter(), superstructure.getIntake()),
+     * Commands.startEnd(hopper::feed, hopper::stop, hopper)));
+     * 
+     * driverJoystick
+     * .reverseFeeder()
+     * .whileTrue(
+     * Commands.parallel(
+     * Commands.startEnd(hopper::reverse, hopper::stop, hopper)));
+     */
   }
 
   private void registerAutoRoutines() {
     // TODO - verify auto routines are reliable
     AutoRoutines.seedPoseFromVision(swerve, vision);
     autoChooser.setDefaultOption("0: Do Nothing", AutoRoutines.doNothing());
-    autoChooser.addOption(
-        "1: Score & Collect",
-        Commands.sequence(
-            AutoRoutines.seedPoseFromVision(swerve, vision),
-            AutoRoutines.scoreCollectAuto(swerve, intake, shooter, hopper, rollerbelt)));
-    autoChooser.addOption(
-        "2: Score Only",
-        Commands.sequence(
-            AutoRoutines.seedPoseFromVision(swerve, vision),
-            AutoRoutines.scoreOnlyAuto(swerve, intake, shooter, hopper, rollerbelt)));
-    autoChooser.addOption(
-        "3: Preload Only",
-        Commands.sequence(
-            AutoRoutines.seedPoseFromVision(swerve, vision),
-            AutoRoutines.preloadOnlyAuto(swerve, intake, shooter, hopper, rollerbelt)));
+    /*
+     * autoChooser.addOption(
+     * "1: Score & Collect",
+     * Commands.sequence(
+     * AutoRoutines.seedPoseFromVision(swerve, vision),
+     * AutoRoutines.scoreCollectAuto(swerve, intake, shooter, hopper)));
+     * autoChooser.addOption(
+     * "2: Score Only",
+     * Commands.sequence(
+     * AutoRoutines.seedPoseFromVision(swerve, vision),
+     * AutoRoutines.scoreOnlyAuto(swerve, intake, shooter, hopper)));
+     * autoChooser.addOption(
+     * "3: Preload Only",
+     * Commands.sequence(
+     * AutoRoutines.seedPoseFromVision(swerve, vision),
+     * AutoRoutines.preloadOnlyAuto(swerve, intake, shooter, hopper)));
+     */
   }
 
   public Command getAutonomousCommand() {
@@ -167,9 +167,9 @@ public class RobotContainer {
       dipSwitchSelector.lockSelection();
       int selection = dipSwitchSelector.getSelection();
       return AutoRoutines.getAutoFromSelection(
-          selection, swerve, intake, shooter, vision, hopper, rollerbelt);
+          selection, swerve, intake, shooter, vision, null);
     } else {
-      return autoChooser.getSelected();
+        return autoChooser.getSelected();
     }
   }
 

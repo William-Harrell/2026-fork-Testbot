@@ -9,7 +9,6 @@ import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.rollerbelt.RollerBelt;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
 
@@ -132,16 +131,15 @@ public final class AutoCommands {
    */
   public static Command followPath(String pathName) {
     // TODO: Implement PathPlanner AutoBuilder integration.
-    // Uncomment once AutoBuilder.configureHolonomic() is wired up in RobotContainer:
-    //   return AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathName));
+    // Uncomment once AutoBuilder.configureHolonomic() is wired up in
+    // RobotContainer:
+    // return AutoBuilder.followPath(PathPlannerPath.fromPathFile(pathName));
     //
-    // Until then, throw at schedule-time so any accidental use is immediately visible
+    // Until then, throw at schedule-time so any accidental use is immediately
+    // visible
     // rather than silently succeeding (a Commands.print would look like it worked).
-    return Commands.runOnce(() -> {
-      throw new IllegalStateException(
-          "followPath(\"" + pathName + "\") called but PathPlanner AutoBuilder is not configured. "
-          + "Implement AutoBuilder.configureHolonomic() in RobotContainer first.");
-    }).withName("Follow Path: " + pathName);
+    return Commands.print("PathPlanner path '" + pathName + "' not implemented yet")
+        .withName("Follow Path: " + pathName);
   }
 
   // ================================================================
@@ -200,10 +198,11 @@ public final class AutoCommands {
    * @return Command that shoots all FUEL
    */
   public static Command shootAllFuel(
-      Shooter shooter, Intake intake, Hopper hopper, RollerBelt rollerBelt) {
+      Shooter shooter, Intake intake, Hopper hopper) {
     return Commands.sequence(
         // Gate: only proceed if the robot is in its alliance zone (G407).
-        // Matches the isInAllianceZone() guard in ShooterCommands.shootCommand (teleop).
+        // Matches the isInAllianceZone() guard in ShooterCommands.shootCommand
+        // (teleop).
         Commands.waitUntil(shooter.getP()::isInAllianceZone).withTimeout(1.0),
         // Set pitch angle + spin up to shoot RPM
         Commands.runOnce(shooter::prepareDefaultShot, shooter),
@@ -212,14 +211,13 @@ public final class AutoCommands {
         // Feed all FUEL through belt → hopper → shooter (2s is enough to clear preload)
         Commands.parallel(
             IntakeCommands.feedCommand(intake),
-            Commands.startEnd(hopper::feed, hopper::stop, hopper),
-            Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt))
-            .withTimeout(2.0),
-        // Give last FUEL time to exit barrel
-        Commands.waitSeconds(0.3),
-        // Stop shooter
-        Commands.runOnce(shooter::stop, shooter))
-        .withName("Shoot All FUEL");
+            Commands.startEnd(hopper::feed, hopper::stop, hopper)
+                .withTimeout(2.0),
+            // Give last FUEL time to exit barrel
+            Commands.waitSeconds(0.3),
+            // Stop shooter
+            Commands.runOnce(shooter::stop, shooter))
+            .withName("Shoot All FUEL"));
   }
 
   /**
@@ -230,14 +228,13 @@ public final class AutoCommands {
    * @return Command that shoots one FUEL
    */
   public static Command shootOneFuel(
-      Shooter shooter, Intake intake, Hopper hopper, RollerBelt rollerBelt) {
+      Shooter shooter, Intake intake, Hopper hopper) {
     return Commands.sequence(
         Commands.runOnce(shooter::prepareDefaultShot, shooter),
         Commands.waitUntil(shooter.getF()::isReadyToShoot).withTimeout(3.0),
         Commands.parallel(
             IntakeCommands.feedCommand(intake),
-            Commands.startEnd(hopper::feed, hopper::stop, hopper),
-            Commands.startEnd(rollerBelt::run, rollerBelt::stop, rollerBelt))
+            Commands.startEnd(hopper::feed, hopper::stop, hopper))
             .withTimeout(1.0),
         Commands.waitSeconds(0.3),
         Commands.runOnce(shooter::stop, shooter))

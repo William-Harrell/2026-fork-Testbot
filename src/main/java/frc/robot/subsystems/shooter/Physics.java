@@ -33,7 +33,7 @@ public class Physics {
 
   /** Get robot pose from swerve odometry. */
   private Pose2d getRobotPose() {
-    return swerve.getPose();
+    return (swerve == null) ? new Pose2d() : swerve.getPose();
   }
 
   /**

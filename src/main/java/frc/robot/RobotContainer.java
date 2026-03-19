@@ -107,9 +107,9 @@ public class RobotContainer {
         .toggleSpeed()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    operatorJoystick
-        .toggleDeploy()
-        .onTrue(IntakeCommands.toggleDeployCommand(intake));
+    // operatorJoystick
+    //     .toggleDeploy()
+    //     .onTrue(IntakeCommands.toggleDeployCommand(intake));
 
     operatorJoystick
         .toggleIntakeOutake()
@@ -136,10 +136,10 @@ public class RobotContainer {
      * 
      */
     // operatorJoystick
-    //     .reverseFeeder()
-    //     .whileTrue(
-    //         Commands.parallel(
-    //             Commands.startEnd(hopper::reverse, hopper::stop, shooter)));
+    // .reverseFeeder()
+    // .whileTrue(
+    // Commands.parallel(
+    // Commands.startEnd(hopper::reverse, hopper::stop, shooter)));
   }
 
   private void registerAutoRoutines() {

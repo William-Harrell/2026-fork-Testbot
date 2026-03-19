@@ -36,13 +36,13 @@ public final class OI {
   public interface OperatorActionSet {
     Trigger toggleIntakeOutake();
 
-    Trigger toggleDeploy();
+    // Trigger toggleDeploy();
 
     Trigger maintainDeployed();
 
     Trigger orientAndShoot();
 
-    Trigger reverseFeeder();
+    Trigger reverseFeeder(); // UNIMPLEMENTED
 
   }
 
@@ -106,22 +106,22 @@ public final class OI {
       return stick.leftBumper();
     }
 
-    @Override
-    public Trigger toggleDeploy() {
-      return stick.a();
-    }
+    // @Override
+    // public Trigger toggleDeploy() {
+    //   return stick.a();
+    // }
 
     @Override
     public Trigger maintainDeployed() {
       return stick.rightTrigger();
     }
 
-    @Override
+    @Override // UNIMPLEMENTED/UNTESTED
     public Trigger orientAndShoot() {
       return stick.x();
     }
 
-    @Override
+    @Override // UNIMPLEMENTED
     public Trigger reverseFeeder() {
       return stick.y();
     }

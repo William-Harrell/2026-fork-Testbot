@@ -42,7 +42,7 @@ public class Deploy {
         .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
 
     SparkFlexConfig followerConfig = new SparkFlexConfig();
-    followerConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(30).follow(deployMotor, false);
+    followerConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(30).follow(deployMotor, true);
 
     deployMotor.configure(
         deployConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

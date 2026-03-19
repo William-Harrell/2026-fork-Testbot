@@ -1,5 +1,3 @@
-// NEED RE CHARACTERIZATION NOT CHECK
-
 package frc.robot.subsystems.swerve;
 
 import edu.wpi.first.math.util.Units;
@@ -9,7 +7,7 @@ public final class SwerveConstants {
   public static final double WHEEL_BASE = Units.inchesToMeters(29.75); // Front to back
 
   public static final double MAX_SPEED = 4.2; // meters per second
-  public static final double MAX_ANGULAR_VELOCITY = 9.547; // rad per second
+  public static final double MAX_ANGULAR_VELOCITY = 4.0; // rad per second — reduced for testing
 
   public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0);
   public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
@@ -57,29 +55,20 @@ public final class SwerveConstants {
   public static final double RR_ENCODER_OFFSET = -122.958 + 45.0;
 
   // DRIVE MOTOR PID - Tuning for wheel speed control
-  //
-  // !!!! IMPORTANT — UNIT MISMATCH — MUST RE-CHARACTERIZE !!!!
-  // These gains were characterized on SparkMax controllers (units: % output / (m/s) error).
-  // The drive motors are now TalonFX (Kraken), whose closed-loop units are VOLTS per RPS error.
-  // Running these SparkMax gains on TalonFX will produce incorrect closed-loop behavior.
-  //
-  // ACTION REQUIRED: Run SysId with the TalonFX drive motors and replace these values.
-  //   Typical starting point for Kraken: kP=0.1 (V/RPS), kV=0.12 (V/RPS).
-  //   DrivingConstants.OPEN_LOOP is currently true so closed-loop is not active in teleop.
-  //   Closed-loop IS needed for accurate auto path following — fix before competition.
-  // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  public static final double DRIVE_kP = 0.1;   // ZEROED — SparkMax value was 0.064395; re-characterize for TalonFX
+
+  // These values were found using SysId characterization
+  public static final double DRIVE_kP = 0.064395;
   public static final double DRIVE_kI = 0.0;
   public static final double DRIVE_kD = 0.0;
 
   // Feedforward values (physics-based compensation)
   public static final double DRIVE_kS = 0.18656; // Static friction
-  public static final double DRIVE_kV = 0.12; // Velocity factor — also needs TalonFX re-characterization
+  public static final double DRIVE_kV = 2.5833; // Velocity factor
   public static final double DRIVE_kA = 0.40138; // Acceleration factor
 
   // AZIMUTH MOTOR PID - Tuning for wheel angle control
 
-  public static final double AZIMUTH_kP = 0.01;
+  public static final double AZIMUTH_kP = 50.0; // TalonFX units: volts per rotation error — tune on robot
   public static final double AZIMUTH_kI = 0.0;
   public static final double AZIMUTH_kD = 0.0;
 

@@ -40,10 +40,15 @@ public final class OI {
 
     Trigger maintainDeployed();
 
-    Trigger orientAndShoot();
+    Trigger orientAndShoot(); // UNTESTED
 
     Trigger reverseFeeder(); // UNIMPLEMENTED
 
+    Trigger runFlywheel();
+
+    Trigger setPitchMax(); // UNTESTED
+    Trigger setPitchMin(); // UNTESTED
+    Trigger setPitchStow(); // UNTESTED
   }
 
   public interface TesterActionSet {
@@ -114,6 +119,11 @@ public final class OI {
     }
 
     @Override
+    public Trigger runFlywheel() {
+      return stick.x();
+    }
+
+    @Override
     public Trigger toggleIntakeOutake() {
       return stick.leftBumper();
     }
@@ -128,14 +138,29 @@ public final class OI {
       return stick.rightTrigger();
     }
 
-    @Override // UNIMPLEMENTED/UNTESTED
+    @Override // IMPLEMENTED/UNTESTED
     public Trigger orientAndShoot() {
-      return stick.x();
+      return stick.b();
     }
 
     @Override // UNIMPLEMENTED
     public Trigger reverseFeeder() {
       return stick.y();
+    }
+
+    @Override
+    public Trigger setPitchMax() {
+      return stick.povUp();
+    }
+
+    @Override
+    public Trigger setPitchMin() {
+      return stick.povDown();
+    }
+
+    @Override
+    public Trigger setPitchStow() {
+      return stick.povLeft();
     }
   }
 

@@ -118,8 +118,26 @@ public class RobotContainer {
         .whileTrue(
             Commands.parallel(
                 IntakeCommands.holdToIntakeCommand(intake)));
+
+    operatorJoystick.runFlywheel().whileTrue(
+        Commands.startEnd(
+            () -> shooter.getF().setFlywheelRPM(ShooterConstants.FLYWHEEL_SHOOT_RPM),
+            shooter.getF()::stopFlywheel,
+            shooter));
+
+    operatorJoystick.setPitchMax().onTrue(
+      Commands.run(() -> {shooter.getO().setPitchAngle(ShooterConstants.PITCH_MAX_ANGLE);}, shooter)
+    );
+
+    operatorJoystick.setPitchMin().onTrue(
+      Commands.run(() -> {shooter.getO().setPitchAngle(ShooterConstants.PITCH_MIN_ANGLE);}, shooter)
+    );
+
+    operatorJoystick.setPitchStow().onTrue(
+      Commands.run(() -> {shooter.getO().setPitchAngle(ShooterConstants.PITCH_STOW_ANGLE);}, shooter)
+    );
     /*
-     * driverJoystick
+     * operatorJoystick
      * .orientAndShoot()
      * .whileTrue(
      * Commands.parallel(

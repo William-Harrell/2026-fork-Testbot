@@ -3,6 +3,7 @@ package frc.robot.util.constants;
 public final class DrivingConstants {
   public static final int DRIVER_PORT = 0;
   public static final int OPERATOR_PORT = 1;
+  public static final int TESTER_PORT = 2;
 
   // OPEN_LOOP = true → motors receive % duty cycle directly (faster response, less precise).
   // Set to false to enable closed-loop velocity control (needed for accurate auto path following).

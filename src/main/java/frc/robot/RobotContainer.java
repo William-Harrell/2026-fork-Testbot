@@ -134,12 +134,12 @@ public class RobotContainer {
      * superstructure.getShooter(), superstructure.getIntake()),
      * Commands.startEnd(hopper::feed, hopper::stop, hopper)));
      * 
-     * driverJoystick
-     * .reverseFeeder()
-     * .whileTrue(
-     * Commands.parallel(
-     * Commands.startEnd(hopper::reverse, hopper::stop, hopper)));
      */
+    // operatorJoystick
+    //     .reverseFeeder()
+    //     .whileTrue(
+    //         Commands.parallel(
+    //             Commands.startEnd(hopper::reverse, hopper::stop, shooter)));
   }
 
   private void registerAutoRoutines() {

@@ -120,5 +120,10 @@ public final class OI {
     public Trigger orientAndShoot() {
       return stick.x();
     }
+
+    @Override
+    public Trigger reverseFeeder() {
+      return stick.y();
+    }
   }
 }

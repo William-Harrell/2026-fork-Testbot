@@ -30,7 +30,8 @@ public class Flywheel {
     config.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_CURRENT_LIMIT;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
-    // TODO: PID gains need re-tuning for TalonFX (units: V/RPS_error for kP, V/RPS for kV)
+    // TODO: PID gains need re-tuning for TalonFX (units: V/RPS_error for kP, V/RPS
+    // for kV)
     config.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
     config.Slot0.kI = ShooterConstants.FLYWHEEL_kI;
     config.Slot0.kD = ShooterConstants.FLYWHEEL_kD;
@@ -38,7 +39,8 @@ public class Flywheel {
 
     flywheelMotor1.getConfigurator().apply(config);
 
-    // Motor 2 faces the opposite side of the ball — TODO: verify invert direction on real robot
+    // Motor 2 faces the opposite side of the ball — TODO: verify invert direction
+    // on real robot
     TalonFXConfiguration config2 = new TalonFXConfiguration();
     config2.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config2.CurrentLimits.StatorCurrentLimit = ShooterConstants.FLYWHEEL_CURRENT_LIMIT;
@@ -67,10 +69,12 @@ public class Flywheel {
   public void setFlywheelRPM(double rpm) {
     targetFlywheelRPM = rpm;
 
-    if (rpm <= 0) {
+    if (rpm == 0) {
       flywheelMotor1.set(0);
       flywheelMotor2.set(0);
       state_machine.set(shooter_state.IDLE);
+    } else if (rpm < 0) {
+
     } else {
       double targetRPS = rpm / 60.0;
       flywheelMotor1.setControl(velocityRequest.withVelocity(targetRPS));
@@ -82,6 +86,11 @@ public class Flywheel {
   /** Spin up the flywheel to shooting speed. */
   public void spinUp() {
     setFlywheelRPM(ShooterConstants.FLYWHEEL_SHOOT_RPM);
+  }
+
+  /** Spin up the flywheel to shooting speed but backwards. */
+  public void spinBack() {
+    setFlywheelRPM(-ShooterConstants.FLYWHEEL_SHOOT_RPM);
   }
 
   /** Spin up the flywheel to idle/warmup speed. */

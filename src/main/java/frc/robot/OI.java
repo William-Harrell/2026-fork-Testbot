@@ -2,6 +2,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.constants.OIConstants;
@@ -44,6 +45,18 @@ public final class OI {
 
     Trigger reverseFeeder(); // UNIMPLEMENTED
 
+  }
+
+  public interface TesterActionSet {
+    Trigger runFlywheel();
+
+    Trigger deployIntake();
+
+    Trigger retractIntake();
+
+    Trigger runIntakeForward();
+
+    Trigger runIntakeReverse();
   }
 
   public static class XboxDriver implements DriverActionSet {
@@ -108,7 +121,7 @@ public final class OI {
 
     // @Override
     // public Trigger toggleDeploy() {
-    //   return stick.a();
+    // return stick.a();
     // }
 
     @Override
@@ -124,6 +137,39 @@ public final class OI {
     @Override // UNIMPLEMENTED
     public Trigger reverseFeeder() {
       return stick.y();
+    }
+  }
+
+  public static class XboxTester implements TesterActionSet {
+    private final CommandXboxController stick;
+
+    public XboxTester(int port) {
+      stick = new CommandXboxController(port);
+    }
+
+    @Override
+    public Trigger runFlywheel() {
+      return stick.x();
+    }
+
+    @Override
+    public Trigger deployIntake() {
+      return stick.leftBumper();
+    }
+
+    @Override
+    public Trigger retractIntake() {
+      return stick.rightBumper();
+    }
+
+    @Override
+    public Trigger runIntakeForward() {
+      return stick.leftTrigger();
+    }
+
+    @Override
+    public Trigger runIntakeReverse() {
+      return stick.rightTrigger();
     }
   }
 }

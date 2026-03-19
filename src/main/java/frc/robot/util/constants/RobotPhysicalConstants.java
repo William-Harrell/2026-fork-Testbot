@@ -3,8 +3,8 @@ package frc.robot.util.constants;
 import edu.wpi.first.math.util.Units;
 
 public final class RobotPhysicalConstants {
-  public static final double ROBOT_LENGTH = Units.inchesToMeters(29.75);
-  public static final double ROBOT_WIDTH = Units.inchesToMeters(29.75);
+  public static final double ROBOT_LENGTH = Units.inchesToMeters(30.125);
+  public static final double ROBOT_WIDTH = Units.inchesToMeters(24.25);
   public static final double BUMPER_THICKNESS = Units.inchesToMeters(3.5);
 
   // Total size including bumpers

@@ -36,7 +36,6 @@ public class RobotContainer {
   private final Vision vision;
   private final Shooter shooter;
   private final Intake intake;
-  // private final Hopper hopper;
 
   private final Superstructure superstructure;
 
@@ -64,9 +63,8 @@ public class RobotContainer {
     swerve = new SwerveDrive(vision);
     shooter = new Shooter(vision, swerve);
     intake = new Intake();
-    // hopper = new Hopper();
 
-    superstructure = new Superstructure(swerve, shooter, intake);
+    superstructure = new Superstructure(swerve, shooter, intake, vision);
 
     Command teleopDriveCommand = swerve.teleopCommand(
         () -> applySpeedCurve(driverJoystick.forward()),

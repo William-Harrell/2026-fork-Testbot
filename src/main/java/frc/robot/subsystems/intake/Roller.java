@@ -47,10 +47,10 @@ public class Roller {
     state_machine.set(intake_state.OUTTAKING);
   }
 
-  /** Feed FUEL to the shooter mechanism */
-  public void feedToShooter() {
+  /** Feed w/o checking whether we're deployed*/
+  public void feed() {
     rollerMotor.set(IntakeConstants.INTAKE_SPEED);
-    state_machine.set(intake_state.FEEDING);
+    state_machine.set(intake_state.INTAKING);
   }
 
   /**

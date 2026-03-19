@@ -142,7 +142,7 @@ public class ShooterCommands {
                 Commands.sequence(
                     Commands.runOnce(
                         () -> shooter.getState().set(shooter_state.SHOOTING), shooter),
-                    Commands.run(intake.getR()::feedToShooter, intake)),
+                    Commands.run(intake.getR()::feed, intake)),
                 Commands.runOnce(
                     () -> {
                       SmartDashboard.putString("Shooter/Warning", "G407: NOT IN ALLIANCE ZONE");

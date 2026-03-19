@@ -124,7 +124,7 @@ public final class IntakeCommands {
    */
   public static Command feedCommand(Intake intake) {
     if (intake == null) return Commands.none();
-    return Commands.startEnd(intake.getR()::feedToShooter, intake.getR()::stopRollers, intake)
+    return Commands.startEnd(intake.getR()::feed, intake.getR()::stopRollers, intake)
         .withName("Feed FUEL");
   }
 

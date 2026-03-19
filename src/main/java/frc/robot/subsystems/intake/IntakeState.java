@@ -9,8 +9,7 @@ public class IntakeState {
     DEPLOYED,
     RETRACTING,
     INTAKING,
-    OUTTAKING,
-    FEEDING
+    OUTTAKING
   }
 
   private intake_state state;

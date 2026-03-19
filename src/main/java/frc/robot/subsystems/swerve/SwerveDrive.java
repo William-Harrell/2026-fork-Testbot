@@ -269,8 +269,8 @@ public class SwerveDrive extends SubsystemBase {
     // Inject vision correction when a valid AprilTag reading is available.
     // The timestamp tells the estimator when the image was captured so it can
     // rewind and re-apply wheel odometry, compensating for camera latency.
-    vision.getBestVisionUpdateRaw(getPose())
-        .ifPresent(update -> addVisionMeasurement(update.pose2d(), update.timestampSeconds()));
+    //vision.getBestVisionUpdateRaw(getPose())
+      //  .ifPresent(update -> addVisionMeasurement(update.pose2d(), update.timestampSeconds()));
 
     // Update the Field2d visualization in Shuffleboard
     field.setRobotPose(getPose());
@@ -281,9 +281,12 @@ public class SwerveDrive extends SubsystemBase {
 
     // Log individual module data to SmartDashboard
     // Useful for debugging wheel alignment and behavior
+    String[] names = {"FL", "FR", "RL", "RR"};
     for (int i = 0; i < modules.length; i++) {
-      SmartDashboard.putNumber("Swerve/Module" + i + "/Angle", modules[i].getAngle().getDegrees());
-      SmartDashboard.putNumber("Swerve/Module" + i + "/Velocity", modules[i].getVelocity());
+      SmartDashboard.putNumber("Swerve/" + names[i] + "/Angle", modules[i].getAngle().getDegrees());
+      SmartDashboard.putNumber("Swerve/" + names[i] + "/AbsAngle", modules[i].getAbsoluteAngle().getDegrees());
+      SmartDashboard.putNumber("Swerve/" + names[i] + "/RawCANCoder", modules[i].getRawCANCoderDegrees());
+      SmartDashboard.putNumber("Swerve/" + names[i] + "/Velocity", modules[i].getVelocity());
     }
   }
 

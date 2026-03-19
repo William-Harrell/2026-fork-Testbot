@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.OI.DriverActionSet;
 import frc.robot.OI.XboxDriver;
+import frc.robot.OI.XboxOperator;
 import frc.robot.auto.AutoRoutines;
 import frc.robot.commands.IntakeCommands;
 import frc.robot.commands.ShooterCommands;
@@ -29,6 +30,7 @@ import frc.robot.util.constants.DrivingConstants;
 public class RobotContainer {
 
   private final XboxDriver driverJoystick;
+  private final XboxOperator operatorJoystick;
 
   // Instance vars
   private final SwerveDrive swerve;
@@ -50,7 +52,8 @@ public class RobotContainer {
   public RobotContainer() {
     DriverStation.silenceJoystickConnectionWarning(true);
 
-    driverJoystick = new XboxDriver(DrivingConstants.CONTROLLER_PORT);
+    driverJoystick = new XboxDriver(DrivingConstants.DRIVER_PORT);
+    operatorJoystick = new XboxOperator(DrivingConstants.OPERATOR_PORT);
 
     autoChooser = new SendableChooser<>();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -104,15 +107,15 @@ public class RobotContainer {
         .toggleSpeed()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    driverJoystick
+    operatorJoystick
         .toggleDeploy()
         .onTrue(IntakeCommands.toggleDeployCommand(intake));
 
-    driverJoystick
+    operatorJoystick
         .toggleIntakeOutake()
         .onTrue(IntakeCommands.toggleDirection(intake));
 
-    driverJoystick
+    operatorJoystick
         .maintainDeployed()
         .whileTrue(
             Commands.parallel(
@@ -169,7 +172,7 @@ public class RobotContainer {
       return AutoRoutines.getAutoFromSelection(
           selection, swerve, intake, shooter, vision, null);
     } else {
-        return autoChooser.getSelected();
+      return autoChooser.getSelected();
     }
   }
 

@@ -1,101 +1,15 @@
-// CHECK //
-
 package frc.robot.subsystems.swerve;
-
-// well documented, if anything
 
 /*
  * ========================================================================
- * SWERVE MODULE - Individual Wheel Control Unit
+ * SWERVE MODULE - One wheel unit of the swerve drive
  * ========================================================================
  *
- * WHAT THIS FILE DOES:
- * --------------------
- * Controls ONE wheel of the swerve drive. A swerve drive has 4 modules
- * (Front Left, Front Right, Rear Left, Rear Right), and each module
- * can independently:
- *   - Spin the wheel at any speed (DRIVE motor)
- *   - Point the wheel in any direction (AZIMUTH motor)
+ * Each swerve module has:
+ *   - A DRIVE motor (TalonFX) that spins the wheel
+ *   - An AZIMUTH motor (TalonFX) that steers the wheel
+ *   - A CANCoder that knows the absolute wheel angle
  *
- * WHAT IS SWERVE DRIVE?
- * --------------------
- * Unlike tank drive (left/right wheels) or mecanum, swerve modules can
- * rotate 360 degrees while spinning. This lets the robot:
- *   - Move in any direction without rotating the chassis
- *   - Rotate while moving in a straight line
- *   - Strafe sideways
- *
- *   TANK DRIVE:              SWERVE DRIVE:
- *   Can only go ^ v          Can go in ANY direction!
- *
- *   +---------+              +---------+
- *   | |     | |              | <>     <> |  <- Modules can rotate
- *   | |     | |              |         |
- *   | |     | |              | <>     <> |
- *   +---------+              +---------+
- *
- * HARDWARE IN EACH MODULE:
- * ------------------------
- *   1. DRIVE MOTOR (NEO)
- *      - Spins the wheel forward/backward
- *      - Controls how fast the robot moves
- *
- *   2. AZIMUTH MOTOR (NEO)
- *      - Rotates the entire wheel assembly
- *      - Points the wheel in the desired direction
- *      - Also called "steering" or "turn" motor
- *
- *   3. CANCoder (Absolute Encoder)
- *      - Tells us the wheel's actual angle
- *      - "Absolute" means it remembers position after power off
- *      - Used to reset the relative encoder on startup
- *
- * WHY TWO ENCODERS?
- * -----------------
- * We use the NEO's built-in encoder (relative) for control because it
- * updates faster. But we need the CANCoder (absolute) to know where
- * "zero" is when the robot turns on.
- *
- *   Startup sequence:
- *   1. Read CANCoder to get absolute angle
- *   2. Set relative encoder to match
- *   3. Use relative encoder for all control
- *
- * ENCODER OFFSET:
- * ---------------
- * When you install a CANCoder, it probably won't read 0 deg when the wheel
- * is pointing forward. The OFFSET corrects for this:
- *
- *   True Forward: 0 deg
- *   CANCoder reads: 47 deg
- *   Offset: -47 deg
- *   After offset: 47 deg + (-47 deg) = 0 deg  OK
- *
- * To calibrate: Point wheel forward manually, read CANCoder value,
- * that's your offset.
- *
- * STATE OPTIMIZATION:
- * -------------------
- * Instead of rotating 180 deg to go backward, we can reverse the drive
- * motor and only rotate 90 deg. This is called "optimization."
- *
- *   Without optimization:    With optimization:
- *   Rotate 180 deg, drive +     Rotate 0 deg, drive -
- *   <> -> ~~~ -> <>              <> (just reverse motor)
- *
- * HOW TO MODIFY:
- * --------------
- * - Change motor IDs: Edit SwerveConstants (different for each module)
- * - Tune turning PID: SwerveConstants.AZIMUTH_kP, kI, kD
- * - Tune drive PID: SwerveConstants.DRIVE_kP, kI, kD
- * - Change wheel size: SwerveConstants.WHEEL_CIRCUMFERENCE
- * - Recalibrate offsets: Update the offset for each module
- *
- * QUICK REFERENCE:
- * ----------------
- * -> Get wheel angle: module.getAngle()
- * -> Get wheel speed: module.getVelocity()
- * -> Get position: module.getModulePosition()
  * -> Set desired state: module.setDesiredState(state, openLoop)
  * -> Reset encoder: module.resetToAbsolute()
  *
@@ -104,226 +18,85 @@ package frc.robot.subsystems.swerve;
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import com.revrobotics.PersistMode;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.ResetMode;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 
-/**
- * ======================================================================== SWERVE MODULE CLASS
- * ========================================================================
- *
- * <p>Represents a single swerve module with independent drive and steering. Each robot has 4 of
- * these modules.
- *
- * <p>[WHAT IS A MODULE?]
- *
- * <p>+-------+ | | =====+=======+===== <- Wheel can spin (drive) | | +-------+ ^ | + <- Entire
- * assembly can rotate (azimuth)
- *
- * <p>The module controls: - Wheel SPEED (drive motor) - Wheel DIRECTION (azimuth motor)
- */
 public class SwerveModule {
 
-  // IDENTIFICATION
-
-  /** Which module this is (0=FL, 1=FR, 2=RL, 3=RR). Used for logging and debugging. */
   private final int moduleNumber;
+  private final boolean invertDrive;
 
-  // MOTORS - The muscle of the module
-
-  /**
-   * DRIVE MOTOR - Controls wheel speed.
-   *
-   * <p>[PHYSICAL DESCRIPTION] This motor spins the wheel forward/backward. It's usually connected
-   * through a gearbox to increase torque.
-   *
-   * <p>[FALCON 500 / TalonFX] CTRE Falcon 500 brushless motor with: - Built-in encoder - High power
-   * density - Controlled by TalonFX (Phoenix 6)
-   */
   private final TalonFX driveMotor;
-
-  /**
-   * AZIMUTH MOTOR - Controls wheel direction.
-   *
-   * <p>[PHYSICAL DESCRIPTION] This motor rotates the entire wheel assembly. Also called "steering"
-   * or "turn" motor.
-   *
-   * <p>[WHY BRAKE MODE?] We want the wheel to stay pointed where we left it, so we use brake mode
-   * (motor resists movement when not powered).
-   */
-  private final SparkMax azimuthMotor;
-
-  // ENCODERS - Position/velocity feedback
-
-  /** Pre-allocated velocity control request for TalonFX closed-loop drive. */
-  private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
-
-  /**
-   * Azimuth motor's built-in encoder.
-   *
-   * <p>[WHAT IT MEASURES] - Position: What angle the wheel is pointing (degrees) - Velocity: How
-   * fast the wheel is rotating (deg/s)
-   *
-   * <p>This is a "relative" encoder - it only tracks changes from where it started. We reset it to
-   * the absolute value on startup.
-   */
-  private final RelativeEncoder azimuthEncoder;
-
-  /**
-   * CANCoder - Absolute position sensor on the azimuth.
-   *
-   * <p>[WHY WE NEED THIS] The NEO's encoder loses its position when powered off. The CANCoder
-   * remembers the absolute angle forever.
-   *
-   * <p>[HOW WE USE IT] On startup, we read the CANCoder and set the NEO encoder to match. Then we
-   * use the NEO encoder for control (it updates faster).
-   */
+  private final TalonFX azimuthMotor;
   private final CANcoder canCoder;
 
-  // CONTROLLERS - PID control
+  private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
+  private final PositionVoltage azimuthPositionRequest = new PositionVoltage(0).withSlot(0);
 
-  /**
-   * PID controller for azimuth motor position.
-   *
-   * <p>[WHAT IT DOES] Takes a target angle (degrees) and rotates the wheel to that position.
-   *
-   * <p>Uses position wrapping (360 deg = 0 deg) for continuous rotation.
-   */
-  private final SparkClosedLoopController azimuthController;
-
-  // FEEDFORWARD - Physics-based control
-
-  /**
-   * Feedforward calculator for drive motor.
-   *
-   * <p>[WHAT IS FEEDFORWARD?] PID alone reacts to error - it needs to see a mistake before
-   * correcting. Feedforward predicts what power is needed.
-   *
-   * <p>[THE CONSTANTS] - kS: Static friction (minimum power to start moving) - kV: Velocity
-   * constant (power per unit speed) - kA: Acceleration constant (power per unit acceleration)
-   *
-   * <p>These are found through SysId characterization or manual tuning.
-   */
   private final SimpleMotorFeedforward driveFeedforward;
-
-  // CALIBRATION
-
-  /**
-   * Offset to correct CANCoder reading to "true forward."
-   *
-   * <p>[WHY THIS EXISTS] When the CANCoder is installed, it probably doesn't read 0 deg when the
-   * wheel is pointing forward. This offset corrects that.
-   *
-   * <p>[HOW TO CALIBRATE] 1. Point the wheel straight forward (manually) 2. Read the CANCoder value
-   * 3. That value is your offset
-   */
   private final Rotation2d encoderOffset;
 
-  // STATE TRACKING
-
-  /** The last state we commanded (for optimization). Used to track what we last asked for. */
-  // private SwerveModuleState lastState = new SwerveModuleState();
-
-  // CONSTRUCTOR
-
-  /**
-   * Creates a new SwerveModule.
-   *
-   * <p>[WHAT HAPPENS AT CREATION] 1. Initialize all motor controllers and sensors 2. Configure
-   * motor settings (PID, current limits, etc.) 3. Configure CANCoder 4. Reset azimuth encoder to
-   * absolute position
-   *
-   * @param moduleNumber The module number (0=FL, 1=FR, 2=RL, 3=RR)
-   * @param driveMotorId CAN ID of the drive motor SparkMAX
-   * @param azimuthMotorId CAN ID of the azimuth motor SparkMAX
-   * @param canCoderId CAN ID of the CANCoder (absolute encoder)
-   * @param encoderOffset Offset to make CANCoder read 0 deg when forward (degrees)
-   */
   public SwerveModule(
       int moduleNumber,
       int driveMotorId,
       int azimuthMotorId,
       int canCoderId,
       double encoderOffset) {
-    this.moduleNumber = moduleNumber;
-    this.encoderOffset = Rotation2d.fromDegrees(encoderOffset);
-
-    // ----------------------------------------------------------------
-    // DRIVE MOTOR SETUP
-    // ----------------------------------------------------------------
-    // Falcon 500 / TalonFX (CTRE Phoenix 6)
-    driveMotor = new TalonFX(driveMotorId);
-
-    // ----------------------------------------------------------------
-    // AZIMUTH MOTOR SETUP
-    // ----------------------------------------------------------------
-    azimuthMotor = new SparkMax(azimuthMotorId, MotorType.kBrushless);
-    azimuthEncoder = azimuthMotor.getEncoder();
-    azimuthController = azimuthMotor.getClosedLoopController();
-
-    // ----------------------------------------------------------------
-    // CANCODER SETUP
-    // ----------------------------------------------------------------
-    canCoder = new CANcoder(canCoderId);
-
-    // ----------------------------------------------------------------
-    // FEEDFORWARD SETUP
-    // ----------------------------------------------------------------
-    // SimpleMotorFeedforward predicts motor power needed for a speed
-    // Constants come from SysId characterization or manual tuning
-    driveFeedforward =
-        new SimpleMotorFeedforward(
-            SwerveConstants.DRIVE_kS, // Static friction (voltage to overcome friction)
-            SwerveConstants.DRIVE_kV, // Velocity constant (voltage per m/s)
-            SwerveConstants.DRIVE_kA // Acceleration constant (voltage per m/s^2)
-            );
-
-    // ----------------------------------------------------------------
-    // FINAL SETUP
-    // ----------------------------------------------------------------
-    configureMotors(); // Set up motor parameters (PID, current limits)
-    configureCANCoder(); // Set up absolute encoder
-    resetToAbsolute(); // Sync relative encoder to absolute position
+    this(moduleNumber, driveMotorId, azimuthMotorId, canCoderId, encoderOffset, false);
   }
 
-  // CONFIGURATION METHODS
+  public SwerveModule(
+      int moduleNumber,
+      int driveMotorId,
+      int azimuthMotorId,
+      int canCoderId,
+      double encoderOffset,
+      boolean invertDrive) {
+    this.moduleNumber = moduleNumber;
+    this.encoderOffset = Rotation2d.fromDegrees(encoderOffset);
+    this.invertDrive = invertDrive;
 
-  /**
-   * Configure motor controllers with appropriate settings.
-   *
-   * <p>[WHAT THIS DOES] Sets up both motors with: - Current limits (protect motors from
-   * overheating) - Ramp rates (smooth acceleration) - PID gains (control accuracy) - Encoder
-   * conversion factors (real-world units)
-   *
-   * <p>[CONVERSION FACTORS EXPLAINED] The NEO encoder counts motor rotations. We need real units:
-   *
-   * <p>Drive: rotations -> meters traveled Formula: circumference / gear_ratio If gear ratio is
-   * 6.75:1 and wheel is 0.1m circumference: 1 motor rotation = 0.1 / 6.75 = 0.0148m
-   *
-   * <p>Azimuth: rotations -> degrees rotated Formula: 360 / gear_ratio If gear ratio is 21.43:1: 1
-   * motor rotation = 360 / 21.43 = 16.8 degrees
-   */
+    // Drive motor (TalonFX)
+    driveMotor = new TalonFX(driveMotorId);
+
+    // Azimuth motor (TalonFX)
+    azimuthMotor = new TalonFX(azimuthMotorId);
+
+    // CANCoder (absolute encoder)
+    canCoder = new CANcoder(canCoderId);
+
+    // Feedforward for drive
+    driveFeedforward =
+        new SimpleMotorFeedforward(
+            SwerveConstants.DRIVE_kS,
+            SwerveConstants.DRIVE_kV,
+            SwerveConstants.DRIVE_kA);
+
+    configureMotors();
+    configureCANCoder();
+    resetToAbsolute();
+  }
+
   private void configureMotors() {
     // ================================================================
-    // DRIVE MOTOR CONFIGURATION (TalonFX / Falcon 500)
+    // DRIVE MOTOR CONFIGURATION
     // ================================================================
     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
 
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    if (invertDrive) {
+      driveConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    }
     driveConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_CURRENT_LIMIT;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     driveConfig.CurrentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_SUPPLY_CURRENT_LIMIT;
@@ -331,7 +104,6 @@ public class SwerveModule {
     driveConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SwerveConstants.DRIVE_OPEN_LOOP_RAMP;
     driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SwerveConstants.DRIVE_CLOSED_LOOP_RAMP;
 
-    // TODO: kP was tuned for SparkMax (units: %/m/s). TalonFX uses V/RPS — retune on real robot.
     driveConfig.Slot0.kP = SwerveConstants.DRIVE_kP;
     driveConfig.Slot0.kI = SwerveConstants.DRIVE_kI;
     driveConfig.Slot0.kD = SwerveConstants.DRIVE_kD;
@@ -339,261 +111,114 @@ public class SwerveModule {
     driveMotor.getConfigurator().apply(driveConfig);
 
     // ================================================================
-    // AZIMUTH MOTOR CONFIGURATION
+    // AZIMUTH MOTOR CONFIGURATION (TalonFX with CANCoder feedback)
     // ================================================================
-    SparkMaxConfig azimuthConfig = new SparkMaxConfig();
+    TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
 
-    azimuthConfig
-        .idleMode(IdleMode.kBrake) // BRAKE mode: hold position when not powered
-        .smartCurrentLimit(SwerveConstants.AZIMUTH_CURRENT_LIMIT)
-        .inverted(true); // May need to flip depending on gearbox setup
+    azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    azimuthConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    azimuthConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.AZIMUTH_CURRENT_LIMIT;
+    azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    // ----------------------------------------------------------------
-    // ENCODER CONVERSION: Motor rotations -> Degrees
-    // ----------------------------------------------------------------
-    double azimuthPositionFactor = 360.0 / SwerveConstants.AZIMUTH_GEAR_RATIO;
-    double azimuthVelocityFactor = azimuthPositionFactor / 60.0;
+    // Use the remote CANCoder as the feedback sensor for closed-loop
+    azimuthConfig.Feedback.FeedbackRemoteSensorID = canCoder.getDeviceID();
+    azimuthConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+    // Gear ratio between motor and CANCoder (motor rotations per CANCoder rotation)
+    azimuthConfig.Feedback.RotorToSensorRatio = SwerveConstants.AZIMUTH_GEAR_RATIO;
 
-    azimuthConfig
-        .encoder
-        .positionConversionFactor(azimuthPositionFactor) // getPosition() returns degrees
-        .velocityConversionFactor(azimuthVelocityFactor); // getVelocity() returns deg/s
+    // Enable continuous wrap so the motor takes the shortest path (e.g., 350° → 10° goes +20°)
+    azimuthConfig.ClosedLoopGeneral.ContinuousWrap = true;
 
-    // ----------------------------------------------------------------
-    // PID GAINS with POSITION WRAPPING
-    // ----------------------------------------------------------------
-    // Range is -180 to 180 to match Rotation2d.minus() normalization used
-    // in resetToAbsolute(). Using 0-360 would conflict because the encoder
-    // seed value comes from Rotation2d.minus() which always returns -180..180.
-    azimuthConfig
-        .closedLoop
-        .p(SwerveConstants.AZIMUTH_kP)
-        .i(SwerveConstants.AZIMUTH_kI)
-        .d(SwerveConstants.AZIMUTH_kD)
-        .positionWrappingEnabled(true)
-        .positionWrappingMinInput(-180)
-        .positionWrappingMaxInput(180);
+    azimuthConfig.Slot0.kP = SwerveConstants.AZIMUTH_kP;
+    azimuthConfig.Slot0.kI = SwerveConstants.AZIMUTH_kI;
+    azimuthConfig.Slot0.kD = SwerveConstants.AZIMUTH_kD;
 
-    azimuthMotor.configure(
-        azimuthConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    azimuthMotor.getConfigurator().apply(azimuthConfig);
   }
 
-  /**
-   * Configure the CANCoder for absolute position sensing.
-   *
-   * <p>[WHAT THIS DOES] Sets the CANCoder to report positive values for counter-clockwise rotation.
-   * This matches the robot coordinate system (CCW positive).
-   */
   private void configureCANCoder() {
     CANcoderConfiguration config = new CANcoderConfiguration();
-
-    // CCW positive matches standard math convention
     config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-
+    // Apply the magnet offset so CANCoder reads 0 when wheel faces forward
+    config.MagnetSensor.MagnetOffset = -encoderOffset.getRotations();
     canCoder.getConfigurator().apply(config);
   }
 
-  /**
-   * Reset the azimuth encoder to the absolute position from CANCoder.
-   *
-   * <p>[WHEN TO CALL] - Automatically called in constructor - Can call manually if encoder gets out
-   * of sync
-   *
-   * <p>[WHAT THIS DOES] Reads the CANCoder's absolute angle and sets the NEO encoder to match. Now
-   * both encoders agree on the current position.
-   */
+  /** Sync is not needed — CANCoder is the direct feedback sensor for the azimuth TalonFX. */
   public void resetToAbsolute() {
-    // Get the absolute angle (already offset-corrected)
-    double absolutePosition = getAbsoluteAngle().getDegrees();
-
-    // Set the relative encoder to match
-    azimuthEncoder.setPosition(absolutePosition);
+    // No-op: the TalonFX uses the CANCoder directly via RemoteCANcoder feedback,
+    // so there's no relative encoder to reset.
   }
 
-  // GETTER METHODS - Read current state
+  // ================================================================
+  // GETTERS
+  // ================================================================
 
-  /**
-   * Get the absolute angle from the CANCoder, accounting for offset.
-   *
-   * <p>[WHEN TO USE THIS] Only use this for resetting the relative encoder. For normal operation,
-   * use getAngle() (relative encoder is faster).
-   *
-   * <p>[OFFSET EXPLAINED] The raw CANCoder reading minus the offset gives "true forward = 0 deg"
-   *
-   * @return The absolute angle as a Rotation2d (0 deg = forward)
-   */
   public Rotation2d getAbsoluteAngle() {
-    // CANCoder returns 0-1 rotations, multiply by 360 for degrees
-    double angle = canCoder.getAbsolutePosition().getValueAsDouble() * 360.0;
-
-    // Subtract offset to get corrected angle
-    return Rotation2d.fromDegrees(angle).minus(encoderOffset);
+    return Rotation2d.fromRotations(canCoder.getAbsolutePosition().getValueAsDouble());
   }
 
-  /**
-   * Get the current angle of the module from the integrated encoder.
-   *
-   * <p>[THIS IS THE MAIN ANGLE GETTER] Use this for all normal operations. It's faster than
-   * CANCoder and is already synced to the correct value.
-   *
-   * @return The current angle as a Rotation2d (0 deg = forward)
-   */
+  /** Raw CANCoder reading in degrees (no offset applied). For calibration only. */
+  public double getRawCANCoderDegrees() {
+    return canCoder.getAbsolutePosition().getValueAsDouble() * 360.0;
+  }
+
+  /** Get the current angle from the azimuth feedback (CANCoder via TalonFX). */
   public Rotation2d getAngle() {
-    return Rotation2d.fromDegrees(azimuthEncoder.getPosition());
+    // TalonFX position with RemoteCANcoder returns rotations
+    return Rotation2d.fromRotations(azimuthMotor.getPosition().getValueAsDouble());
   }
 
-  /**
-   * Get the current velocity of the drive motor.
-   *
-   * @return The velocity in meters per second (positive = forward)
-   */
   public double getVelocity() {
-    // TalonFX reports RPS (rotations/s) → convert to m/s
     return driveMotor.getVelocity().getValueAsDouble()
         * SwerveConstants.WHEEL_CIRCUMFERENCE
         / SwerveConstants.DRIVE_GEAR_RATIO;
   }
 
-  /**
-   * Get the current position of the drive motor.
-   *
-   * <p>[WHAT THIS RETURNS] Total distance the wheel has traveled since startup (or last reset).
-   * Used for odometry to track robot position on the field.
-   *
-   * @return The position in meters
-   */
   public double getPosition() {
-    // TalonFX reports rotations → convert to meters
     return driveMotor.getPosition().getValueAsDouble()
         * SwerveConstants.WHEEL_CIRCUMFERENCE
         / SwerveConstants.DRIVE_GEAR_RATIO;
   }
 
-  /**
-   * Get the current state of the swerve module.
-   *
-   * <p>[WHAT IS A STATE?] SwerveModuleState contains: - speedMetersPerSecond: How fast the wheel is
-   * spinning - angle: Which direction the wheel is pointing
-   *
-   * <p>Think of it as a "snapshot" of what the module is doing right now.
-   *
-   * @return The current SwerveModuleState
-   */
   public SwerveModuleState getState() {
     return new SwerveModuleState(getVelocity(), getAngle());
   }
 
-  /**
-   * Get the current position of the swerve module.
-   *
-   * <p>[WHAT IS A POSITION?] SwerveModulePosition contains: - distanceMeters: How far the wheel has
-   * traveled (total) - angle: Which direction the wheel is pointing
-   *
-   * <p>Used by odometry to calculate where the robot is on the field. The difference from STATE is
-   * that position tracks TOTAL distance, while state tracks current SPEED.
-   *
-   * @return The current SwerveModulePosition
-   */
   public SwerveModulePosition getModulePosition() {
     return new SwerveModulePosition(getPosition(), getAngle());
   }
 
-  // CONTROL METHODS - Set desired state
+  // ================================================================
+  // CONTROL
+  // ================================================================
 
-  /**
-   * Set the desired state of the swerve module.
-   *
-   * <p>[THIS IS THE MAIN CONTROL METHOD] Called by SwerveDrive to tell each module what to do.
-   *
-   * <p>[OPEN LOOP vs CLOSED LOOP]
-   *
-   * <p>OPEN LOOP (openLoop = true): - Just sets motor power as a percentage - Power = desiredSpeed
-   * / maxSpeed - Used in teleop (feels more responsive)
-   *
-   * <p>CLOSED LOOP (openLoop = false): - Uses PID + feedforward for precise velocity - Measures
-   * actual speed and adjusts - Used in autonomous (more accurate)
-   *
-   * <p>[STATE OPTIMIZATION] The optimize() call is KEY for swerve efficiency. If we need to go
-   * backward, instead of: - Rotating 180 deg and driving forward We do: - Keep pointing same
-   * direction, drive backward
-   *
-   * <p>This means we NEVER rotate more than 90 deg!
-   *
-   * @param desiredState The desired state (speed and angle)
-   * @param openLoop True for teleop (percentage control), false for auto (PID control)
-   */
   public void setDesiredState(SwerveModuleState desiredState, boolean openLoop) {
-
-    // ================================================================
-    // OPTIMIZATION - Smart angle selection
-    // ================================================================
-    // This is the magic that makes swerve efficient!
-    // If target is more than 90 deg away, flip the angle and negate speed
-    //
-    // Example:
-    //   Current: 0 deg, Target: 170 deg
-    //   Without optimization: rotate 170 deg
-    //   With optimization: rotate -10 deg, drive backward
     desiredState.optimize(getAngle());
 
-    // ================================================================
-    // AZIMUTH CONTROL - Point the wheel
-    // ================================================================
-    // Tell the PID controller what angle we want
-    // Position wrapping handles the 0 deg/360 deg boundary
-    azimuthController.setSetpoint(
-        desiredState.angle.getDegrees(), SparkMax.ControlType.kPosition // Position control mode
-        );
+    // Azimuth — position control in rotations (CANCoder units)
+    double targetRotations = desiredState.angle.getRotations();
+    azimuthMotor.setControl(azimuthPositionRequest.withPosition(targetRotations));
 
-    // ================================================================
-    // DRIVE CONTROL - Spin the wheel
-    // ================================================================
+    // Drive
     if (openLoop) {
-      // --------------------------------------------------------
-      // OPEN LOOP - Simple percentage output
-      // --------------------------------------------------------
-      // Convert desired speed to a -1 to 1 percentage
-      // If max speed is 4 m/s and we want 2 m/s: 2/4 = 0.5 = 50% power
       double percentOutput = desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED;
       driveMotor.set(percentOutput);
-
     } else {
-      // --------------------------------------------------------
-      // CLOSED LOOP - PID with feedforward (TalonFX VelocityVoltage)
-      // --------------------------------------------------------
-      // Convert m/s → RPS (motor rotations per second)
       double targetRPS = desiredState.speedMetersPerSecond
           * SwerveConstants.DRIVE_GEAR_RATIO
           / SwerveConstants.WHEEL_CIRCUMFERENCE;
-
-      // Feedforward in volts from SimpleMotorFeedforward (kS, kV, kA)
       double ffVolts = driveFeedforward.calculate(desiredState.speedMetersPerSecond);
-
       driveMotor.setControl(driveVelocityRequest.withVelocity(targetRPS).withFeedForward(ffVolts));
     }
-
-    // Remember what we commanded (for debugging/optimization)
-    // lastState = desiredState;
   }
 
-  /**
-   * Stop the module by setting both motors to 0.
-   *
-   * <p>[WHEN TO USE] Emergency stop or when robot is disabled. For normal stopping, set desired
-   * state to 0 velocity instead.
-   */
   public void stop() {
     driveMotor.set(0);
     azimuthMotor.set(0);
   }
 
-  /**
-   * Get the module number.
-   *
-   * @return The module number (0=FL, 1=FR, 2=RL, 3=RR)
-   */
   public int getModuleNumber() {
     return moduleNumber;
   }
-} // End of SwerveModule class
-// fuck ai
+}

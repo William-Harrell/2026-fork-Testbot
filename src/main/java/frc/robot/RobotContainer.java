@@ -28,7 +28,7 @@ import frc.robot.util.constants.DrivingConstants;
 
 public class RobotContainer {
 
-  private final DriverActionSet driverJoystick;
+  private final XboxDriver driverJoystick;
 
   // Instance vars
   private final SwerveDrive swerve;

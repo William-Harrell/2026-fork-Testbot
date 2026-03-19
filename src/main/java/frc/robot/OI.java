@@ -7,7 +7,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.util.constants.OIConstants;
 
 public final class OI {
-  private OI() {}
+  private OI() {
+  }
 
   public static double deadband(double value, double band) {
     return Math.abs(value) > band ? value : 0;
@@ -30,7 +31,9 @@ public final class OI {
     Trigger skiStop();
 
     boolean isMovementCommanded();
+  }
 
+  public interface OperatorActionSet {
     Trigger toggleIntakeOutake();
 
     Trigger toggleDeploy();
@@ -40,6 +43,7 @@ public final class OI {
     Trigger orientAndShoot();
 
     Trigger reverseFeeder();
+
   }
 
   public static class XboxDriver implements DriverActionSet {
@@ -87,6 +91,14 @@ public final class OI {
     @Override
     public boolean isMovementCommanded() {
       return Math.abs(forward()) + Math.abs(strafe()) + Math.abs(turn()) > 0.01;
+    }
+  }
+
+  public static class XboxOperator implements OperatorActionSet {
+    private final CommandXboxController stick;
+
+    public XboxOperator(int port) {
+      this.stick = new CommandXboxController(port);
     }
 
     @Override

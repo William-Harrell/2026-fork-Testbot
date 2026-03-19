@@ -34,8 +34,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.LinearVelocityUnit;
 import frc.robot.OI.XboxDriver;
 import frc.robot.auto.AutoConstants;

@@ -4,8 +4,8 @@ package frc.robot;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.swerve.SwerveDrive;
-import frc.robot.subsystems.vision.Vision;
-import frc.robot.subsystems.hopper.Hopper;
+// import frc.robot.subsystems.vision.Vision;
+// import frc.robot.subsystems.hopper.Hopper;
 
 /**
  * Superstructure holds references to all robot subsystems.

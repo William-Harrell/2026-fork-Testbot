@@ -2,16 +2,14 @@
 
 package frc.robot;
 
-import java.nio.file.Path;
-
-import com.pathplanner.lib.path.PathPlannerPath;
+// import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.auto.AutoSetup;
-import frc.robot.auto.CSPPathing;
+// import frc.robot.auto.AutoSetup;
+// import frc.robot.auto.CSPPathing;
 
 public class Robot extends TimedRobot {
 
@@ -45,7 +43,7 @@ public class Robot extends TimedRobot {
     // AutoSetup.configure();
     // CSPPathing.reset();
     try {
-      PathPlannerPath testPath = PathPlannerPath.fromPathFile("src/main/deploy/paths/Juggernaut_Collect.path");
+      // PathPlannerPath testPath = PathPlannerPath.fromPathFile("src/main/deploy/paths/Juggernaut_Collect.path");
     } catch (Exception e) {
       System.out.println("Error loading path: " + e.getMessage());
     }

@@ -74,23 +74,28 @@ public final class FieldConstants {
   // ALLIANCE ZONE BOUNDARIES (G407 — must be in zone to shoot)
   // Alliance zone is 158.6in (4.03m) deep from each alliance wall.
   // ================================================================
-  public static final double BLUE_ALLIANCE_ZONE_MAX_X = ALLIANCE_ZONE_DEPTH;        // 4.03m
-  public static final double RED_ALLIANCE_ZONE_MIN_X  = FIELD_LENGTH - ALLIANCE_ZONE_DEPTH; // 12.51m
+  public static final double BLUE_ALLIANCE_ZONE_MAX_X = ALLIANCE_ZONE_DEPTH; // 4.03m
+  public static final double RED_ALLIANCE_ZONE_MIN_X = FIELD_LENGTH - ALLIANCE_ZONE_DEPTH; // 12.51m
 
   // ================================================================
   // OUTPOST / CHUTE collection positions
   // OUTPOST is at each alliance wall end on the non-scoring-table side.
-  // X: ~1.0m from alliance wall. Y: ~1.5m from guardrail. TODO: verify on real field.
+  // X: ~1.0m from alliance wall. Y: ~1.5m from guardrail. TODO: verify on real
+  // field.
   // ================================================================
-  public static final double BLUE_OUTPOST_X = 1.0;           // meters from Blue wall
-  public static final double BLUE_OUTPOST_Y = 1.5;           // meters — TODO: measure
-  public static final double RED_OUTPOST_X  = FIELD_LENGTH - 1.0;
-  public static final double RED_OUTPOST_Y  = 1.5;           // TODO: measure
+  public static final double BLUE_OUTPOST_X = 1.0; // meters from Blue wall
+  public static final double BLUE_OUTPOST_Y = 1.5; // meters — TODO: measure
+  public static final double RED_OUTPOST_X = FIELD_LENGTH - 1.0;
+  public static final double RED_OUTPOST_Y = 1.5; // TODO: measure
 
   // ================================================================
   // TOWER RUNG HEIGHTS (section 5.8 of game manual)
   // ================================================================
-  public static final double LOW_RUNG_HEIGHT  = 0.686; // 27.0in — Level 2 threshold
-  public static final double MID_RUNG_HEIGHT  = 1.143; // 45.0in — Level 3 threshold
-  public static final double HIGH_RUNG_HEIGHT = 1.600; // 63.0in
+  /*
+   * public static final double LOW_RUNG_HEIGHT = 0.686; // 27.0in — Level 2
+   * threshold
+   * public static final double MID_RUNG_HEIGHT = 1.143; // 45.0in — Level 3
+   * threshold
+   * public static final double HIGH_RUNG_HEIGHT = 1.600; // 63.0in
+   */
 }

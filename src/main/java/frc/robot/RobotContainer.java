@@ -45,7 +45,7 @@ public class RobotContainer {
 
   private static final boolean USE_DIP_SWITCH = false;
 
-  private int speedExponent = 2;
+  private int speedExponent = 1;
 
   public RobotContainer() {
     DriverStation.silenceJoystickConnectionWarning(true);

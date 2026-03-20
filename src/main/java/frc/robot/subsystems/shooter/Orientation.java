@@ -115,25 +115,25 @@ public class Orientation {
    *              CommandScheduler
    *              can prevent concurrent commands from fighting over this motor).
    */
-  public Command homeCommand(SubsystemBase owner) {
-    return Commands.either(
-        // Already home — just zero
-        Commands.runOnce(() -> {
-          hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
-          homed = true;
-        }, owner),
-        // Not home — drive slowly toward stow until switch triggers
-        Commands.run(() -> hoodMotor.set(ShooterConstants.HOOD_HOMING_SPEED), owner)
-            .until(this::isAtHome)
-            .andThen(Commands.runOnce(() -> {
-              hoodMotor.set(0);
-              hoodMotor2.set(0);
-              hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
-              homed = true;
-            }, owner)),
-        this::isAtHome)
-        .withName("Home Shooter Hood");
-  }
+  // public Command homeCommand(SubsystemBase owner) {
+  //   return Commands.either(
+  //       // Already home — just zero
+  //       Commands.runOnce(() -> {
+  //         hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
+  //         homed = true;
+  //       }, owner),
+  //       // Not home — drive slowly toward stow until switch triggers
+  //       Commands.run(() -> hoodMotor.set(ShooterConstants.HOOD_HOMING_SPEED), owner)
+  //           .until(this::isAtHome)
+  //           .andThen(Commands.runOnce(() -> {
+  //             hoodMotor.set(0);
+  //             hoodMotor2.set(0);
+  //             hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
+  //             homed = true;
+  //           }, owner)),
+  //       this::isAtHome)
+  //       .withName("Home Shooter Hood");
+  // }
 
   /** Call from Shooter.periodic() to update dashboard and auto-correct drift. */
   public void updateDashboard() {

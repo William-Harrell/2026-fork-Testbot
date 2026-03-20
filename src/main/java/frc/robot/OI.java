@@ -92,12 +92,12 @@ public final class OI {
 
     @Override
     public Trigger resetGyro() {
-      return stick.start();
+      return stick.povUp();
     }
 
     @Override
     public Trigger toggleFieldRelative() {
-      return stick.back();
+      return stick.povDown();
     }
 
     @Override

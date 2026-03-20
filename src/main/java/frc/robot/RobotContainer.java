@@ -105,10 +105,6 @@ public class RobotContainer {
         .toggleSpeed()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    // operatorJoystick
-    // .toggleDeploy()
-    // .onTrue(IntakeCommands.toggleDeployCommand(intake));
-
     operatorJoystick
         .toggleIntakeOutake()
         .onTrue(IntakeCommands.toggleDirection(intake));
@@ -126,17 +122,24 @@ public class RobotContainer {
             shooter));
 
     operatorJoystick.setPitchMax().onTrue(
-      Commands.run(() -> {shooter.getO().setPitchAngle(ShooterConstants.PITCH_MAX_ANGLE);}, shooter)
-    );
+        Commands.run(() -> {
+          shooter.getO().setPitchAngle(
+              Math.min(ShooterConstants.PITCH_MAX_ANGLE, shooter.getO().getActualPitchAngle() + 5.0));
+        }, shooter));
 
     operatorJoystick.setPitchMin().onTrue(
-      Commands.run(() -> {shooter.getO().setPitchAngle(ShooterConstants.PITCH_MIN_ANGLE);}, shooter)
-    );
+        Commands.run(() -> {
+          shooter.getO().setPitchAngle(
+              Math.max(ShooterConstants.PITCH_MIN_ANGLE, shooter.getO().getActualPitchAngle() - 5.0));
+        }, shooter));
 
     operatorJoystick.setPitchStow().onTrue(
-      Commands.run(() -> {shooter.getO().setPitchAngle(ShooterConstants.PITCH_STOW_ANGLE);}, shooter)
-    );
+        Commands.run(() -> {
+          shooter.getO().setPitchAngle(ShooterConstants.PITCH_STOW_ANGLE);
+        }, shooter));
+
     /*
+     * NEED CAMERAS CALIBRATED: TODO
      * operatorJoystick
      * .orientAndShoot()
      * .whileTrue(

@@ -3,11 +3,11 @@ package frc.robot.subsystems.swerve;
 import edu.wpi.first.math.util.Units;
 
 public final class SwerveConstants {
-  public static final double TRACK_WIDTH = Units.inchesToMeters(17.75); // Left to right
-  public static final double WHEEL_BASE = Units.inchesToMeters(29.75); // Front to back
+  public static final double TRACK_WIDTH = Units.inchesToMeters(18.5); // Left to right
+  public static final double WHEEL_BASE = Units.inchesToMeters(24.75); // Front to back
 
   public static final double MAX_SPEED = 4.2; // meters per second
-  public static final double MAX_ANGULAR_VELOCITY = 4.0; // rad per second — reduced for testing
+  public static final double MAX_ANGULAR_VELOCITY = 9.547/1.6; // rad per second
 
   public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0);
   public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;

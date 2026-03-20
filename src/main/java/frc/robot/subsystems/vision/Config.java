@@ -13,7 +13,11 @@ public class Config {
       List.of(
           new CameraConfig(
               "front_cam",
-              VisionConstants.FRONT_CAMERA_TRANSFORM,
+              VisionConstants.FRONT_LEFT_CAMERA_TRANSFORM,
+              PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR),
+          new CameraConfig(
+              "front_right",
+              VisionConstants.FRONT_RIGHT_CAMERA_TRANSFORM,
               PhotonPoseEstimator.PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR),
           new CameraConfig(
               "back_left_cam",

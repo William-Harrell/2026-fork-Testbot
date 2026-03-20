@@ -86,7 +86,7 @@ public class SwerveDrive extends SubsystemBase {
    * moves toward the opponent's side - Doesn't matter which way robot is facing - More intuitive
    * for strafing
    */
-  private boolean fieldRelative = false; // TODO: robot-relative for single-wheel testing
+  private boolean fieldRelative = true;
 
   /**
    * Open-loop vs closed-loop control.

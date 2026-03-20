@@ -23,9 +23,9 @@ public class Orientation {
   private final SparkClosedLoopController hoodController;
   private final SparkFlex hoodMotor2;
   private final SparkClosedLoopController hoodController2;
-  private final DigitalInput limitSwitch;
+  // private final DigitalInput limitSwitch;
   private double targetPitchAngle;
-  private boolean homed = false;
+  // private boolean homed = false;
 
   public Orientation(SparkFlex motor, SparkFlex motor2) {
     hoodMotor = motor;
@@ -52,13 +52,13 @@ public class Orientation {
     hoodMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     hoodMotor2.configure(config2, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-    limitSwitch = new DigitalInput(ShooterConstants.HOOD_LIMIT_SWITCH_DIO);
+    // limitSwitch = new DigitalInput(ShooterConstants.HOOD_LIMIT_SWITCH_DIO);
     targetPitchAngle = ShooterConstants.PITCH_STOW_ANGLE;
 
     // If already at home on boot, zero to stow angle immediately
     // if (isAtHome()) {
       hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
-      homed = true;
+      // homed = true;
     // }
   }
 

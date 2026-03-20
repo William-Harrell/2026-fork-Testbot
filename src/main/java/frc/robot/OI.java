@@ -202,12 +202,12 @@ public final class OI {
 
         @Override
     public Trigger setPitchMax() {
-      return stick.povUp();
+      return stick.y();
     }
 
     @Override
     public Trigger setPitchMin() {
-      return stick.povDown();
+      return stick.a();
     }
   }
 }

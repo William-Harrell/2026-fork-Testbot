@@ -186,22 +186,18 @@ public class RobotContainer {
             intake));
 
     testerJoystick.setPitchMax().onTrue(
-        Commands.repeatingSequence(
-            Commands.run(() -> {
-              shooter.getO().setPitchAngle(
-                  Math.min(ShooterConstants.PITCH_MAX_ANGLE,
-                      shooter.getO().getActualPitchAngle() + 5.0));
-            }, shooter)).until(() -> (!testerJoystick.setPitchMax().getAsBoolean()
-                || shooter.getO().getActualPitchAngle() >= ShooterConstants.PITCH_MAX_ANGLE)));
+        Commands.runOnce(() -> {
+          shooter.getO().setPitchAngle(
+              Math.min(ShooterConstants.PITCH_MAX_ANGLE,
+                  shooter.getO().getActualPitchAngle() + 5.0));
+        }, shooter));
 
     testerJoystick.setPitchMin().onTrue(
-        Commands.repeatingSequence(
-            Commands.run(() -> {
-              shooter.getO().setPitchAngle(
-                  Math.max(ShooterConstants.PITCH_MIN_ANGLE,
-                      shooter.getO().getActualPitchAngle() - 5.0));
-            }, shooter)).until(() -> (!testerJoystick.setPitchMin().getAsBoolean()
-                || shooter.getO().getActualPitchAngle() <= ShooterConstants.PITCH_MIN_ANGLE)));
+        Commands.runOnce(() -> {
+          shooter.getO().setPitchAngle(
+              Math.max(ShooterConstants.PITCH_MIN_ANGLE,
+                  shooter.getO().getActualPitchAngle() - 5.0));
+        }, shooter));
 
     // testerJoystick.setPitchMin().onTrue(
     // Commands.run(() -> {

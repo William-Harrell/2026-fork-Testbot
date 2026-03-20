@@ -139,11 +139,11 @@ public class Orientation {
   public void updateDashboard() {
     // Auto-correct: if limit switch triggers, re-zero to stow angle
     // if (isAtHome()) {
-      double stowRot = degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE);
-      if (Math.abs(hoodEncoder.getPosition() - stowRot) > degreesToRotations(ShooterConstants.PITCH_TOLERANCE)) {
-        hoodEncoder.setPosition(stowRot);
-        homed = true;
-      }
+    //   double stowRot = degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE);
+    //   if (Math.abs(hoodEncoder.getPosition() - stowRot) > degreesToRotations(ShooterConstants.PITCH_TOLERANCE)) {
+    //     hoodEncoder.setPosition(stowRot);
+    //     homed = true;
+    //   }
     // }
 
     // SmartDashboard.putBoolean("Shooter/HoodLimitSwitch", isAtHome());

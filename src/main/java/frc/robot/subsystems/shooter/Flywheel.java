@@ -38,8 +38,7 @@ public class Flywheel {
     config.Slot0.kV = ShooterConstants.FLYWHEEL_kFF;
 
     flywheelMotor1.getConfigurator().apply(config);
-
-    // Motor 2 faces the opposite side of the ball — TODO: verify invert direction
+    
     // on real robot
     TalonFXConfiguration config2 = new TalonFXConfiguration();
     config2.MotorOutput.NeutralMode = NeutralModeValue.Coast;

@@ -29,7 +29,7 @@ public class RobotContainer {
 
   private final XboxDriver driverJoystick;
   private final XboxOperator operatorJoystick;
-  private final XboxTester testerJoystick;
+  // private final XboxTester testerJoystick;
 
   // Instance vars
   private final SwerveDrive swerve;
@@ -52,7 +52,7 @@ public class RobotContainer {
 
     driverJoystick = new XboxDriver(DrivingConstants.DRIVER_PORT);
     operatorJoystick = new XboxOperator(DrivingConstants.OPERATOR_PORT);
-    testerJoystick = new XboxTester(DrivingConstants.TESTER_PORT);
+    // testerJoystick = new XboxTester(DrivingConstants.TESTER_PORT);
 
     autoChooser = new SendableChooser<>();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -112,12 +112,11 @@ public class RobotContainer {
     operatorJoystick
         .maintainDeployed()
         .whileTrue(
-            Commands.parallel(
-                IntakeCommands.holdToIntakeCommand(intake)));
+            IntakeCommands.holdToIntakeCommand(intake));
 
     operatorJoystick.runFlywheel().whileTrue(
         Commands.startEnd(
-            () -> shooter.getF().setFlywheelRPM(ShooterConstants.FLYWHEEL_SHOOT_RPM),
+            shooter.getF()::spinUp,
             shooter.getF()::stopFlywheel,
             shooter));
 
@@ -159,26 +158,29 @@ public class RobotContainer {
     // .whileTrue(
     // Commands.parallel(
     // Commands.startEnd(hopper::reverse, hopper::stop, shooter)));
-
-    testerJoystick.runFlywheel().whileTrue(
-        Commands.startEnd(
-            () -> shooter.getF().setFlywheelRPM(ShooterConstants.FLYWHEEL_SHOOT_RPM),
-            shooter.getF()::stopFlywheel,
-            shooter));
-
-    testerJoystick.deployIntake().onTrue(
-        Commands.startEnd(intake::deployIntakeMechanism, () -> {
-        }, intake));
-
-    testerJoystick.retractIntake().onTrue(
-        Commands.startEnd(intake::retractIntakeMechanism, () -> {
-        }, intake));
-
-    testerJoystick.runIntakeForward().whileTrue(
-        Commands.startEnd(intake.getR()::runIntake, intake.getR()::stopRollers, intake));
-
-    testerJoystick.runIntakeReverse().whileTrue(
-        Commands.startEnd(intake.getR()::runOuttake, intake.getR()::stopRollers, intake));
+    /*
+     * testerJoystick.runFlywheel().whileTrue(
+     * Commands.startEnd(
+     * () -> shooter.getF().setFlywheelRPM(ShooterConstants.FLYWHEEL_SHOOT_RPM),
+     * shooter.getF()::stopFlywheel,
+     * shooter));
+     * 
+     * testerJoystick.deployIntake().onTrue(
+     * Commands.startEnd(intake::deployIntakeMechanism, () -> {
+     * }, intake));
+     * 
+     * testerJoystick.retractIntake().onTrue(
+     * Commands.startEnd(intake::retractIntakeMechanism, () -> {
+     * }, intake));
+     * 
+     * testerJoystick.runIntakeForward().whileTrue(
+     * Commands.startEnd(intake.getR()::runIntake, intake.getR()::stopRollers,
+     * intake));
+     * 
+     * testerJoystick.runIntakeReverse().whileTrue(
+     * Commands.startEnd(intake.getR()::runOuttake, intake.getR()::stopRollers,
+     * intake));
+     */
   }
 
   private void registerAutoRoutines() {

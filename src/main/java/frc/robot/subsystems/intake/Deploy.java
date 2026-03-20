@@ -21,17 +21,21 @@ public class Deploy {
   private final SparkFlex deployMotor;
   private final SparkFlex deployMotor2;
   private final RelativeEncoder deployEncoder;
+  private final RelativeEncoder deployEncoder2;
   private final SparkClosedLoopController deployController;
+  private final SparkClosedLoopController deployController2;
   private final DigitalInput limitSwitch;
   private double targetPosition;
   private boolean homed = false;
 
-  /** {@code motor1} is the leader, {@code motor2} follows it */
+  /** {@code motor1} is the left side, {@code motor2} is the right side (inverted) */
   public Deploy(SparkFlex motor1, SparkFlex motor2) {
     deployMotor = motor1;
     deployMotor2 = motor2;
     deployEncoder = deployMotor.getEncoder();
+    deployEncoder2 = deployMotor2.getEncoder();
     deployController = deployMotor.getClosedLoopController();
+    deployController2 = deployMotor2.getClosedLoopController();
 
     targetPosition = IntakeConstants.STOWED_POSITION;
 
@@ -41,19 +45,23 @@ public class Deploy {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
 
-    SparkFlexConfig followerConfig = new SparkFlexConfig();
-    followerConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(30).follow(deployMotor, true);
+    SparkFlexConfig motor2Config = new SparkFlexConfig();
+    motor2Config.idleMode(IdleMode.kBrake).smartCurrentLimit(30).inverted(true);
+    motor2Config.closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
 
     deployMotor.configure(
         deployConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     deployMotor2.configure(
-        followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motor2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     limitSwitch = new DigitalInput(IntakeConstants.DEPLOY_LIMIT_SWITCH_DIO);
 
     // If already at home position on boot, zero immediately
     if (isAtHome()) {
       deployEncoder.setPosition(0);
+      deployEncoder2.setPosition(0);
       homed = true;
     }
   }
@@ -71,6 +79,7 @@ public class Deploy {
   public void setTargetPosition(double newPos) {
     targetPosition = newPos;
     deployController.setSetpoint(targetPosition, SparkFlex.ControlType.kPosition);
+    deployController2.setSetpoint(targetPosition, SparkFlex.ControlType.kPosition);
   }
 
   /** Check if intake is at deployed position */
@@ -111,13 +120,22 @@ public class Deploy {
   public Command homeCommand(SubsystemBase owner) {
     return Commands.either(
         // Already home — just zero
-        Commands.runOnce(() -> { deployEncoder.setPosition(0); homed = true; }, owner),
+        Commands.runOnce(() -> {
+          deployEncoder.setPosition(0);
+          deployEncoder2.setPosition(0);
+          homed = true;
+        }, owner),
         // Not home — drive slowly toward stow until switch triggers
-        Commands.run(() -> deployMotor.set(IntakeConstants.HOMING_SPEED), owner)
+        Commands.run(() -> {
+          deployMotor.set(IntakeConstants.HOMING_SPEED);
+          deployMotor2.set(IntakeConstants.HOMING_SPEED);
+        }, owner)
             .until(this::isAtHome)
             .andThen(Commands.runOnce(() -> {
               deployMotor.set(0);
+              deployMotor2.set(0);
               deployEncoder.setPosition(0);
+              deployEncoder2.setPosition(0);
               homed = true;
             }, owner)),
         this::isAtHome)
@@ -126,12 +144,18 @@ public class Deploy {
 
   public void update() {
     // Auto-correct encoder drift: if limit switch triggers, re-zero
-    if (isAtHome() && Math.abs(deployEncoder.getPosition()) > IntakeConstants.POSITION_TOLERANCE) {
-      deployEncoder.setPosition(0);
+    if (isAtHome()) {
+      if (Math.abs(deployEncoder.getPosition()) > IntakeConstants.POSITION_TOLERANCE) {
+        deployEncoder.setPosition(0);
+      }
+      if (Math.abs(deployEncoder2.getPosition()) > IntakeConstants.POSITION_TOLERANCE) {
+        deployEncoder2.setPosition(0);
+      }
       homed = true;
     }
 
     SmartDashboard.putNumber("Intake/Position", deployEncoder.getPosition());
+    SmartDashboard.putNumber("Intake/Position2", deployEncoder2.getPosition());
     SmartDashboard.putBoolean("Intake/IsDeployed", isDeployed());
     SmartDashboard.putBoolean("Intake/IsStowed", isStowed());
     SmartDashboard.putBoolean("Intake/LimitSwitch", isAtHome());

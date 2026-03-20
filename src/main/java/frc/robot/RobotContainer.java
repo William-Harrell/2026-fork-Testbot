@@ -180,7 +180,9 @@ public class RobotContainer {
             intake));
 
     testerJoystick.runIntakeReverse().whileTrue(
-        Commands.startEnd(intake.getR()::runOuttake, intake.getR()::stopRollers,
+        Commands.startEnd(() -> {
+          intake.getR().runOuttake();
+        }, intake.getR()::stopRollers,
             intake));
 
     testerJoystick.setPitchMax().onTrue(

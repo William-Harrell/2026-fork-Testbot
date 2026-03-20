@@ -39,7 +39,7 @@ public final class ShooterConstants {
   public static final double HOOD_DEGREES_PER_ROTATION = 10.0;
 
   /** Hood PID gains — tune on real robot */
-  public static final double HOOD_kP = 0.05;
+  public static final double HOOD_kP = 0.5;
   public static final double HOOD_kI = 0.0;
   public static final double HOOD_kD = 0.0;
 

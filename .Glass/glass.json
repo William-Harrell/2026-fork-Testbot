@@ -4,5 +4,10 @@
       "open": true
     },
     "visible": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Server",
+    "serverTeam": "3164",
+    "visible": false
   }
 }

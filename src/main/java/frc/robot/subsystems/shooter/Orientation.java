@@ -36,8 +36,8 @@ public class Orientation {
 
     SparkFlexConfig config = new SparkFlexConfig();
     SparkFlexConfig config2 = new SparkFlexConfig();
-    config.idleMode(IdleMode.kBrake).smartCurrentLimit(20);
-    config2.idleMode(IdleMode.kBrake).smartCurrentLimit(20).inverted(true);
+    config.idleMode(IdleMode.kBrake).smartCurrentLimit(70);
+    config2.idleMode(IdleMode.kBrake).smartCurrentLimit(70).inverted(true);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(ShooterConstants.HOOD_kP)

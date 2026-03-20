@@ -86,7 +86,7 @@ public final class OI {
 
     @Override
     public double turn() {
-      return deadband(-stick.getRightX(), OIConstants.JOYSTICK_DEADBAND) * 0.7;
+      return deadband(-stick.getRightX(), OIConstants.JOYSTICK_DEADBAND) * 0.4;
     }
 
     @Override

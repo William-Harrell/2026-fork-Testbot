@@ -28,7 +28,9 @@ public class Deploy {
   private double targetPosition;
   private boolean homed = false;
 
-  /** {@code motor1} is the left side, {@code motor2} is the right side (inverted) */
+  /**
+   * {@code motor1} is the left side, {@code motor2} is the right side (inverted)
+   */
   public Deploy(SparkFlex motor1, SparkFlex motor2) {
     deployMotor = motor1;
     deployMotor2 = motor2;
@@ -40,16 +42,16 @@ public class Deploy {
     targetPosition = IntakeConstants.STOWED_POSITION;
 
     SparkFlexConfig deployConfig = new SparkFlexConfig();
-    deployConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(30);
+    deployConfig.idleMode(IdleMode.kBrake).smartCurrentLimit(40);
     deployConfig.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
+        .p(0.0001).i(0).d(0.001).iZone(0.0).minOutput(-1.0).maxOutput(1.0);
 
     SparkFlexConfig motor2Config = new SparkFlexConfig();
-    motor2Config.idleMode(IdleMode.kBrake).smartCurrentLimit(30).inverted(true);
+    motor2Config.idleMode(IdleMode.kBrake).smartCurrentLimit(47).inverted(true);
     motor2Config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
+        .p(0.0001).i(0).d(0.001).iZone(0.0).minOutput(-1.0).maxOutput(1.0);
 
     deployMotor.configure(
         deployConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -67,9 +69,12 @@ public class Deploy {
   }
 
   /**
-   * @deprecated Do NOT call set() directly on the returned controller — doing so bypasses the
-   *     state machine and will desync physical and logical state. Use the methods on {@link Deploy}
-   *     or {@link IntakeCommands} instead. This accessor exists only for legacy telemetry reads.
+   * @deprecated Do NOT call set() directly on the returned controller — doing so
+   *             bypasses the
+   *             state machine and will desync physical and logical state. Use the
+   *             methods on {@link Deploy}
+   *             or {@link IntakeCommands} instead. This accessor exists only for
+   *             legacy telemetry reads.
    */
   @Deprecated
   public SparkFlex get() {
@@ -84,14 +89,13 @@ public class Deploy {
 
   /** Check if intake is at deployed position */
   public boolean isDeployed() {
-    return Math.abs(deployEncoder.getPosition() - IntakeConstants.DEPLOYED_POSITION)
-        < IntakeConstants.POSITION_TOLERANCE;
+    return Math
+        .abs(deployEncoder.getPosition() - IntakeConstants.DEPLOYED_POSITION) < IntakeConstants.POSITION_TOLERANCE;
   }
 
   /** Check if intake is at stowed position */
   public boolean isStowed() {
-    return Math.abs(deployEncoder.getPosition() - IntakeConstants.STOWED_POSITION)
-        < IntakeConstants.POSITION_TOLERANCE;
+    return Math.abs(deployEncoder.getPosition() - IntakeConstants.STOWED_POSITION) < IntakeConstants.POSITION_TOLERANCE;
   }
 
   /** Get current deploy position */
@@ -99,7 +103,9 @@ public class Deploy {
     return deployEncoder.getPosition();
   }
 
-  /** True when the limit switch is triggered (mechanism at stow/home position). */
+  /**
+   * True when the limit switch is triggered (mechanism at stow/home position).
+   */
   public boolean isAtHome() {
     return !limitSwitch.get(); // active-low: grounded = false = triggered
   }
@@ -114,7 +120,8 @@ public class Deploy {
    * then zeros the encoder. If already at home, zeros immediately.
    */
   /**
-   * @param owner The subsystem that owns this mechanism (passed so the CommandScheduler
+   * @param owner The subsystem that owns this mechanism (passed so the
+   *              CommandScheduler
    *              can prevent concurrent commands from fighting over this motor).
    */
   public Command homeCommand(SubsystemBase owner) {

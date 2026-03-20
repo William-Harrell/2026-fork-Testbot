@@ -11,17 +11,17 @@ import frc.robot.subsystems.shooter.ShooterState.shooter_state;
 
 public class Flywheel {
   private final TalonFX flywheelMotor1;
-  // private final TalonFX flywheelMotor2;
+  private final TalonFX flywheelMotor2;
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0);
   private ShooterState state_machine;
   private final Orientation orientation;
 
   private double targetFlywheelRPM = 0.0;
 
-  // public Flywheel(TalonFX motor1, TalonFX motor2, Orientation myO) {
-  public Flywheel(TalonFX motor1, Orientation myO) {
+  public Flywheel(TalonFX motor1, TalonFX motor2, Orientation myO) {
+    // public Flywheel(TalonFX motor1, Orientation myO) {
     flywheelMotor1 = motor1;
-    // flywheelMotor2 = motor2;
+    flywheelMotor2 = motor2;
     orientation = myO;
 
     TalonFXConfiguration config = new TalonFXConfiguration();
@@ -31,30 +31,32 @@ public class Flywheel {
     config.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_CURRENT_LIMIT;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
-    // TODO: PID gains need re-tuning for TalonFX (units: V/RPS_error for kP, V/RPS
-    // for kV)
     config.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
     config.Slot0.kI = ShooterConstants.FLYWHEEL_kI;
     config.Slot0.kD = ShooterConstants.FLYWHEEL_kD;
-    config.Slot0.kV = ShooterConstants.FLYWHEEL_kFF;
+    config.Slot0.kV = ShooterConstants.FLYWHEEL_kV;
+    config.Slot0.kS = ShooterConstants.FLYWHEEL_kS;
+    config.Slot0.kA = ShooterConstants.FLYWHEEL_kA;
 
     flywheelMotor1.getConfigurator().apply(config);
 
     // on real robot
-    // TalonFXConfiguration config2 = new TalonFXConfiguration();
-    // config2.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    // config2.CurrentLimits.StatorCurrentLimit = ShooterConstants.FLYWHEEL_CURRENT_LIMIT;
-    // config2.CurrentLimits.StatorCurrentLimitEnable = true;
-    // config2.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_CURRENT_LIMIT;
-    // config2.CurrentLimits.SupplyCurrentLimitEnable = true;
-    // config2.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
-    // config2.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
-    // config2.Slot0.kI = ShooterConstants.FLYWHEEL_kI;
-    // config2.Slot0.kD = ShooterConstants.FLYWHEEL_kD;
-    // config2.Slot0.kV = ShooterConstants.FLYWHEEL_kFF;
-    // config2.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    TalonFXConfiguration config2 = new TalonFXConfiguration();
+    config2.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config2.CurrentLimits.StatorCurrentLimit = ShooterConstants.FLYWHEEL_CURRENT_LIMIT;
+    config2.CurrentLimits.StatorCurrentLimitEnable = true;
+    config2.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_CURRENT_LIMIT;
+    config2.CurrentLimits.SupplyCurrentLimitEnable = true;
+    config2.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
+    config.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
+    config.Slot0.kI = ShooterConstants.FLYWHEEL_kI;
+    config.Slot0.kD = ShooterConstants.FLYWHEEL_kD;
+    config.Slot0.kV = ShooterConstants.FLYWHEEL_kV;
+    config.Slot0.kS = ShooterConstants.FLYWHEEL_kS;
+    config.Slot0.kA = ShooterConstants.FLYWHEEL_kA;
+    config2.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    // flywheelMotor2.getConfigurator().apply(config2);
+    flywheelMotor2.getConfigurator().apply(config2);
   }
 
   public void setStateMachine(ShooterState sm) {
@@ -76,12 +78,12 @@ public class Flywheel {
     } else if (rpm < 0) {
       double targetRPS = rpm / 60.0;
       flywheelMotor1.setControl(velocityRequest.withVelocity(targetRPS));
-      // flywheelMotor2.setControl(velocityRequest.withVelocity(targetRPS));
+      flywheelMotor2.setControl(velocityRequest.withVelocity(targetRPS));
       state_machine.set(shooter_state.SPINNING_UP);
     } else {
       double targetRPS = rpm / 60.0;
       flywheelMotor1.setControl(velocityRequest.withVelocity(targetRPS));
-      // flywheelMotor2.setControl(velocityRequest.withVelocity(targetRPS));
+      flywheelMotor2.setControl(velocityRequest.withVelocity(targetRPS));
       state_machine.set(shooter_state.SPINNING_UP);
     }
   }

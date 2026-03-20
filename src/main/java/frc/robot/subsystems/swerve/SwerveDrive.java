@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.Vision;
@@ -627,7 +628,8 @@ public class SwerveDrive extends SubsystemBase {
    * @return A command that resets the gyro (runs once, instantly)
    */
   public Command resetGyroCommand() {
-    return runOnce(() -> resetYaw(Rotation2d.fromDegrees(180)));
+    return runOnce(() -> resetYaw(Rotation2d.fromDegrees(180)))
+        .andThen(new InstantCommand(this::resetWheelsForward, this));
   }
 
   /** Point all wheels straight forward with zero speed. */

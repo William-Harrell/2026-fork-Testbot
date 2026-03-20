@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase {
     physics = new Physics(vision, swerve);
     flywheel = new Flywheel(
         new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID),
-        // new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_2_ID),
+        new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_2_ID),
         orientation);
     state_machine = new ShooterState(flywheel);
     flywheel.setStateMachine(state_machine);
@@ -41,15 +41,6 @@ public class Shooter extends SubsystemBase {
 
   public Physics getP() {
     return physics;
-  }
-
-  /**
-   * @deprecated Use {@link #getState()} — getS() is ambiguous next to
-   *             getO()/getP()/getF().
-   */
-  @Deprecated
-  public ShooterState getS() {
-    return state_machine;
   }
 
   /**

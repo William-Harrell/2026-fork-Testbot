@@ -96,14 +96,14 @@ public class Orientation {
   }
 
   /** True when the limit switch is triggered (hood at stow/home position). */
-  public boolean isAtHome() {
-    return !limitSwitch.get(); // active-low: grounded = false = triggered
-  }
+  // public boolean isAtHome() {
+  //   return !limitSwitch.get(); // active-low: grounded = false = triggered
+  // }
 
-  /** Whether the encoder has been homed since boot. */
-  public boolean isHomed() {
-    return homed;
-  }
+  // /** Whether the encoder has been homed since boot. */
+  // public boolean isHomed() {
+  //   return homed;
+  // }
 
   /**
    * Command that slowly drives the hood toward stow until the limit switch
@@ -138,16 +138,16 @@ public class Orientation {
   /** Call from Shooter.periodic() to update dashboard and auto-correct drift. */
   public void updateDashboard() {
     // Auto-correct: if limit switch triggers, re-zero to stow angle
-    if (isAtHome()) {
+    // if (isAtHome()) {
       double stowRot = degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE);
       if (Math.abs(hoodEncoder.getPosition() - stowRot) > degreesToRotations(ShooterConstants.PITCH_TOLERANCE)) {
         hoodEncoder.setPosition(stowRot);
         homed = true;
       }
-    }
+    // }
 
-    SmartDashboard.putBoolean("Shooter/HoodLimitSwitch", isAtHome());
-    SmartDashboard.putBoolean("Shooter/HoodHomed", homed);
+    // SmartDashboard.putBoolean("Shooter/HoodLimitSwitch", isAtHome());
+    // SmartDashboard.putBoolean("Shooter/HoodHomed", homed);
   }
 
   private double degreesToRotations(double degrees) {

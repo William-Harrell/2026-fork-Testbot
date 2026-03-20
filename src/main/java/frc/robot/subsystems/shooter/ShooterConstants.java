@@ -62,21 +62,22 @@ public final class ShooterConstants {
   // ================================================================
 
   /** Flywheel velocity for scoring (RPM) — tune on real robot */
-  public static final double FLYWHEEL_SHOOT_RPM = 4000.0;
+  public static final double FLYWHEEL_SHOOT_RPM = 6000.0;
 
   /** Flywheel idle/warmup velocity (RPM) */
-  public static final double FLYWHEEL_IDLE_RPM = 1000.0;
+  public static final double FLYWHEEL_IDLE_RPM = 2000.0;
 
   /** Tolerance for flywheel at target speed */
-  public static final double FLYWHEEL_RPM_TOLERANCE = 100.0;
+  public static final double FLYWHEEL_RPM_TOLERANCE = 50.0;
 
   /** Flywheel PID gains — TalonFX units (kP: V/RPS error, kFF/kV: V/RPS).
    *  Starting estimates only — characterize with SysId on real robot. */
-  public static final double FLYWHEEL_kP = 0.0005;
-
+  public static final double FLYWHEEL_kP = 0.2;
   public static final double FLYWHEEL_kI = 0.0;
-  public static final double FLYWHEEL_kD = 0.0;
-  public static final double FLYWHEEL_kFF = 0.12; // kV: ~0.12 V/RPS for Kraken — tune on real robot
+  public static final double FLYWHEEL_kD = 0.0005;
+  public static final double FLYWHEEL_kS = 0.15;
+  public static final double FLYWHEEL_kA = 0.015;
+  public static final double FLYWHEEL_kV = 12/ShooterConstants.FLYWHEEL_SHOOT_RPM;
 
   /**
    * Flywheel wheel radius for exit velocity calculation (meters).
@@ -91,10 +92,10 @@ public final class ShooterConstants {
   public static final double FLYWHEEL_EFFICIENCY = 0.85;
 
   /** Flywheel stator current limit */
-  public static final int FLYWHEEL_CURRENT_LIMIT = 59; // Amps stator
+  public static final int FLYWHEEL_CURRENT_LIMIT = 95; // Amps stator
 
   /** Flywheel supply current limit (protects battery/breaker) */
-  public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 30; // Amps from battery
+  public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 60; // Amps from battery
 
   /** Ramp rate for closed-loop spinup (seconds from 0 to full output) — limits inrush current */
   public static final double FLYWHEEL_RAMP_RATE = 0.75; // seconds

@@ -56,10 +56,10 @@ public class Orientation {
     targetPitchAngle = ShooterConstants.PITCH_STOW_ANGLE;
 
     // If already at home on boot, zero to stow angle immediately
-    if (isAtHome()) {
+    // if (isAtHome()) {
       hoodEncoder.setPosition(degreesToRotations(ShooterConstants.PITCH_STOW_ANGLE));
       homed = true;
-    }
+    // }
   }
 
   /**

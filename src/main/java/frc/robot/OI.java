@@ -61,6 +61,10 @@ public final class OI {
     Trigger runIntakeForward();
 
     Trigger runIntakeReverse();
+
+    Trigger setPitchMax();
+
+    Trigger setPitchMin();
   }
 
   public static class XboxDriver implements DriverActionSet {
@@ -194,6 +198,16 @@ public final class OI {
     @Override
     public Trigger runIntakeReverse() {
       return stick.rightTrigger();
+    }
+
+        @Override
+    public Trigger setPitchMax() {
+      return stick.povUp();
+    }
+
+    @Override
+    public Trigger setPitchMin() {
+      return stick.povDown();
     }
   }
 }

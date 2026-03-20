@@ -28,8 +28,8 @@ import frc.robot.util.constants.DrivingConstants;
 public class RobotContainer {
 
   private final XboxDriver driverJoystick;
-  private final XboxOperator operatorJoystick;
-  // private final XboxTester testerJoystick;
+  // private final XboxOperator operatorJoystick;
+  private final XboxTester testerJoystick;
 
   // Instance vars
   private final SwerveDrive swerve;
@@ -51,8 +51,8 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true);
 
     driverJoystick = new XboxDriver(DrivingConstants.DRIVER_PORT);
-    operatorJoystick = new XboxOperator(DrivingConstants.OPERATOR_PORT);
-    // testerJoystick = new XboxTester(DrivingConstants.TESTER_PORT);
+    // operatorJoystick = new XboxOperator(DrivingConstants.OPERATOR_PORT);
+    testerJoystick = new XboxTester(DrivingConstants.TESTER_PORT);
 
     autoChooser = new SendableChooser<>();
     SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -105,37 +105,39 @@ public class RobotContainer {
         .toggleSpeed()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    operatorJoystick
-        .toggleIntakeOutake()
-        .onTrue(IntakeCommands.toggleDirection(intake));
+    // operatorJoystick
+    // .toggleIntakeOutake()
+    // .onTrue(IntakeCommands.toggleDirection(intake));
 
-    operatorJoystick
-        .maintainDeployed()
-        .whileTrue(
-            IntakeCommands.holdToIntakeCommand(intake));
+    // operatorJoystick
+    // .maintainDeployed()
+    // .whileTrue(
+    // IntakeCommands.holdToIntakeCommand(intake));
 
-    operatorJoystick.runFlywheel().whileTrue(
-        Commands.startEnd(
-            shooter.getF()::spinUp,
-            shooter.getF()::stopFlywheel,
-            shooter));
+    // operatorJoystick.runFlywheel().whileTrue(
+    // Commands.startEnd(
+    // shooter.getF()::spinUp,
+    // shooter.getF()::stopFlywheel,
+    // shooter));
 
-    operatorJoystick.setPitchMax().onTrue(
-        Commands.run(() -> {
-          shooter.getO().setPitchAngle(
-              Math.min(ShooterConstants.PITCH_MAX_ANGLE, shooter.getO().getActualPitchAngle() + 5.0));
-        }, shooter));
+    // operatorJoystick.setPitchMax().onTrue(
+    // Commands.run(() -> {
+    // shooter.getO().setPitchAngle(
+    // Math.min(ShooterConstants.PITCH_MAX_ANGLE,
+    // shooter.getO().getActualPitchAngle() + 5.0));
+    // }, shooter));
 
-    operatorJoystick.setPitchMin().onTrue(
-        Commands.run(() -> {
-          shooter.getO().setPitchAngle(
-              Math.max(ShooterConstants.PITCH_MIN_ANGLE, shooter.getO().getActualPitchAngle() - 5.0));
-        }, shooter));
+    // operatorJoystick.setPitchMin().onTrue(
+    // Commands.run(() -> {
+    // shooter.getO().setPitchAngle(
+    // Math.max(ShooterConstants.PITCH_MIN_ANGLE,
+    // shooter.getO().getActualPitchAngle() - 5.0));
+    // }, shooter));
 
-    operatorJoystick.setPitchStow().onTrue(
-        Commands.run(() -> {
-          shooter.getO().setPitchAngle(ShooterConstants.PITCH_STOW_ANGLE);
-        }, shooter));
+    // operatorJoystick.setPitchStow().onTrue(
+    // Commands.run(() -> {
+    // shooter.getO().setPitchAngle(ShooterConstants.PITCH_STOW_ANGLE);
+    // }, shooter));
 
     /*
      * NEED CAMERAS CALIBRATED: TODO
@@ -158,29 +160,43 @@ public class RobotContainer {
     // .whileTrue(
     // Commands.parallel(
     // Commands.startEnd(hopper::reverse, hopper::stop, shooter)));
-    /*
-     * testerJoystick.runFlywheel().whileTrue(
-     * Commands.startEnd(
-     * () -> shooter.getF().setFlywheelRPM(ShooterConstants.FLYWHEEL_SHOOT_RPM),
-     * shooter.getF()::stopFlywheel,
-     * shooter));
-     * 
-     * testerJoystick.deployIntake().onTrue(
-     * Commands.startEnd(intake::deployIntakeMechanism, () -> {
-     * }, intake));
-     * 
-     * testerJoystick.retractIntake().onTrue(
-     * Commands.startEnd(intake::retractIntakeMechanism, () -> {
-     * }, intake));
-     * 
-     * testerJoystick.runIntakeForward().whileTrue(
-     * Commands.startEnd(intake.getR()::runIntake, intake.getR()::stopRollers,
-     * intake));
-     * 
-     * testerJoystick.runIntakeReverse().whileTrue(
-     * Commands.startEnd(intake.getR()::runOuttake, intake.getR()::stopRollers,
-     * intake));
-     */
+
+    testerJoystick.runFlywheel().whileTrue(
+        Commands.startEnd(
+            () -> shooter.getF().setFlywheelRPM(ShooterConstants.FLYWHEEL_SHOOT_RPM),
+            shooter.getF()::stopFlywheel,
+            shooter));
+
+    testerJoystick.deployIntake().onTrue(
+        Commands.startEnd(intake::deployIntakeMechanism, () -> {
+        }, intake));
+
+    testerJoystick.retractIntake().onTrue(
+        Commands.startEnd(intake::retractIntakeMechanism, () -> {
+        }, intake));
+
+    testerJoystick.runIntakeForward().whileTrue(
+        Commands.startEnd(intake.getR()::runIntake, intake.getR()::stopRollers,
+            intake));
+
+    testerJoystick.runIntakeReverse().whileTrue(
+        Commands.startEnd(intake.getR()::runOuttake, intake.getR()::stopRollers,
+            intake));
+
+    testerJoystick.setPitchMax().onTrue(
+        Commands.run(() -> {
+          shooter.getO().setPitchAngle(
+              Math.min(ShooterConstants.PITCH_MAX_ANGLE,
+                  shooter.getO().getActualPitchAngle() + 5.0));
+        }, shooter));
+
+    testerJoystick.setPitchMin().onTrue(
+        Commands.run(() -> {
+          shooter.getO().setPitchAngle(
+              Math.max(ShooterConstants.PITCH_MIN_ANGLE,
+                  shooter.getO().getActualPitchAngle() - 5.0));
+        }, shooter));
+
   }
 
   private void registerAutoRoutines() {
@@ -226,37 +242,38 @@ public class RobotContainer {
 
   public void onEnabled() {
     // if (hasHomed)
-    //   return;
+    // return;
     // hasHomed = true;
 
     // CommandScheduler.getInstance().schedule(
-    //     Commands.parallel(intake.getD().homeCommand(intake), shooter.getO().homeCommand(shooter))
-    //         .withTimeout(3.0)
-    //         .andThen(
-    //             Commands.runOnce(
-    //                 () -> {
-    //                   boolean intakeOk = intake.getD().isHomed();
-    //                   boolean hoodOk = shooter.getO().isHomed();
-    //                   if (intakeOk && hoodOk) {
-    //                     Elastic.sendNotification(
-    //                         new Elastic.Notification()
-    //                             .withLevel(Elastic.NotificationLevel.INFO)
-    //                             .withTitle("Homing Complete")
-    //                             .withDescription("Intake and hood encoders zeroed")
-    //                             .withDisplaySeconds(3.0));
-    //                   } else {
-    //                     Elastic.sendNotification(
-    //                         new Elastic.Notification()
-    //                             .withLevel(Elastic.NotificationLevel.ERROR)
-    //                             .withTitle("Homing Failed")
-    //                             .withDescription(
-    //                                 (!intakeOk ? "Intake " : "")
-    //                                     + (!hoodOk ? "Hood " : "")
-    //                                     + "limit switch not triggered")
-    //                             .withNoAutoDismiss());
-    //                   }
-    //                 }))
-    //         .withName("Home Mechanisms"));
+    // Commands.parallel(intake.getD().homeCommand(intake),
+    // shooter.getO().homeCommand(shooter))
+    // .withTimeout(3.0)
+    // .andThen(
+    // Commands.runOnce(
+    // () -> {
+    // boolean intakeOk = intake.getD().isHomed();
+    // boolean hoodOk = shooter.getO().isHomed();
+    // if (intakeOk && hoodOk) {
+    // Elastic.sendNotification(
+    // new Elastic.Notification()
+    // .withLevel(Elastic.NotificationLevel.INFO)
+    // .withTitle("Homing Complete")
+    // .withDescription("Intake and hood encoders zeroed")
+    // .withDisplaySeconds(3.0));
+    // } else {
+    // Elastic.sendNotification(
+    // new Elastic.Notification()
+    // .withLevel(Elastic.NotificationLevel.ERROR)
+    // .withTitle("Homing Failed")
+    // .withDescription(
+    // (!intakeOk ? "Intake " : "")
+    // + (!hoodOk ? "Hood " : "")
+    // + "limit switch not triggered")
+    // .withNoAutoDismiss());
+    // }
+    // }))
+    // .withName("Home Mechanisms"));
   }
 
   public void logData() {

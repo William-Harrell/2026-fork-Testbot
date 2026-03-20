@@ -91,7 +91,7 @@ public final class ShooterConstants {
   public static final double FLYWHEEL_EFFICIENCY = 0.85;
 
   /** Flywheel stator current limit */
-  public static final int FLYWHEEL_CURRENT_LIMIT = 40; // Amps stator
+  public static final int FLYWHEEL_CURRENT_LIMIT = 59; // Amps stator
 
   /** Flywheel supply current limit (protects battery/breaker) */
   public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 30; // Amps from battery

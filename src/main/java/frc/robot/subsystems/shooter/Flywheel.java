@@ -11,16 +11,17 @@ import frc.robot.subsystems.shooter.ShooterState.shooter_state;
 
 public class Flywheel {
   private final TalonFX flywheelMotor1;
-  private final TalonFX flywheelMotor2;
+  // private final TalonFX flywheelMotor2;
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0);
   private ShooterState state_machine;
   private final Orientation orientation;
 
   private double targetFlywheelRPM = 0.0;
 
-  public Flywheel(TalonFX motor1, TalonFX motor2, Orientation myO) {
+  // public Flywheel(TalonFX motor1, TalonFX motor2, Orientation myO) {
+  public Flywheel(TalonFX motor1, Orientation myO) {
     flywheelMotor1 = motor1;
-    flywheelMotor2 = motor2;
+    // flywheelMotor2 = motor2;
     orientation = myO;
 
     TalonFXConfiguration config = new TalonFXConfiguration();
@@ -38,22 +39,22 @@ public class Flywheel {
     config.Slot0.kV = ShooterConstants.FLYWHEEL_kFF;
 
     flywheelMotor1.getConfigurator().apply(config);
-    
-    // on real robot
-    TalonFXConfiguration config2 = new TalonFXConfiguration();
-    config2.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    config2.CurrentLimits.StatorCurrentLimit = ShooterConstants.FLYWHEEL_CURRENT_LIMIT;
-    config2.CurrentLimits.StatorCurrentLimitEnable = true;
-    config2.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_CURRENT_LIMIT;
-    config2.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config2.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
-    config2.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
-    config2.Slot0.kI = ShooterConstants.FLYWHEEL_kI;
-    config2.Slot0.kD = ShooterConstants.FLYWHEEL_kD;
-    config2.Slot0.kV = ShooterConstants.FLYWHEEL_kFF;
-    config2.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    flywheelMotor2.getConfigurator().apply(config2);
+    // on real robot
+    // TalonFXConfiguration config2 = new TalonFXConfiguration();
+    // config2.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    // config2.CurrentLimits.StatorCurrentLimit = ShooterConstants.FLYWHEEL_CURRENT_LIMIT;
+    // config2.CurrentLimits.StatorCurrentLimitEnable = true;
+    // config2.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_CURRENT_LIMIT;
+    // config2.CurrentLimits.SupplyCurrentLimitEnable = true;
+    // config2.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
+    // config2.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
+    // config2.Slot0.kI = ShooterConstants.FLYWHEEL_kI;
+    // config2.Slot0.kD = ShooterConstants.FLYWHEEL_kD;
+    // config2.Slot0.kV = ShooterConstants.FLYWHEEL_kFF;
+    // config2.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    // flywheelMotor2.getConfigurator().apply(config2);
   }
 
   public void setStateMachine(ShooterState sm) {
@@ -70,14 +71,17 @@ public class Flywheel {
 
     if (rpm == 0) {
       flywheelMotor1.set(0);
-      flywheelMotor2.set(0);
+      // flywheelMotor2.set(0);
       state_machine.set(shooter_state.IDLE);
     } else if (rpm < 0) {
-
+      double targetRPS = rpm / 60.0;
+      flywheelMotor1.setControl(velocityRequest.withVelocity(targetRPS));
+      // flywheelMotor2.setControl(velocityRequest.withVelocity(targetRPS));
+      state_machine.set(shooter_state.SPINNING_UP);
     } else {
       double targetRPS = rpm / 60.0;
       flywheelMotor1.setControl(velocityRequest.withVelocity(targetRPS));
-      flywheelMotor2.setControl(velocityRequest.withVelocity(targetRPS));
+      // flywheelMotor2.setControl(velocityRequest.withVelocity(targetRPS));
       state_machine.set(shooter_state.SPINNING_UP);
     }
   }

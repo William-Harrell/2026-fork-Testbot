@@ -7,7 +7,7 @@ public final class SwerveConstants {
   public static final double WHEEL_BASE = Units.inchesToMeters(24.75); // Front to back
 
   public static final double MAX_SPEED = 4.2; // meters per second
-  public static final double MAX_ANGULAR_VELOCITY = 9.547/1.6; // rad per second
+  public static final double MAX_ANGULAR_VELOCITY = 9.547; // rad per second
 
   public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0);
   public static final double WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * Math.PI;
@@ -74,7 +74,7 @@ public final class SwerveConstants {
 
   // CURRENT LIMITS - Protects motors from overheating
 
-  public static final int DRIVE_CURRENT_LIMIT = 40; // Amps stator (was 60 — lowered for breaker safety)
+  public static final int DRIVE_CURRENT_LIMIT = 59; // Amps stator (was 60 — lowered for breaker safety)
   public static final int DRIVE_SUPPLY_CURRENT_LIMIT = 35; // Amps from battery
 
   public static final int AZIMUTH_CURRENT_LIMIT = 20; // Amps (was 30 — steering mostly holds position)

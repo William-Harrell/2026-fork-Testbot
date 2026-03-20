@@ -222,41 +222,41 @@ public class RobotContainer {
     hasHomed = false;
   }
 
-  private boolean hasHomed = false;
+  private boolean hasHomed = true;
 
   public void onEnabled() {
-    if (hasHomed)
-      return;
-    hasHomed = true;
+    // if (hasHomed)
+    //   return;
+    // hasHomed = true;
 
-    CommandScheduler.getInstance().schedule(
-        Commands.parallel(intake.getD().homeCommand(intake), shooter.getO().homeCommand(shooter))
-            .withTimeout(3.0)
-            .andThen(
-                Commands.runOnce(
-                    () -> {
-                      boolean intakeOk = intake.getD().isHomed();
-                      boolean hoodOk = shooter.getO().isHomed();
-                      if (intakeOk && hoodOk) {
-                        Elastic.sendNotification(
-                            new Elastic.Notification()
-                                .withLevel(Elastic.NotificationLevel.INFO)
-                                .withTitle("Homing Complete")
-                                .withDescription("Intake and hood encoders zeroed")
-                                .withDisplaySeconds(3.0));
-                      } else {
-                        Elastic.sendNotification(
-                            new Elastic.Notification()
-                                .withLevel(Elastic.NotificationLevel.ERROR)
-                                .withTitle("Homing Failed")
-                                .withDescription(
-                                    (!intakeOk ? "Intake " : "")
-                                        + (!hoodOk ? "Hood " : "")
-                                        + "limit switch not triggered")
-                                .withNoAutoDismiss());
-                      }
-                    }))
-            .withName("Home Mechanisms"));
+    // CommandScheduler.getInstance().schedule(
+    //     Commands.parallel(intake.getD().homeCommand(intake), shooter.getO().homeCommand(shooter))
+    //         .withTimeout(3.0)
+    //         .andThen(
+    //             Commands.runOnce(
+    //                 () -> {
+    //                   boolean intakeOk = intake.getD().isHomed();
+    //                   boolean hoodOk = shooter.getO().isHomed();
+    //                   if (intakeOk && hoodOk) {
+    //                     Elastic.sendNotification(
+    //                         new Elastic.Notification()
+    //                             .withLevel(Elastic.NotificationLevel.INFO)
+    //                             .withTitle("Homing Complete")
+    //                             .withDescription("Intake and hood encoders zeroed")
+    //                             .withDisplaySeconds(3.0));
+    //                   } else {
+    //                     Elastic.sendNotification(
+    //                         new Elastic.Notification()
+    //                             .withLevel(Elastic.NotificationLevel.ERROR)
+    //                             .withTitle("Homing Failed")
+    //                             .withDescription(
+    //                                 (!intakeOk ? "Intake " : "")
+    //                                     + (!hoodOk ? "Hood " : "")
+    //                                     + "limit switch not triggered")
+    //                             .withNoAutoDismiss());
+    //                   }
+    //                 }))
+    //         .withName("Home Mechanisms"));
   }
 
   public void logData() {

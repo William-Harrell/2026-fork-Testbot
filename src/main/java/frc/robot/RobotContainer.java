@@ -171,9 +171,9 @@ public class RobotContainer {
         Commands.startEnd(intake::deployIntakeMechanism, () -> {
         }, intake));
 
-    testerJoystick.retractIntake().onTrue(
-        Commands.startEnd(intake::retractIntakeMechanism, () -> {
-        }, intake));
+    // testerJoystick.retractIntake().onTrue(
+    //     Commands.startEnd(intake::retractIntakeMechanism, () -> {
+    //     }, intake));
 
     testerJoystick.runIntakeForward().whileTrue(
         Commands.startEnd(intake.getR()::runIntake, intake.getR()::stopRollers,

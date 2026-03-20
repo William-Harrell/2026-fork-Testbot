@@ -29,7 +29,7 @@ public class Orientation {
 
   public Orientation(SparkFlex motor, SparkFlex motor2) {
     hoodMotor = motor;
-    hoodMotor2 = motor;
+    hoodMotor2 = motor2;
     hoodEncoder = hoodMotor.getEncoder();
     hoodController = hoodMotor.getClosedLoopController();
     hoodController2 = hoodMotor2.getClosedLoopController();
@@ -50,7 +50,7 @@ public class Orientation {
         .d(ShooterConstants.HOOD_kD);
 
     hoodMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    hoodMotor.configure(config2, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    hoodMotor2.configure(config2, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     limitSwitch = new DigitalInput(ShooterConstants.HOOD_LIMIT_SWITCH_DIO);
     targetPitchAngle = ShooterConstants.PITCH_STOW_ANGLE;

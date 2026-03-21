@@ -35,25 +35,25 @@ public final class OI {
     boolean isMovementCommanded();
   }
 
-  public interface OperatorActionSet {
-    Trigger toggleIntakeOutake();
+  // public interface OperatorActionSet {
+  //   Trigger toggleIntakeOutake();
 
-    // Trigger toggleDeploy();
+  //   // Trigger toggleDeploy();
 
-    Trigger maintainDeployed();
+  //   Trigger maintainDeployed();
 
-    Trigger orientAndShoot(); // UNTESTED
+  //   Trigger orientAndShoot(); // UNTESTED
 
-    Trigger reverseFeeder(); // UNIMPLEMENTED
+  //   Trigger reverseFeeder(); // UNIMPLEMENTED
 
-    Trigger runFlywheel();
+  //   Trigger runFlywheel();
 
-    Trigger setPitchMax(); // UNTESTED
+  //   Trigger setPitchMax(); // UNTESTED
 
-    Trigger setPitchMin(); // UNTESTED
+  //   Trigger setPitchMin(); // UNTESTED
 
-    Trigger setPitchStow(); // UNTESTED
-  }
+  //   Trigger setPitchStow(); // UNTESTED
+  // }
 
   public interface TesterActionSet {
     Trigger runFlywheel();
@@ -124,58 +124,58 @@ public final class OI {
     }
   }
 
-  public static class XboxOperator implements OperatorActionSet {
-    private final CommandXboxController stick;
+  // public static class XboxOperator implements OperatorActionSet {
+  //   private final CommandXboxController stick;
 
-    public XboxOperator(int port) {
-      this.stick = new CommandXboxController(port);
-    }
+  //   public XboxOperator(int port) {
+  //     this.stick = new CommandXboxController(port);
+  //   }
 
-    @Override
-    public Trigger runFlywheel() {
-      return stick.x();
-    }
+  //   @Override
+  //   public Trigger runFlywheel() {
+  //     return stick.x();
+  //   }
 
-    @Override
-    public Trigger toggleIntakeOutake() {
-      return stick.leftBumper();
-    }
+  //   @Override
+  //   public Trigger toggleIntakeOutake() {
+  //     return stick.leftBumper();
+  //   }
 
-    // @Override
-    // public Trigger toggleDeploy() {
-    // return stick.a();
-    // }
+  //   // @Override
+  //   // public Trigger toggleDeploy() {
+  //   // return stick.a();
+  //   // }
 
-    @Override
-    public Trigger maintainDeployed() {
-      return stick.rightTrigger();
-    }
+  //   @Override
+  //   public Trigger maintainDeployed() {
+  //     return stick.rightTrigger();
+  //   }
 
-    @Override // IMPLEMENTED/UNTESTED
-    public Trigger orientAndShoot() {
-      return stick.b();
-    }
+  //   @Override // IMPLEMENTED/UNTESTED
+  //   public Trigger orientAndShoot() {
+  //     return stick.b();
+  //   }
 
-    @Override // UNIMPLEMENTED
-    public Trigger reverseFeeder() {
-      return stick.y();
-    }
+  //   @Override // UNIMPLEMENTED
+  //   public Trigger reverseFeeder() {
+  //     return stick.y();
+  //   }
 
-    @Override
-    public Trigger setPitchMax() {
-      return stick.povUp();
-    }
+  //   @Override
+  //   public Trigger setPitchMax() {
+  //     return stick.povUp();
+  //   }
 
-    @Override
-    public Trigger setPitchMin() {
-      return stick.povDown();
-    }
+  //   @Override
+  //   public Trigger setPitchMin() {
+  //     return stick.povDown();
+  //   }
 
-    @Override
-    public Trigger setPitchStow() {
-      return stick.povLeft();
-    }
-  }
+  //   @Override
+  //   public Trigger setPitchStow() {
+  //     return stick.povLeft();
+  //   }
+  // }
 
   public static class XboxTester implements TesterActionSet {
     private final CommandXboxController stick;

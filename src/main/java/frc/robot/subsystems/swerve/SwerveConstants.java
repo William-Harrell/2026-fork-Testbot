@@ -51,8 +51,8 @@ public final class SwerveConstants {
 
   public static final double FL_ENCODER_OFFSET = 90 + 40.0;
   public static final double FR_ENCODER_OFFSET = 180 + 40.0;
-  public static final double RL_ENCODER_OFFSET = 90 + 40.0;
-  public static final double RR_ENCODER_OFFSET = -90 - 2.0;
+  public static final double RL_ENCODER_OFFSET = 90 + 35.0;
+  public static final double RR_ENCODER_OFFSET = -90 + 3.0;
 
   // DRIVE MOTOR PID - Tuning for wheel speed control
 

@@ -73,7 +73,7 @@ public class Flywheel {
 
     if (rpm == 0) {
       flywheelMotor1.set(0);
-      // flywheelMotor2.set(0);
+      flywheelMotor2.set(0);
       state_machine.set(shooter_state.IDLE);
     } else if (rpm < 0) {
       double targetRPS = rpm / 60.0;

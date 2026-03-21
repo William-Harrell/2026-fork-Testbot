@@ -22,11 +22,13 @@ public final class OI {
 
     double turn();
 
-    Trigger resetGyro();
+    Trigger resetGyroTo();
+
+    Trigger resetGyroAway();
 
     Trigger toggleSpeed();
 
-    Trigger toggleFieldRelative();
+    // Trigger toggleFieldRelative();
 
     Trigger skiStop();
 
@@ -47,7 +49,9 @@ public final class OI {
     Trigger runFlywheel();
 
     Trigger setPitchMax(); // UNTESTED
+
     Trigger setPitchMin(); // UNTESTED
+
     Trigger setPitchStow(); // UNTESTED
   }
 
@@ -62,9 +66,9 @@ public final class OI {
 
     Trigger runIntakeReverse();
 
-    Trigger setPitchMax();
+    // Trigger setPitchMax();
 
-    Trigger setPitchMin();
+    // Trigger setPitchMin();
   }
 
   public static class XboxDriver implements DriverActionSet {
@@ -76,12 +80,12 @@ public final class OI {
 
     @Override
     public double forward() {
-      return deadband(-stick.getLeftY(), OIConstants.JOYSTICK_DEADBAND);
+      return deadband(-stick.getLeftY(), OIConstants.JOYSTICK_DEADBAND) * .65;
     }
 
     @Override
     public double strafe() {
-      return deadband(-stick.getLeftX(), OIConstants.JOYSTICK_DEADBAND);
+      return deadband(-stick.getLeftX(), OIConstants.JOYSTICK_DEADBAND) * .65;
     }
 
     @Override
@@ -95,14 +99,19 @@ public final class OI {
     }
 
     @Override
-    public Trigger resetGyro() {
+    public Trigger resetGyroTo() {
       return stick.povUp();
     }
 
     @Override
-    public Trigger toggleFieldRelative() {
+    public Trigger resetGyroAway() {
       return stick.povDown();
     }
+
+    // @Override
+    // public Trigger toggleFieldRelative() {
+    //   return stick.povDown();
+    // }
 
     @Override
     public Trigger skiStop() {
@@ -200,14 +209,14 @@ public final class OI {
       return stick.rightTrigger();
     }
 
-        @Override
-    public Trigger setPitchMax() {
-      return stick.y();
-    }
+    // @Override
+    // public Trigger setPitchMax() {
+    //   return stick.y();
+    // }
 
-    @Override
-    public Trigger setPitchMin() {
-      return stick.a();
-    }
+    // @Override
+    // public Trigger setPitchMin() {
+    //   return stick.a();
+    // }
   }
 }

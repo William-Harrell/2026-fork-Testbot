@@ -98,7 +98,7 @@ public class SwerveDrive extends SubsystemBase {
    * More intuitive
    * for strafing
    */
-  private boolean fieldRelative = true;
+  private boolean fieldRelative = false;
 
   /**
    * Open-loop vs closed-loop control.
@@ -314,21 +314,21 @@ public class SwerveDrive extends SubsystemBase {
       Translation2d translation, double rotation, boolean fieldRelative, boolean openLoop) {
     ChassisSpeeds speeds;
 
-    if (fieldRelative) {
-      // FIELD-RELATIVE: Adjust for robot's current heading
-      // "Forward" means toward the far end of the field, regardless of robot
-      // orientation
-      speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-          translation.getX(), // Field X velocity
-          translation.getY(), // Field Y velocity
-          rotation, // Rotation velocity
-          getYaw() // Current robot heading (to convert field->robot)
-      );
-    } else {
-      // ROBOT-RELATIVE: No adjustment needed
-      // "Forward" means wherever the robot is facing
-      speeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
-    }
+    // if (fieldRelative) {
+    // // FIELD-RELATIVE: Adjust for robot's current heading
+    // // "Forward" means toward the far end of the field, regardless of robot
+    // // orientation
+    // speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+    // translation.getX(), // Field X velocity
+    // translation.getY(), // Field Y velocity
+    // rotation, // Rotation velocity
+    // getYaw() // Current robot heading (to convert field->robot)
+    // );
+    // } else {
+    // ROBOT-RELATIVE: No adjustment needed
+    // "Forward" means wherever the robot is facing
+    speeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
+    // }
 
     // Pass to the ChassisSpeeds version of drive()
     drive(speeds, openLoop);
@@ -627,8 +627,14 @@ public class SwerveDrive extends SubsystemBase {
    *
    * @return A command that resets the gyro (runs once, instantly)
    */
-  public Command resetGyroCommand() {
+  public Command resetGyroCommandTo() {
     return runOnce(() -> resetYaw(Rotation2d.fromDegrees(180)))
+        .andThen(new InstantCommand(this::resetWheelsForward, this));
+  }
+  
+  // if the robot is pointing away from you when the round starts
+  public Command resetGyroCommandAway() {
+    return runOnce(() -> resetYaw(Rotation2d.fromDegrees(0)))
         .andThen(new InstantCommand(this::resetWheelsForward, this));
   }
 

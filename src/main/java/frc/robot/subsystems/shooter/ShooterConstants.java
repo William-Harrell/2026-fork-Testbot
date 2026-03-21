@@ -92,10 +92,10 @@ public final class ShooterConstants {
   public static final double FLYWHEEL_EFFICIENCY = 0.85;
 
   /** Flywheel stator current limit */
-  public static final int FLYWHEEL_CURRENT_LIMIT = 95; // Amps stator
+  public static final int FLYWHEEL_CURRENT_LIMIT = 100; // Amps stator
 
   /** Flywheel supply current limit (protects battery/breaker) */
-  public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 60; // Amps from battery
+  public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 70; // Amps from battery
 
   /** Ramp rate for closed-loop spinup (seconds from 0 to full output) — limits inrush current */
   public static final double FLYWHEEL_RAMP_RATE = 0.75; // seconds

@@ -93,9 +93,11 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
 
-    driverJoystick.resetGyro().onTrue(swerve.resetGyroCommand());
+    driverJoystick.resetGyroTo().onTrue(swerve.resetGyroCommandTo());
+    driverJoystick.resetGyroAway().onTrue(swerve.resetGyroCommandAway());
 
-    driverJoystick.toggleFieldRelative().onTrue(new InstantCommand(swerve::toggleFieldRelative));
+    // driverJoystick.toggleFieldRelative().onTrue(new
+    // InstantCommand(swerve::toggleFieldRelative));
 
     driverJoystick
         .skiStop()
@@ -185,19 +187,19 @@ public class RobotContainer {
         }, intake.getR()::stopRollers,
             intake));
 
-    testerJoystick.setPitchMax().onTrue(
-        Commands.runOnce(() -> {
-          shooter.getO().setPitchAngle(
-              Math.min(ShooterConstants.PITCH_MAX_ANGLE,
-                  shooter.getO().getTargetPitchAngle() + 5.0));
-        }, shooter));
+    // testerJoystick.setPitchMax().onTrue(
+    // Commands.runOnce(() -> {
+    // shooter.getO().setPitchAngle(
+    // Math.min(ShooterConstants.PITCH_MAX_ANGLE,
+    // shooter.getO().getTargetPitchAngle() + 5.0));
+    // }, shooter));
 
-    testerJoystick.setPitchMin().onTrue(
-        Commands.runOnce(() -> {
-          shooter.getO().setPitchAngle(
-              Math.max(ShooterConstants.PITCH_MIN_ANGLE,
-                  shooter.getO().getTargetPitchAngle() - 5.0));
-        }, shooter));
+    // testerJoystick.setPitchMin().onTrue(
+    // Commands.runOnce(() -> {
+    // shooter.getO().setPitchAngle(
+    // Math.max(ShooterConstants.PITCH_MIN_ANGLE,
+    // shooter.getO().getTargetPitchAngle() - 5.0));
+    // }, shooter));
 
     // testerJoystick.setPitchMin().onTrue(
     // Commands.run(() -> {

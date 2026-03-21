@@ -62,7 +62,7 @@ public final class ShooterConstants {
   // ================================================================
 
   /** Flywheel velocity for scoring (RPM) — tune on real robot */
-  public static final double FLYWHEEL_SHOOT_RPM = 8000.0;
+  public static final double FLYWHEEL_SHOOT_RPM = 6000.0;
 
   /** Flywheel idle/warmup velocity (RPM) */
   public static final double FLYWHEEL_IDLE_RPM = 2000.0;

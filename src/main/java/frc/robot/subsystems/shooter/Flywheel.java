@@ -48,12 +48,12 @@ public class Flywheel {
     config2.CurrentLimits.SupplyCurrentLimit = ShooterConstants.FLYWHEEL_SUPPLY_CURRENT_LIMIT;
     config2.CurrentLimits.SupplyCurrentLimitEnable = true;
     config2.ClosedLoopRamps.VoltageClosedLoopRampPeriod = ShooterConstants.FLYWHEEL_RAMP_RATE;
-    config.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
-    config.Slot0.kI = ShooterConstants.FLYWHEEL_kI;
-    config.Slot0.kD = ShooterConstants.FLYWHEEL_kD;
-    config.Slot0.kV = ShooterConstants.FLYWHEEL_kV;
-    config.Slot0.kS = ShooterConstants.FLYWHEEL_kS;
-    config.Slot0.kA = ShooterConstants.FLYWHEEL_kA;
+    config2.Slot0.kP = ShooterConstants.FLYWHEEL_kP;
+    config2.Slot0.kI = ShooterConstants.FLYWHEEL_kI;
+    config2.Slot0.kD = ShooterConstants.FLYWHEEL_kD;
+    config2.Slot0.kV = ShooterConstants.FLYWHEEL_kV;
+    config2.Slot0.kS = ShooterConstants.FLYWHEEL_kS;
+    config2.Slot0.kA = ShooterConstants.FLYWHEEL_kA;
     config2.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     flywheelMotor2.getConfigurator().apply(config2);
@@ -96,6 +96,10 @@ public class Flywheel {
   /** Spin up the flywheel to shooting speed but backwards. */
   public void spinBack() {
     setFlywheelRPM(-ShooterConstants.FLYWHEEL_SHOOT_RPM);
+  }
+
+  public VelocityVoltage getVelocityVoltage() {
+    return velocityRequest;
   }
 
   /** Spin up the flywheel to idle/warmup speed. */

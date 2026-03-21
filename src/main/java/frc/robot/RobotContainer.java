@@ -73,7 +73,7 @@ public class RobotContainer {
     swerve.setDefaultCommand(teleopDriveCommand);
 
     boolean isRed = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
-    swerve.resetYaw(Rotation2d.fromDegrees(isRed ? 0 : 180));
+    swerve.resetYaw(Rotation2d.fromDegrees(isRed ? 180 : 0));
 
     SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
 

@@ -7,7 +7,6 @@
   },
   "NetworkTables Settings": {
     "mode": "Server",
-    "serverTeam": "3164",
-    "visible": false
+    "serverTeam": "3164"
   }
 }

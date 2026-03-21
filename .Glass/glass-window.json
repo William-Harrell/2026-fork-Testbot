@@ -8,13 +8,13 @@
     "GLOBAL": {
       "font": "Proggy Dotted",
       "fps": "120",
-      "height": "0",
-      "maximized": "0",
+      "height": "1050",
+      "maximized": "1",
       "style": "0",
       "userScale": "2",
-      "width": "0",
-      "xpos": "-32000",
-      "ypos": "-32000"
+      "width": "1536",
+      "xpos": "0",
+      "ypos": "34"
     }
   },
   "Table": {
@@ -39,7 +39,7 @@
     "###NetworkTables Settings": {
       "Collapsed": "0",
       "Pos": "45,45",
-      "Size": "499,211"
+      "Size": "261,32"
     },
     "Debug##Default": {
       "Collapsed": "0",

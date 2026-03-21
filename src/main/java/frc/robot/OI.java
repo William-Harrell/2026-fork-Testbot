@@ -80,12 +80,12 @@ public final class OI {
 
     @Override
     public double forward() {
-      return deadband(-stick.getLeftY(), OIConstants.JOYSTICK_DEADBAND) * .65;
+      return deadband(-stick.getLeftY(), OIConstants.JOYSTICK_DEADBAND) * .45;
     }
 
     @Override
     public double strafe() {
-      return deadband(-stick.getLeftX(), OIConstants.JOYSTICK_DEADBAND) * .65;
+      return deadband(-stick.getLeftX(), OIConstants.JOYSTICK_DEADBAND) * .45;
     }
 
     @Override

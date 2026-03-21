@@ -62,7 +62,7 @@ public final class ShooterConstants {
   // ================================================================
 
   /** Flywheel velocity for scoring (RPM) — tune on real robot */
-  public static final double FLYWHEEL_SHOOT_RPM = 6000.0;
+  public static final double FLYWHEEL_SHOOT_RPM = 8000.0;
 
   /** Flywheel idle/warmup velocity (RPM) */
   public static final double FLYWHEEL_IDLE_RPM = 2000.0;
@@ -92,10 +92,10 @@ public final class ShooterConstants {
   public static final double FLYWHEEL_EFFICIENCY = 0.85;
 
   /** Flywheel stator current limit */
-  public static final int FLYWHEEL_CURRENT_LIMIT = 100; // Amps stator
+  public static final int FLYWHEEL_CURRENT_LIMIT = 120; // Amps stator
 
   /** Flywheel supply current limit (protects battery/breaker) */
-  public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 70; // Amps from battery
+  public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 80; // Amps from battery
 
   /** Ramp rate for closed-loop spinup (seconds from 0 to full output) — limits inrush current */
   public static final double FLYWHEEL_RAMP_RATE = 0.75; // seconds

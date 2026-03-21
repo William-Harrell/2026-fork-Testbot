@@ -105,11 +105,11 @@ public class Shooter extends SubsystemBase {
     }
 
     // Console
-    System.out.println("Flywheel RPM: " + flywheel.getFlywheelRPM());
-    System.out.println("Flywheel Target RPM: " + flywheel.getTargetFlywheelRPM());
-    System.out.println("Flywheel @ Target RPM: " + ((flywheel.isFlywheelAtSpeed()) ? "True" : "False"));
-    System.out.println(flywheel.getVelocityVoltage().toString());
-    System.out.println((hubActive) ? "Hub Active" : "Hub Inactive");
+    // System.out.println("Flywheel RPM: " + flywheel.getFlywheelRPM());
+    // System.out.println("Flywheel Target RPM: " + flywheel.getTargetFlywheelRPM());
+    // System.out.println("Flywheel @ Target RPM: " + ((flywheel.isFlywheelAtSpeed()) ? "True" : "False"));
+    // System.out.println(flywheel.getVelocityVoltage().toString());
+    // System.out.println((hubActive) ? "Hub Active" : "Hub Inactive");
   }
 
   public void prepareShot(double pitchDegrees, double flywheelRPM) {

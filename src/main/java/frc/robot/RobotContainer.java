@@ -33,7 +33,7 @@ public class RobotContainer {
 
   // Instance vars
   private final SwerveDrive swerve;
-  private final Vision vision;
+  // private final Vision vision;
   private final Shooter shooter;
   private final Intake intake;
 
@@ -59,12 +59,15 @@ public class RobotContainer {
 
     dipSwitchSelector = new DipSwitchSelector(); // for choosing auto routine
 
-    vision = new Vision();
-    swerve = new SwerveDrive(vision);
-    shooter = new Shooter(vision, swerve);
+    // vision = new Vision();
+    // swerve = new SwerveDrive(vision);
+    swerve = new SwerveDrive(null);
+    // shooter = new Shooter(vision, swerve);
+    shooter = new Shooter(swerve);
     intake = new Intake();
 
-    superstructure = new Superstructure(swerve, shooter, intake, vision);
+    // superstructure = new Superstructure(swerve, shooter, intake, vision);
+    superstructure = new Superstructure(swerve, shooter, intake);
 
     Command teleopDriveCommand = swerve.teleopCommand(
         () -> applySpeedCurve(driverJoystick.forward()),
@@ -212,7 +215,7 @@ public class RobotContainer {
 
   private void registerAutoRoutines() {
     // TODO - verify auto routines are reliable
-    AutoRoutines.seedPoseFromVision(swerve, vision);
+    // AutoRoutines.seedPoseFromVision(swerve, vision);
     autoChooser.setDefaultOption("0: Do Nothing", AutoRoutines.doNothing());
     /*
      * autoChooser.addOption(
@@ -234,22 +237,22 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    if (USE_DIP_SWITCH) { // amazing addition. thank you. so much.
-      dipSwitchSelector.lockSelection();
-      int selection = dipSwitchSelector.getSelection();
-      return AutoRoutines.getAutoFromSelection(
-          selection, swerve, intake, shooter, vision, null);
-    } else {
+    // if (USE_DIP_SWITCH) { // amazing addition. thank you. so much.
+    //   dipSwitchSelector.lockSelection();
+    //   int selection = dipSwitchSelector.getSelection();
+    //   return AutoRoutines.getAutoFromSelection(
+    //       selection, swerve, intake, shooter, vision, null);
+    // } else {
       return autoChooser.getSelected();
-    }
+    // }
   }
 
   public void onDisabled() {
-    dipSwitchSelector.unlockSelection();
-    hasHomed = false;
+    // dipSwitchSelector.unlockSelection();
+    // hasHomed = false;
   }
 
-  private boolean hasHomed = true;
+  // private boolean hasHomed = true;
 
   public void onEnabled() {
     // if (hasHomed)
@@ -288,8 +291,8 @@ public class RobotContainer {
   }
 
   public void logData() {
-    SmartDashboard.putBoolean("Slow Speed", speedExponent == 2);
-    SmartDashboard.putBoolean("Auto/Using DIP Switch", USE_DIP_SWITCH);
-    dipSwitchSelector.updateDashboard();
+    // SmartDashboard.putBoolean("Slow Speed", speedExponent == 2);
+    // SmartDashboard.putBoolean("Auto/Using DIP Switch", USE_DIP_SWITCH);
+    // dipSwitchSelector.updateDashboard();
   }
 }

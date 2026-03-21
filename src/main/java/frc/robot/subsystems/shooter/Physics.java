@@ -16,13 +16,14 @@ import java.util.Optional;
 public class Physics {
   private double x, y, z;
   private Rotation2d heading;
-  private final Vision vision;
+  // private final Vision vision;
   private final SwerveDrive swerve;
   private double[] hub = new double[2];
   private Alliance alliance;
 
-  public Physics(Vision myV, SwerveDrive mySD) {
-    vision = myV;
+  // public Physics(Vision myV, SwerveDrive mySD) {
+  public Physics(SwerveDrive mySD) {
+    // vision = myV;
     swerve = mySD;
     refreshAlliance();
   }
@@ -107,7 +108,8 @@ public class Physics {
    * @return Angle difference in degrees
    */
   public Optional<Double> robotToHub() {
-    Optional<Pose3d> poseOpt = vision.getPose3d(getRobotPose());
+    // Optional<Pose3d> poseOpt = vision.getPose3d(getRobotPose());
+    Optional<Pose3d> poseOpt = Optional.empty();
     if (poseOpt.isEmpty())
       return Optional.empty();
 
@@ -137,7 +139,8 @@ public class Physics {
       return Optional.empty();
     }
 
-    Optional<Pose3d> poseOpt = vision.getPose3d(robotPose);
+    // Optional<Pose3d> poseOpt = vision.getPose3d(robotPose);
+    Optional<Pose3d> poseOpt = Optional.empty();
     if (poseOpt.isEmpty()) {
       return Optional.empty();
     }
@@ -166,7 +169,8 @@ public class Physics {
       return 0.0;
     }
 
-    Optional<Pose3d> poseOpt = vision.getPose3d(getRobotPose());
+    // Optional<Pose3d> poseOpt = vision.getPose3d(getRobotPose());
+    Optional<Pose3d> poseOpt = Optional.empty();
     if (poseOpt.isEmpty()) {
       return 0.0;
     }
@@ -216,7 +220,8 @@ public class Physics {
     updateHubLocation();
 
     // Try to get vision-based pose
-    Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
+    // Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
+    Optional<Vision.VisionUpdate> visionUpdateOpt = Optional.empty();
 
     if (visionUpdateOpt.isEmpty()) {
       // No vision data - fall back to odometry
@@ -296,7 +301,8 @@ public class Physics {
    * @return true if AprilTags are visible with acceptable ambiguity
    */
   public boolean hasReliableVisionTarget() {
-    Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
+    // Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
+    Optional<Vision.VisionUpdate> visionUpdateOpt = Optional.empty();
 
     if (visionUpdateOpt.isEmpty()) {
       return false;

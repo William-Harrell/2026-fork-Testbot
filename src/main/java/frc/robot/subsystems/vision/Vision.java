@@ -57,7 +57,7 @@ public class Vision extends SubsystemBase {
   /** Called every 20ms by the CommandScheduler via SubsystemBase. Clears the
    *  per-loop vision cache so the next caller gets a fresh read from cameras. */
   public void periodic() {
-    photon.invalidateCache();
+    // photon.invalidateCache();
   }
 
   /*

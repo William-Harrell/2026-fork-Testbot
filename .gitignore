@@ -11,7 +11,6 @@
 .gradle/
 **/build/
 !gradle/wrapper/gradle-wrapper.jar
-!simulator/gradle/wrapper/gradle-wrapper.jar
 
 # Java
 bin/
@@ -21,18 +20,11 @@ bin/
 *.ear
 *.pdb
 
-# WPILib / FRC specific
+# 
 networktables.json
 networktables.json.bck
 simgui*.json
 ctre_sim/
-
-# Simulator subproject — track source, ignore build artifacts
-simulator/.gradle/
-simulator/build/
-simulator/bin/
-simulator/tmp/
-simulator/benchmark_results.json
 
 # Anything in extras
 extras/
@@ -41,6 +33,3 @@ extras/
 .venv/
 __pycache__/
 *.pyc
-
-# Other
-swervepy

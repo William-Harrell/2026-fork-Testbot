@@ -13,10 +13,10 @@ import frc.robot.OI.XboxDriver;
 import frc.robot.OI.XboxTester;
 import frc.robot.auto.AutoRoutines;
 import frc.robot.commands.SwerveCommands;
-// import frc.robot.subsystems.hopper.Hopper;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
+import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.DipSwitchSelector;
@@ -33,6 +33,7 @@ public class RobotContainer {
   // private final Vision vision;
   private final Shooter shooter;
   private final Intake intake;
+  private final Spindexer spindexer;
 
   private final Superstructure superstructure;
 
@@ -61,7 +62,9 @@ public class RobotContainer {
     swerve = new SwerveDrive(null);
     // shooter = new Shooter(vision, swerve);
     shooter = new Shooter(swerve);
+    spindexer = new Spindexer();
     intake = new Intake();
+
 
     // superstructure = new Superstructure(swerve, shooter, intake, vision);
     superstructure = new Superstructure(swerve, shooter, intake);
@@ -157,11 +160,6 @@ public class RobotContainer {
      * Commands.startEnd(hopper::feed, hopper::stop, hopper)));
      * 
      */
-    // operatorJoystick
-    // .reverseFeeder()
-    // .whileTrue(
-    // Commands.parallel(
-    // Commands.startEnd(hopper::reverse, hopper::stop, shooter)));
 
     testerJoystick.runFlywheel().whileTrue(
         Commands.startEnd(
@@ -186,27 +184,6 @@ public class RobotContainer {
           intake.getR().runOuttake();
         }, intake.getR()::stopRollers,
             intake));
-
-    // testerJoystick.setPitchMax().onTrue(
-    // Commands.runOnce(() -> {
-    // shooter.getO().setPitchAngle(
-    // Math.min(ShooterConstants.PITCH_MAX_ANGLE,
-    // shooter.getO().getTargetPitchAngle() + 5.0));
-    // }, shooter));
-
-    // testerJoystick.setPitchMin().onTrue(
-    // Commands.runOnce(() -> {
-    // shooter.getO().setPitchAngle(
-    // Math.max(ShooterConstants.PITCH_MIN_ANGLE,
-    // shooter.getO().getTargetPitchAngle() - 5.0));
-    // }, shooter));
-
-    // testerJoystick.setPitchMin().onTrue(
-    // Commands.run(() -> {
-    // shooter.getO().setPitchAngle(
-    // Math.max(ShooterConstants.PITCH_MIN_ANGLE,
-    // shooter.getO().getActualPitchAngle() - 5.0));
-    // }, shooter));
 
   }
 
@@ -235,12 +212,12 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // if (USE_DIP_SWITCH) { // amazing addition. thank you. so much.
-    //   dipSwitchSelector.lockSelection();
-    //   int selection = dipSwitchSelector.getSelection();
-    //   return AutoRoutines.getAutoFromSelection(
-    //       selection, swerve, intake, shooter, vision, null);
+    // dipSwitchSelector.lockSelection();
+    // int selection = dipSwitchSelector.getSelection();
+    // return AutoRoutines.getAutoFromSelection(
+    // selection, swerve, intake, shooter, vision, null);
     // } else {
-      return autoChooser.getSelected();
+    return autoChooser.getSelected();
     // }
   }
 
@@ -252,38 +229,6 @@ public class RobotContainer {
   // private boolean hasHomed = true;
 
   public void onEnabled() {
-    // if (hasHomed)
-    // return;
-    // hasHomed = true;
-
-    // CommandScheduler.getInstance().schedule(
-    // Commands.parallel(intake.getD().homeCommand(intake),
-    // shooter.getO().homeCommand(shooter))
-    // .withTimeout(3.0)
-    // .andThen(
-    // Commands.runOnce(
-    // () -> {
-    // boolean intakeOk = intake.getD().isHomed();
-    // boolean hoodOk = shooter.getO().isHomed();
-    // if (intakeOk && hoodOk) {
-    // Elastic.sendNotification(
-    // new Elastic.Notification()
-    // .withLevel(Elastic.NotificationLevel.INFO)
-    // .withTitle("Homing Complete")
-    // .withDescription("Intake and hood encoders zeroed")
-    // .withDisplaySeconds(3.0));
-    // } else {
-    // Elastic.sendNotification(
-    // new Elastic.Notification()
-    // .withLevel(Elastic.NotificationLevel.ERROR)
-    // .withTitle("Homing Failed")
-    // .withDescription(
-    // (!intakeOk ? "Intake " : "")
-    // + (!hoodOk ? "Hood " : "")
-    // + "limit switch not triggered")
-    // .withNoAutoDismiss());
-    // }
-    // }))
-    // .withName("Home Mechanisms"));
+    
   }
 }

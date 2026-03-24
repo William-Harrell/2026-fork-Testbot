@@ -3,6 +3,7 @@ package frc.robot;
 
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
+import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
 
@@ -19,6 +20,7 @@ public class Superstructure {
   private final Shooter shooter;
   // private final Vision vision;
   private final Intake intake;
+  private final Spindexer spindexer;
 
   // public Superstructure(SwerveDrive swerve, Shooter shooter, Intake intake, Vision vision) {
   //   this.swerve = swerve;
@@ -29,13 +31,12 @@ public class Superstructure {
   //   // this.rollerbelt = rollerbelt;
   // }
 
-  public Superstructure(SwerveDrive swerve, Shooter shooter, Intake intake) {
+  public Superstructure(SwerveDrive swerve, Shooter shooter, Intake intake, Spindexer spindexer) {
     this.swerve = swerve;
     this.shooter = shooter;
     // this.vision = vision;
     this.intake = intake;
-    // this.hopper = hopper;
-    // this.rollerbelt = rollerbelt;
+    this.spindexer = spindexer;
   }
 
   public SwerveDrive getSwerve() {
@@ -52,5 +53,9 @@ public class Superstructure {
 
   public Intake getIntake() {
     return intake;
+  }
+
+  public Spindexer getSpindexer() {
+    return spindexer;
   }
 }

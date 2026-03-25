@@ -5,9 +5,6 @@ public final class IntakeConstants {
   public static final int DEPLOY_MOTOR_2_ID = 14; // Vortex (SparkFlex)
   public static final int ROLLER_MOTOR_ID = 15; // Kraken X60 (TalonFX)
 
-  // Hex encoder (REV Through Bore, 8192 CPR)
-  public static final int ENCODER_CPR = 8192;
-
   // ---------------------------------------------------------------
   // DEPLOY POSITION CONSTANTS
   // Units: raw SparkFlex encoder rotations (no conversion factor set).

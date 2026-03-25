@@ -9,9 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.OI.XboxDriver;
-// import frc.robot.OI.XboxOperator;
 import frc.robot.OI.XboxTester;
-import frc.robot.auto.AutoRoutines;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.shooter.Shooter;
@@ -19,7 +17,6 @@ import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.util.DipSwitchSelector;
 import frc.robot.util.constants.DrivingConstants;
 
 public class RobotContainer {
@@ -30,7 +27,7 @@ public class RobotContainer {
 
   // Instance vars
   private final SwerveDrive swerve;
-  // private final Vision vision;
+  private final Vision vision;
   private final Shooter shooter;
   private final Intake intake;
   private final Spindexer spindexer;
@@ -39,35 +36,24 @@ public class RobotContainer {
 
   private final SendableChooser<Command> autoChooser;
 
-  private final DipSwitchSelector dipSwitchSelector;
-
-  private static final boolean USE_DIP_SWITCH = false;
-
   private int speedExponent = 1;
 
   public RobotContainer() {
     DriverStation.silenceJoystickConnectionWarning(true);
 
     driverJoystick = new XboxDriver(DrivingConstants.DRIVER_PORT);
-    // operatorJoystick = new XboxOperator(DrivingConstants.OPERATOR_PORT);
     testerJoystick = new XboxTester(DrivingConstants.TESTER_PORT);
 
     autoChooser = new SendableChooser<>();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    dipSwitchSelector = new DipSwitchSelector(); // for choosing auto routine
-
-    // vision = new Vision();
-    // swerve = new SwerveDrive(vision);
-    swerve = new SwerveDrive(null);
-    // shooter = new Shooter(vision, swerve);
-    shooter = new Shooter(swerve);
+    vision = new Vision();
+    swerve = new SwerveDrive(vision);
+    shooter = new Shooter(vision, swerve);
     spindexer = new Spindexer();
     intake = new Intake();
 
-
-    // superstructure = new Superstructure(swerve, shooter, intake, vision);
-    superstructure = new Superstructure(swerve, shooter, intake);
+    superstructure = new Superstructure(swerve, shooter, intake, spindexer, vision);
 
     Command teleopDriveCommand = swerve.teleopCommand(
         () -> applySpeedCurve(driverJoystick.forward()),
@@ -75,8 +61,10 @@ public class RobotContainer {
         () -> applySpeedCurve(driverJoystick.turn()));
     swerve.setDefaultCommand(teleopDriveCommand);
 
-    boolean isRed = DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red;
-    swerve.resetYaw(Rotation2d.fromDegrees(isRed ? 180 : 0));
+    swerve.resetYaw(Rotation2d.fromDegrees(
+        (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red)
+            ? 180
+            : 0));
 
     SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
 
@@ -90,7 +78,7 @@ public class RobotContainer {
     }
 
     double magnitude = Math.pow(Math.abs(input), speedExponent);
-    double sign = (input > 0) ? 1.0 : -1.0; // a famous function
+    double sign = (input > 0) ? 1.0 : -1.0;
     return magnitude * sign;
   }
 
@@ -110,40 +98,6 @@ public class RobotContainer {
         .toggleSpeed()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    // operatorJoystick
-    // .toggleIntakeOutake()
-    // .onTrue(IntakeCommands.toggleDirection(intake));
-
-    // operatorJoystick
-    // .maintainDeployed()
-    // .whileTrue(
-    // IntakeCommands.holdToIntakeCommand(intake));
-
-    // operatorJoystick.runFlywheel().whileTrue(
-    // Commands.startEnd(
-    // shooter.getF()::spinUp,
-    // shooter.getF()::stopFlywheel,
-    // shooter));
-
-    // operatorJoystick.setPitchMax().onTrue(
-    // Commands.run(() -> {
-    // shooter.getO().setPitchAngle(
-    // Math.min(ShooterConstants.PITCH_MAX_ANGLE,
-    // shooter.getO().getActualPitchAngle() + 5.0));
-    // }, shooter));
-
-    // operatorJoystick.setPitchMin().onTrue(
-    // Commands.run(() -> {
-    // shooter.getO().setPitchAngle(
-    // Math.max(ShooterConstants.PITCH_MIN_ANGLE,
-    // shooter.getO().getActualPitchAngle() - 5.0));
-    // }, shooter));
-
-    // operatorJoystick.setPitchStow().onTrue(
-    // Commands.run(() -> {
-    // shooter.getO().setPitchAngle(ShooterConstants.PITCH_STOW_ANGLE);
-    // }, shooter));
-
     /*
      * NEED CAMERAS CALIBRATED: TODO
      * operatorJoystick
@@ -156,8 +110,7 @@ public class RobotContainer {
      * () -> applySpeedCurve(driverJoystick.forward()),
      * () -> applySpeedCurve(driverJoystick.strafe())),
      * ShooterCommands.shootCommand(
-     * superstructure.getShooter(), superstructure.getIntake()),
-     * Commands.startEnd(hopper::feed, hopper::stop, hopper)));
+     * superstructure.getShooter(), superstructure.getIntake())));
      * 
      */
 
@@ -188,26 +141,8 @@ public class RobotContainer {
   }
 
   private void registerAutoRoutines() {
-    // TODO - verify auto routines are reliable
-    // AutoRoutines.seedPoseFromVision(swerve, vision);
-    autoChooser.setDefaultOption("0: Do Nothing", AutoRoutines.doNothing());
-    /*
-     * autoChooser.addOption(
-     * "1: Score & Collect",
-     * Commands.sequence(
-     * AutoRoutines.seedPoseFromVision(swerve, vision),
-     * AutoRoutines.scoreCollectAuto(swerve, intake, shooter, hopper)));
-     * autoChooser.addOption(
-     * "2: Score Only",
-     * Commands.sequence(
-     * AutoRoutines.seedPoseFromVision(swerve, vision),
-     * AutoRoutines.scoreOnlyAuto(swerve, intake, shooter, hopper)));
-     * autoChooser.addOption(
-     * "3: Preload Only",
-     * Commands.sequence(
-     * AutoRoutines.seedPoseFromVision(swerve, vision),
-     * AutoRoutines.preloadOnlyAuto(swerve, intake, shooter, hopper)));
-     */
+    // autoChooser.setDefaultOption(NAME, REF);
+    // autoChooser.addOption(NAME, REF);
   }
 
   public Command getAutonomousCommand() {
@@ -229,6 +164,6 @@ public class RobotContainer {
   // private boolean hasHomed = true;
 
   public void onEnabled() {
-    
+
   }
 }

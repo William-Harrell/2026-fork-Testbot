@@ -23,12 +23,10 @@ public class Shooter extends SubsystemBase {
   // Track hub active state for shift change notifications
   // private boolean lastHubActive = true;
 
-  // public Shooter(Vision vision, SwerveDrive swerve) {
-  public Shooter(SwerveDrive swerve) {
+  public Shooter(Vision vision, SwerveDrive swerve) {
     orientation = new Orientation(new SparkFlex(ShooterConstants.HOOD_MOTOR_ID1, MotorType.kBrushless),
         new SparkFlex(ShooterConstants.HOOD_MOTOR_ID2, MotorType.kBrushless));
-    // physics = new Physics(vision, swerve);
-    physics = new Physics(swerve);
+    physics = new Physics(vision, swerve);
     flywheel = new Flywheel(
         new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_ID),
         new TalonFX(ShooterConstants.FLYWHEEL_MOTOR_2_ID),
@@ -45,11 +43,6 @@ public class Shooter extends SubsystemBase {
     return physics;
   }
 
-  /**
-   * Returns the ShooterState state machine.
-   * Use this to read or set the current shooter phase (IDLE, SPINNING_UP, READY,
-   * SHOOTING, etc.).
-   */
   public ShooterState getState() {
     return state_machine;
   }
@@ -58,69 +51,34 @@ public class Shooter extends SubsystemBase {
     return flywheel;
   }
 
-  private void updateDashboard() {
-    // SmartDashboard.putString("Shooter/State", state_machine.get().toString());
-    // SmartDashboard.putNumber("Shooter/PitchAngle", orientation.getTargetPitchAngle());
-    // SmartDashboard.putNumber("Shooter/FlywheelRPM", flywheel.getFlywheelRPM());
-    // SmartDashboard.putNumber("Shooter/TargetRPM", flywheel.getTargetFlywheelRPM());
-    // SmartDashboard.putBoolean("Shooter/AtSpeed", flywheel.isFlywheelAtSpeed());
-    // SmartDashboard.putBoolean("Shooter/ReadyToShoot", flywheel.isReadyToShoot());
-    // physics.hubDistance().ifPresent(d -> SmartDashboard.putNumber("Shooter/HubDistance", d));
-
-    // SmartDashboard.putBoolean("Shooter/HubActive", physics.isHubActive());
-    // SmartDashboard.putBoolean("Shooter/InAllianceZone", physics.isInAllianceZone());
-
-    // SmartDashboard.putBoolean("Shooter/VisionAvailable", physics.hasReliableVisionTarget());
-    // if (physics.hasReliableVisionTarget()) {
-    //   VisionAimedShot visionShot = physics.calculateOptimalPitchWithVision();
-    //   SmartDashboard.putNumber("Shooter/Vision/RecommendedPitch", visionShot.pitchAngle());
-    //   SmartDashboard.putNumber("Shooter/Vision/TagCount", visionShot.tagCount());
-    //   SmartDashboard.putNumber("Shooter/Vision/Ambiguity", visionShot.ambiguity());
-    //   SmartDashboard.putNumber("Shooter/Vision/Distance", visionShot.distanceToHub());
-    //   SmartDashboard.putBoolean("Shooter/Vision/HighConfidence", visionShot.isHighConfidence());
-    // }
-  }
-
   public void periodic() {
     state_machine.update();
-    // orientation.updateDashboard();
-    // updateDashboard();
 
-    // boolean hubActive = physics.isHubActive();
-    // if (hubActive != lastHubActive) {
-    //   if (hubActive) {
-    //     Elastic.sendNotification(
-    //         new Elastic.Notification()
-    //             .withLevel(Elastic.NotificationLevel.INFO)
-    //             .withTitle("HUB ACTIVE")
-    //             .withDescription("Your hub is now scoring!")
-    //             .withDisplaySeconds(3.0));
-    //   } else {
-    //     Elastic.sendNotification(
-    //         new Elastic.Notification()
-    //             .withLevel(Elastic.NotificationLevel.WARNING)
-    //             .withTitle("HUB INACTIVE")
-    //             .withDescription("Your hub is off — hold fire!")
-    //             .withDisplaySeconds(5.0));
-    //   }
-    //   lastHubActive = hubActive;
-    // }
+    // SmartDashboard
+    SmartDashboard.putString("Shooter/State", state_machine.get().toString());
+    SmartDashboard.putNumber("Shooter/PitchAngle", orientation.getTargetPitchAngle());
+    SmartDashboard.putNumber("Shooter/FlywheelRPM", flywheel.getFlywheelRPM());
+    SmartDashboard.putNumber("Shooter/TargetRPM", flywheel.getTargetFlywheelRPM());
+    SmartDashboard.putBoolean("Shooter/AtSpeed", flywheel.isFlywheelAtSpeed());
+    SmartDashboard.putBoolean("Shooter/ReadyToShoot", flywheel.isReadyToShoot());
+    physics.hubDistance().ifPresent(d -> SmartDashboard.putNumber("Shooter/HubDistance", d));
 
-    // Console
-    // System.out.println("Flywheel RPM: " + flywheel.getFlywheelRPM());
-    // System.out.println("Flywheel Target RPM: " + flywheel.getTargetFlywheelRPM());
-    // System.out.println("Flywheel @ Target RPM: " + ((flywheel.isFlywheelAtSpeed()) ? "True" : "False"));
-    // System.out.println(flywheel.getVelocityVoltage().toString());
-    // System.out.println((hubActive) ? "Hub Active" : "Hub Inactive");
+    SmartDashboard.putBoolean("Shooter/HubActive", physics.isHubActive());
+    SmartDashboard.putBoolean("Shooter/InAllianceZone", physics.isInAllianceZone());
+    SmartDashboard.putBoolean("Shooter/VisionAvailable", physics.hasReliableVisionTarget());
+
+    if (physics.hasReliableVisionTarget()) {
+      VisionAimedShot visionShot = physics.calculateOptimalPitchWithVision();
+      SmartDashboard.putNumber("Shooter/Vision/RecommendedPitch", visionShot.pitchAngle());
+      SmartDashboard.putNumber("Shooter/Vision/TagCount", visionShot.tagCount());
+      SmartDashboard.putNumber("Shooter/Vision/Ambiguity", visionShot.ambiguity());
+      SmartDashboard.putNumber("Shooter/Vision/Distance", visionShot.distanceToHub());
+    }
   }
 
   public void prepareShot(double pitchDegrees, double flywheelRPM) {
     orientation.setPitchAngle(pitchDegrees);
     flywheel.setFlywheelRPM(flywheelRPM);
-  }
-
-  public void prepareDefaultShot() {
-    prepareShot(ShooterConstants.LAUNCH_ANGLE, ShooterConstants.FLYWHEEL_SHOOT_RPM);
   }
 
   public void stop() {

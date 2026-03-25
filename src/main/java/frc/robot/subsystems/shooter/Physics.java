@@ -16,20 +16,26 @@ import java.util.Optional;
 public class Physics {
   private double x, y, z;
   private Rotation2d heading;
-  // private final Vision vision;
+  private final Vision vision;
   private final SwerveDrive swerve;
   private double[] hub = new double[2];
   private Alliance alliance;
 
-  // public Physics(Vision myV, SwerveDrive mySD) {
-  public Physics(SwerveDrive mySD) {
-    // vision = myV;
+  public static VisionAimedShot fallbackData = new VisionAimedShot(
+      0.0,
+      false,
+      0,
+      1.0,
+      0.0);
+
+  public Physics(Vision myV, SwerveDrive mySD) {
+    vision = myV;
     swerve = mySD;
     refreshAlliance();
   }
 
   private void refreshAlliance() {
-    alliance = DriverStation.getAlliance().orElse(ShooterConstants.DEFAULT_ALLIANCE);
+    alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
   }
 
   /** Get robot pose from swerve odometry. */
@@ -79,19 +85,11 @@ public class Physics {
     return false;
   }
 
-  /**
-   * Check if our alliance's hub is currently active (accepting FUEL for points).
-   *
-   * <p>
-   * The FMS broadcasts a game-specific message each period: 'B' = Blue hub
-   * active, 'R' = Red
-   * hub active. Shooting into an inactive hub scores zero points.
-   */
   public boolean isHubActive() {
     refreshAlliance();
     String gameData = DriverStation.getGameSpecificMessage();
-    if (gameData.length() == 0)
-      return true; // No FMS data (practice/testing) — assume active
+    if (gameData.length() == 0) // no data
+      return true;
     char active = gameData.charAt(0);
     return (active == 'B' && alliance.equals(Alliance.Blue))
         || (active == 'R' && alliance.equals(Alliance.Red));
@@ -102,14 +100,9 @@ public class Physics {
     return Rotation2d.fromDegrees(0.0);
   }
 
-  /**
-   * Calculate angle difference between robot and hub.
-   *
-   * @return Angle difference in degrees
-   */
+  // Calculate angle difference between robot and hub.
   public Optional<Double> robotToHub() {
-    // Optional<Pose3d> poseOpt = vision.getPose3d(getRobotPose());
-    Optional<Pose3d> poseOpt = Optional.empty();
+    Optional<Pose3d> poseOpt = vision.getPose3d(getRobotPose());
     if (poseOpt.isEmpty())
       return Optional.empty();
 
@@ -123,24 +116,17 @@ public class Physics {
     return Optional.of(heading.minus(targetAngle).minus(robotToShooter()).getDegrees());
   }
 
-  /**
-   * Calculate distance to hub.
-   *
-   * @return Optional distance in meters, empty if scoring not allowed or no
-   *         vision
-   */
+  // Calculate distance to hub.
   public Optional<Double> hubDistance() {
     refreshAlliance();
     updateHubLocation();
 
-    // Get current pose FIRST so canScore() never reads a stale cached field.
     Pose2d robotPose = getRobotPose();
     if (!canScore(robotPose)) {
       return Optional.empty();
     }
 
-    // Optional<Pose3d> poseOpt = vision.getPose3d(robotPose);
-    Optional<Pose3d> poseOpt = Optional.empty();
+    Optional<Pose3d> poseOpt = vision.getPose3d(robotPose);
     if (poseOpt.isEmpty()) {
       return Optional.empty();
     }
@@ -157,20 +143,15 @@ public class Physics {
     return Optional.of(a.getDistance(b));
   }
 
-  /**
-   * Calculate required launch velocity based on distance.
-   *
-   * @return Required velocity in m/s, or 0 if shot not possible
-   */
-  public double getRequiredVelocity() {
+  // Self-explanatory
+  public double getRequiredVelocity(double pitch) {
     Optional<Double> dx_proxy = hubDistance();
 
     if (dx_proxy.isEmpty()) {
       return 0.0;
     }
 
-    // Optional<Pose3d> poseOpt = vision.getPose3d(getRobotPose());
-    Optional<Pose3d> poseOpt = Optional.empty();
+    Optional<Pose3d> poseOpt = vision.getPose3d(getRobotPose());
     if (poseOpt.isEmpty()) {
       return 0.0;
     }
@@ -181,27 +162,9 @@ public class Physics {
     double dx = dx_proxy.get();
     double dy = ShooterConstants.HUB_RIM_HEIGHT - (z + ShooterConstants.Z_OFFSET);
     double g = ShooterConstants.G_ACCEL;
-    double theta = Math.toRadians(ShooterConstants.LAUNCH_ANGLE);
+    double theta = Math.toRadians(pitch);
 
     return dx / Math.cos(theta) * Math.sqrt(g / 2 * (-dy + dx * Math.tan(theta)));
-  }
-
-  /**
-   * Calculate optimal pitch angle for current position. This is a simplified
-   * calculation - adjust
-   * based on testing.
-   *
-   * @return Optimal pitch angle in degrees
-   */
-  public double calculateOptimalPitch() {
-    Optional<Double> distanceOpt = hubDistance();
-
-    if (distanceOpt.isEmpty()) {
-      return ShooterConstants.LAUNCH_ANGLE;
-    }
-
-    double distance = distanceOpt.get();
-    return calculatePitchFromDistance(distance);
   }
 
   /**
@@ -219,20 +182,10 @@ public class Physics {
   public VisionAimedShot calculateOptimalPitchWithVision() {
     updateHubLocation();
 
-    // Try to get vision-based pose
-    // Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
-    Optional<Vision.VisionUpdate> visionUpdateOpt = Optional.empty();
+    Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
 
     if (visionUpdateOpt.isEmpty()) {
-      // No vision data - fall back to odometry
-      double odometryPitch = calculateOptimalPitch();
-      return new VisionAimedShot(
-          odometryPitch,
-          false, // not vision-assisted
-          0, // no tags
-          1.0, // max ambiguity (no confidence)
-          0.0, // unknown distance
-          "No AprilTags detected - using odometry");
+      return fallbackData;
     }
 
     Vision.VisionUpdate visionUpdate = visionUpdateOpt.get();
@@ -245,28 +198,13 @@ public class Physics {
     double dx = hub[0] - visionX;
     double dy = hub[1] - visionY;
     double horizontalDistance = Math.sqrt(dx * dx + dy * dy);
-
-    // Calculate vertical component for more accurate pitch
     double dz = ShooterConstants.HUB_RIM_HEIGHT - (visionZ + ShooterConstants.Z_OFFSET);
 
-    // Use physics-based pitch calculation when we have good vision data
     double pitch;
     if (visionUpdate.tagCount() >= 2 && visionUpdate.avgAmbiguity() < 0.2) {
-      // High confidence - use physics-based calculation
       pitch = calculatePitchPhysics(horizontalDistance, dz);
     } else {
-      // Lower confidence - use interpolation table
-      pitch = calculatePitchFromDistance(horizontalDistance);
-    }
-
-    // Determine confidence level
-    String confidence;
-    if (visionUpdate.tagCount() >= 2 && visionUpdate.avgAmbiguity() < 0.15) {
-      confidence = "HIGH - Multiple tags, low ambiguity";
-    } else if (visionUpdate.tagCount() >= 1 && visionUpdate.avgAmbiguity() < 0.3) {
-      confidence = "MEDIUM - Vision-assisted";
-    } else {
-      confidence = "LOW - High ambiguity, verify manually";
+      return fallbackData;
     }
 
     return new VisionAimedShot(
@@ -274,8 +212,7 @@ public class Physics {
         true,
         visionUpdate.tagCount(),
         visionUpdate.avgAmbiguity(),
-        horizontalDistance,
-        confidence);
+        horizontalDistance);
   }
 
   /**
@@ -301,8 +238,7 @@ public class Physics {
    * @return true if AprilTags are visible with acceptable ambiguity
    */
   public boolean hasReliableVisionTarget() {
-    // Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
-    Optional<Vision.VisionUpdate> visionUpdateOpt = Optional.empty();
+    Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
 
     if (visionUpdateOpt.isEmpty()) {
       return false;
@@ -310,36 +246,6 @@ public class Physics {
 
     Vision.VisionUpdate update = visionUpdateOpt.get();
     return update.tagCount() >= 1 && update.avgAmbiguity() < 0.4;
-  }
-
-  /**
-   * Calculate pitch angle from horizontal distance using interpolation. Tune
-   * these values based on
-   * testing.
-   *
-   * @param distance Horizontal distance to hub in meters
-   * @return Pitch angle in degrees
-   */
-  private double calculatePitchFromDistance(double distance) {
-    // Interpolation table — tune based on testing.
-    // closeAngle is capped at PITCH_MAX_ANGLE (56.5°) because the hood cannot
-    // physically exceed that angle. Previously this was 70°, which was silently
-    // clamped by setPitchAngle() with no indication that close shots were
-    // inaccurate.
-    double minDistance = 2.0; // meters
-    double maxDistance = 8.0; // meters
-    double closeAngle = ShooterConstants.PITCH_MAX_ANGLE; // degrees — was 70, which exceeded hardware limit
-    double farAngle = 35.0; // degrees for far shots
-
-    if (distance <= minDistance) {
-      return closeAngle;
-    } else if (distance >= maxDistance) {
-      return farAngle;
-    }
-
-    // Linear interpolation
-    double t = (distance - minDistance) / (maxDistance - minDistance);
-    return closeAngle + t * (farAngle - closeAngle);
   }
 
   /**
@@ -394,16 +300,13 @@ public class Physics {
       boolean visionAssisted, // True if AprilTags were used
       int tagCount, // Number of AprilTags detected
       double ambiguity, // Vision ambiguity (0 = perfect, 1 = bad)
-      double distanceToHub, // Calculated distance to hub in meters
-      String confidenceDescription // Human-readable confidence level
+      double distanceToHub // Calculated distance to hub in meters
   ) {
-    /** Check if this shot has high confidence. */
-    public boolean isHighConfidence() {
+    public boolean isGreatShot() {
       return visionAssisted && tagCount >= 2 && ambiguity < 0.2;
     }
 
-    /** Check if this shot should be taken automatically. */
-    public boolean isSafeForAutoShot() {
+    public boolean isGoodShot() {
       return visionAssisted && tagCount >= 1 && ambiguity < 0.3;
     }
   }

@@ -1,4 +1,4 @@
-package frc.robot.auto;
+package frc.robot.auto.pathfinding;
 
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.path.GoalEndState;
@@ -25,7 +25,7 @@ public final class CSPPathing {
   private static final double SAMPLE_DT = 0.02; // seconds
   private static final double AUTO_CONTROL_DISTANCE_FACTOR = 0.25;
   private static final double CURVATURE_WEIGHT = 2.0;
-  private static final double SEGMENT_SAMPLE_METERS = 0.05;
+  // private static final double SEGMENT_SAMPLE_METERS = 0.05;
   private static final double CURV_EPS_DIST = 1e-4;
 
   private static final double PATH_ERROR_METERS = 0.5;

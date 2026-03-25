@@ -7,12 +7,17 @@
 .vscode/
 *.iml
 
+.Glass/
 README.md
 
 # Gradle
 .gradle/
 **/build/
 !gradle/wrapper/gradle-wrapper.jar
+
+.github/workflows/
+
+orangepi/**
 
 # Java
 bin/

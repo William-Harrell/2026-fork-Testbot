@@ -7,6 +7,8 @@
 .vscode/
 *.iml
 
+README.md
+
 # Gradle
 .gradle/
 **/build/

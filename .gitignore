@@ -17,8 +17,6 @@ README.md
 
 .github/workflows/
 
-orangepi/**
-
 # Java
 bin/
 *.class

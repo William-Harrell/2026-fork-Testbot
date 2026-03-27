@@ -10,7 +10,7 @@ public final class OI {
   private OI() {
   }
 
-  public static double deadband(double value, double band) {
+  private static double deadband(double value, double band) {
     return Math.abs(value) > band ? value : 0;
   }
 
@@ -98,15 +98,5 @@ public final class OI {
     public Trigger runIntakeReverse() {
       return stick.rightTrigger();
     }
-
-    // @Override
-    // public Trigger setPitchMax() {
-    //   return stick.y();
-    // }
-
-    // @Override
-    // public Trigger setPitchMin() {
-    //   return stick.a();
-    // }
   }
 }

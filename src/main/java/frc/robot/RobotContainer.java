@@ -12,10 +12,10 @@ import frc.robot.OI.XboxDriver;
 import frc.robot.OI.XboxTester;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.shooter.Shooter;
 import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.constants.DrivingConstants;
 
@@ -28,7 +28,7 @@ public class RobotContainer {
   // Instance vars
   private final SwerveDrive swerve;
   private final Vision vision;
-  private final Shooter shooter;
+  private final Turret turret;
   private final Intake intake;
   private final Spindexer spindexer;
 
@@ -49,11 +49,11 @@ public class RobotContainer {
 
     vision = new Vision();
     swerve = new SwerveDrive(vision);
-    shooter = new Shooter(vision, swerve);
+    turret = new Turret(vision);
     spindexer = new Spindexer();
     intake = new Intake();
 
-    superstructure = new Superstructure(swerve, shooter, intake, spindexer, vision);
+    superstructure = new Superstructure(swerve, turret, intake, spindexer, vision);
 
     Command teleopDriveCommand = swerve.teleopCommand(
         () -> applySpeedCurve(driverJoystick.forward()),
@@ -83,7 +83,7 @@ public class RobotContainer {
   }
 
   private void configureButtonBindings() {
-
+    // DRIVER
     driverJoystick.resetGyroTo().onTrue(swerve.resetGyroCommandTo());
     driverJoystick.resetGyroAway().onTrue(swerve.resetGyroCommandAway());
 
@@ -98,27 +98,12 @@ public class RobotContainer {
         .toggleSpeed()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    /*
-     * NEED CAMERAS CALIBRATED: TODO
-     * operatorJoystick
-     * .orientAndShoot()
-     * .whileTrue(
-     * Commands.parallel(
-     * new SwerveCommands.OrientToHubCommand(
-     * swerve,
-     * shooter.getP(),
-     * () -> applySpeedCurve(driverJoystick.forward()),
-     * () -> applySpeedCurve(driverJoystick.strafe())),
-     * ShooterCommands.shootCommand(
-     * superstructure.getShooter(), superstructure.getIntake())));
-     * 
-     */
-
+    // "TESTER"
     testerJoystick.runFlywheel().whileTrue(
         Commands.startEnd(
-            () -> shooter.getF().setFlywheelRPM(ShooterConstants.FLYWHEEL_SHOOT_RPM),
-            shooter.getF()::stopFlywheel,
-            shooter));
+            turret.getF()::spinUp,
+            turret.getF()::stop,
+            turret));
 
     testerJoystick.deployIntake().onTrue(
         Commands.startEnd(intake::deployIntakeMechanism, () -> {
@@ -146,7 +131,7 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // if (USE_DIP_SWITCH) { // amazing addition. thank you. so much.
+    // if (USE_DIP_SWITCH) {
     // dipSwitchSelector.lockSelection();
     // int selection = dipSwitchSelector.getSelection();
     // return AutoRoutines.getAutoFromSelection(
@@ -158,10 +143,7 @@ public class RobotContainer {
 
   public void onDisabled() {
     // dipSwitchSelector.unlockSelection();
-    // hasHomed = false;
   }
-
-  // private boolean hasHomed = true;
 
   public void onEnabled() {
 

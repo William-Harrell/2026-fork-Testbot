@@ -6,9 +6,11 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.turret.TurretState.turret_state;
+import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.Vision;
 
 public class Turret extends SubsystemBase {
+    private final Limelight limelight;
     private final Vision vision;
 
     // Sub-subsystems
@@ -22,6 +24,7 @@ public class Turret extends SubsystemBase {
 
     public Turret(Vision vision) {
         this.vision = vision;
+        this.limelight = vision.getL();
 
         flywheel = new Flywheel(new TalonFX(TurretConstants.FLYWHEEL_MOTOR_1_ID));
 
@@ -81,5 +84,13 @@ public class Turret extends SubsystemBase {
         }
 
         // Update angles & encoders here
+    }
+
+    public Flywheel getF() {
+        return flywheel;
+    }
+
+    public turret_state getState() {
+        return state.get();
     }
 }

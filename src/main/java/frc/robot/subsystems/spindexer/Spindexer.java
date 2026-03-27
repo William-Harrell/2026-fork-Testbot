@@ -35,4 +35,12 @@ public class Spindexer {
             }
         }
     }
+
+    public Spinner getS() {
+        return spinner;
+    }
+
+    public spindexer_state getState() {
+        return state.get();
+    }
 }

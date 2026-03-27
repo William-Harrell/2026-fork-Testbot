@@ -6,10 +6,7 @@ import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.vision.templates.VisionUpdate;
-
-import java.awt.Desktop;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Optional;
 
 public class Vision extends SubsystemBase {
@@ -18,7 +15,7 @@ public class Vision extends SubsystemBase {
   private final Limelight limelight;
 
   public Vision() {
-            AprilTagFieldLayout layout = null;
+    AprilTagFieldLayout layout = null;
     try {
       layout = new AprilTagFieldLayout(
           Filesystem.getDeployDirectory().toPath().resolve("2026-rebuilt-welded.json"));
@@ -67,19 +64,5 @@ public class Vision extends SubsystemBase {
   // Parameter is odometry
   public Optional<VisionUpdate> getBestVisionUpdateRaw(Pose2d robotPose) {
     return photon.getBestVisionUpdate(robotPose);
-  }
-
-  public void openPhotonHub() {
-    try {
-            String url = "https://www.example.com";
-            Desktop.getDesktop().browse(new URI(url));
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-  }
-
-  public void openLimelightHub() {
-
   }
 }

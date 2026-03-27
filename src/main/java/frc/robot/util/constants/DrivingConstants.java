@@ -57,9 +57,5 @@ public final class DrivingConstants {
     Trigger runIntakeForward();
 
     Trigger runIntakeReverse();
-
-    // Trigger setPitchMax();
-
-    // Trigger setPitchMin();
   }
 }

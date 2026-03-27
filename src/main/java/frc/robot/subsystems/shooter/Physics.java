@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.templates.VisionUpdate;
 import frc.robot.util.constants.FieldConstants;
 import java.util.Optional;
 
@@ -182,13 +183,13 @@ public class Physics {
   public VisionAimedShot calculateOptimalPitchWithVision() {
     updateHubLocation();
 
-    Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
+    Optional<VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
 
     if (visionUpdateOpt.isEmpty()) {
       return fallbackData;
     }
 
-    Vision.VisionUpdate visionUpdate = visionUpdateOpt.get();
+    VisionUpdate visionUpdate = visionUpdateOpt.get();
 
     // Calculate distance to hub using vision pose
     double visionX = visionUpdate.pose3d().getX();
@@ -238,13 +239,13 @@ public class Physics {
    * @return true if AprilTags are visible with acceptable ambiguity
    */
   public boolean hasReliableVisionTarget() {
-    Optional<Vision.VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
+    Optional<VisionUpdate> visionUpdateOpt = vision.getP().getBestVisionUpdate(getRobotPose());
 
     if (visionUpdateOpt.isEmpty()) {
       return false;
     }
 
-    Vision.VisionUpdate update = visionUpdateOpt.get();
+    VisionUpdate update = visionUpdateOpt.get();
     return update.tagCount() >= 1 && update.avgAmbiguity() < 0.4;
   }
 

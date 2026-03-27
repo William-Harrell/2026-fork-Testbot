@@ -1,6 +1,6 @@
 package frc.robot.subsystems.vision;
 
-import frc.robot.subsystems.vision.Vision.VisionUpdate;
+import frc.robot.subsystems.vision.templates.VisionUpdate;
 import java.util.List;
 import java.util.Optional;
 

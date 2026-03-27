@@ -14,7 +14,7 @@ public final class OI {
     return Math.abs(value) > band ? value : 0;
   }
 
-  public static class XboxDriver implements DriverActionSet {
+  public static class XboxDriver implements DrivingConstants.DriverActionSet {
     private final CommandXboxController stick;
 
     public XboxDriver(int port) {
@@ -67,7 +67,7 @@ public final class OI {
     }
   }
 
-  public static class XboxTester implements TesterActionSet {
+  public static class XboxTester implements DrivingConstants.TesterActionSet {
     private final CommandXboxController stick;
 
     public XboxTester(int port) {

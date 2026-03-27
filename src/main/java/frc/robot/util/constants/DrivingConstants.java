@@ -1,6 +1,7 @@
 package frc.robot.util.constants;
 
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.swerve.SwerveConstants;
 
 public final class DrivingConstants {
   // Controller stuff
@@ -18,7 +19,7 @@ public final class DrivingConstants {
   public static final double DRIVE_MAX_ACC = 3.0;
 
   // radians & seconds
-  public static final double TURN_MAX_VEL = MAX_ANGULAR_VELOCITY;
+  public static final double TURN_MAX_VEL = SwerveConstants.MAX_ANGULAR_VELOCITY;
   public static final double TURN_MAX_ACC = 12.0;
   //
   //

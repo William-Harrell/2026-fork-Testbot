@@ -1,23 +1,64 @@
 package frc.robot.util.constants;
 
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 public final class DrivingConstants {
+  // Controller stuff
   public static final int DRIVER_PORT = 0;
-  public static final int OPERATOR_PORT = 1;
-  public static final int TESTER_PORT = 2;
+  public static final int TESTER_PORT = 1;
 
-  // OPEN_LOOP = true → motors receive % duty cycle directly (faster response, less precise).
-  // Set to false to enable closed-loop velocity control (needed for accurate auto path following).
-  // Must re-characterize SwerveConstants drive PID gains (currently zeroed) before disabling.
-  public static final boolean OPEN_LOOP = true;
+  public static final double JOYSTICK_DEADBAND = 0.1;
 
-  public static final double NORMAL_SPEED_MULTIPLIER = 1.0; // Scale according to joystick
-  public static final double SLOW_SPEED_MULTIPLIER = 0.3;
+  public static final boolean OPEN_LOOP = false;
+  //
+  //
+  // CSPathing path constraints
+  // meters & seconds
+  public static final double DRIVE_MAX_VEL = SwerveConstants.MAX_SPEED;
+  public static final double DRIVE_MAX_ACC = 3.0;
 
-  // Path constraint values — used by AutoSetup.configure() to set CSPPathing's PathConstraints.
-  // Match SwerveConstants.MAX_SPEED / MAX_ANGULAR_VELOCITY — tune acceleration on real robot
-  public static final double DRIVE_MAX_VEL = 4.2; // m/s
-  public static final double DRIVE_MAX_ACC = 3.0; // m/s²
+  // radians & seconds
+  public static final double TURN_MAX_VEL = MAX_ANGULAR_VELOCITY;
+  public static final double TURN_MAX_ACC = 12.0;
+  //
+  //
+  // Action Sets
+  public interface DriverActionSet {
 
-  public static final double TURN_MAX_VEL = 9.547; // rad/s
-  public static final double TURN_MAX_ACC = 12.0; // rad/s²
+    double forward();
+
+    double strafe();
+
+    double turn();
+
+    Trigger resetGyroTo();
+
+    Trigger resetGyroAway();
+
+    Trigger toggleSpeed();
+
+    // Trigger toggleFieldRelative();
+
+    Trigger skiStop();
+
+    boolean isMovementCommanded();
+  }
+  //
+  //
+  //
+  public interface TesterActionSet {
+    Trigger runFlywheel();
+
+    Trigger deployIntake();
+
+    Trigger retractIntake();
+
+    Trigger runIntakeForward();
+
+    Trigger runIntakeReverse();
+
+    // Trigger setPitchMax();
+
+    // Trigger setPitchMin();
+  }
 }

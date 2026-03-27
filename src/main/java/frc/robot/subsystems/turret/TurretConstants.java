@@ -42,12 +42,14 @@ public final class TurretConstants {
 
   public static final double FLYWHEEL_RAMP_RATE = 0.75; // seconds (0, 1]
 
-  public static final double FLYWHEEL_kP = 0.2;
-  public static final double FLYWHEEL_kI = 0.0;
-  public static final double FLYWHEEL_kD = 0.0005;
-  public static final double FLYWHEEL_kS = 0.15;
-  public static final double FLYWHEEL_kA = 0.015;
-  public static final double FLYWHEEL_kV = 12 / FLYWHEEL_SHOT_VELOCITY * 60;
+  // Look these up if you're interested.
+  // It's called PID control. It's for error correction & smoothing.
+  public static final double FLYWHEEL_kP = 0.2; // Proportional Gain
+  public static final double FLYWHEEL_kI = 0.0; // Integral Gain
+  public static final double FLYWHEEL_kD = 0.0005; // Derivative Gain
+  public static final double FLYWHEEL_kS = 0.15; // Signum Gain (static friction)
+  public static final double FLYWHEEL_kA = 0.015; // Acceleration Gain
+  public static final double FLYWHEEL_kV = 12 / FLYWHEEL_SHOT_VELOCITY * 60; // Velocity Gain
 
   public static final int FLYWHEEL_STATOR_CURRENT_LIMIT = 120; // Amps stator
   public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 80; // Amps from battery

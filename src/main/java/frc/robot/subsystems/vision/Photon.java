@@ -4,8 +4,10 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.subsystems.vision.Config.CameraConfig;
-import frc.robot.subsystems.vision.Vision.VisionUpdate;
+import frc.robot.subsystems.vision.templates.Config;
+import frc.robot.subsystems.vision.templates.VisionUpdate;
+import frc.robot.subsystems.vision.templates.Config.CameraConfig;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

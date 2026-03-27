@@ -1,15 +1,12 @@
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Pose3d;
+
 public class Limelight {
     private String name;
 
     public Limelight(String n) {
-        name = n; // Stored first so all reads below use the correct camera name.
-
-        // double txnc = LimelightHelpers.getTXNC(name);
-        // double tync = LimelightHelpers.getTYNC(name);
-
-        // Switch to pipeline 0
+        name = n;
         LimelightHelpers.setPipelineIndex(name, 0);
     }
 
@@ -17,4 +14,9 @@ public class Limelight {
         return LimelightHelpers.getTV(name);
     }
 
+    public Pose3d getCFrame() {
+        // X, Y, Z, & Rotation
+        // 0 degrees rot is facing camera
+        return LimelightHelpers.getCameraPose3d_TargetSpace(name);
+    }
 }

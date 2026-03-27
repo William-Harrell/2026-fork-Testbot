@@ -12,7 +12,6 @@ import frc.robot.OI.XboxDriver;
 import frc.robot.OI.XboxTester;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.shooter.ShooterConstants;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.swerve.SwerveDrive;
 import frc.robot.subsystems.turret.Turret;
@@ -20,56 +19,62 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.constants.DrivingConstants;
 
 public class RobotContainer {
-
+  // Controllers
   private final XboxDriver driverJoystick;
-  // private final XboxOperator operatorJoystick;
   private final XboxTester testerJoystick;
-
-  // Instance vars
+  
+  // Auto
+  private final SendableChooser<Command> autoChooser;
+  
+  // Swerve
+  private int speedExponent = 1;
+  
+  // Subsystems
   private final SwerveDrive swerve;
   private final Vision vision;
   private final Turret turret;
   private final Intake intake;
   private final Spindexer spindexer;
 
-  private final Superstructure superstructure;
-
-  private final SendableChooser<Command> autoChooser;
-
-  private int speedExponent = 1;
-
   public RobotContainer() {
+    // Controllers
     DriverStation.silenceJoystickConnectionWarning(true);
-
     driverJoystick = new XboxDriver(DrivingConstants.DRIVER_PORT);
     testerJoystick = new XboxTester(DrivingConstants.TESTER_PORT);
 
+    // Auto
     autoChooser = new SendableChooser<>();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
+    // Subsystems
     vision = new Vision();
     swerve = new SwerveDrive(vision);
     turret = new Turret(vision);
     spindexer = new Spindexer();
     intake = new Intake();
+    
+    // Init methods
+    setupDrive();
+    configureButtonBindings();
+    registerAutoRoutines();
+  }
 
-    superstructure = new Superstructure(swerve, turret, intake, spindexer, vision);
-
+  // On container init
+  private void setupDrive() {
+    // Drive command
     Command teleopDriveCommand = swerve.teleopCommand(
         () -> applySpeedCurve(driverJoystick.forward()),
         () -> applySpeedCurve(driverJoystick.strafe()),
         () -> applySpeedCurve(driverJoystick.turn()));
     swerve.setDefaultCommand(teleopDriveCommand);
 
+    // Gyro
     swerve.resetYaw(Rotation2d.fromDegrees(
         (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red)
             ? 180
             : 0));
 
     SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
-
-    configureButtonBindings();
-    registerAutoRoutines();
   }
 
   private double applySpeedCurve(double input) {

@@ -8,8 +8,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.OI.XboxDriver;
-import frc.robot.OI.XboxTester;
+import frc.robot.OI.XboxOperator;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.spindexer.Spindexer;
@@ -21,7 +22,7 @@ import frc.robot.util.constants.DrivingConstants;
 public class RobotContainer {
   // Controllers
   private final XboxDriver driverJoystick;
-  private final XboxTester testerJoystick;
+  private final XboxOperator operatorJoystick;
 
   // Auto
   private final SendableChooser<Command> autoChooser;
@@ -40,7 +41,7 @@ public class RobotContainer {
     // Controllers
     DriverStation.silenceJoystickConnectionWarning(true);
     driverJoystick = new XboxDriver(DrivingConstants.DRIVER_PORT);
-    testerJoystick = new XboxTester(DrivingConstants.TESTER_PORT);
+    operatorJoystick = new XboxOperator(DrivingConstants.TESTER_PORT);
 
     // Auto
     autoChooser = new SendableChooser<>();
@@ -101,14 +102,14 @@ public class RobotContainer {
         .toggleSpeed()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    // "TESTER"
-    testerJoystick.runFlywheel().whileTrue(
+    // OPERATOR
+    operatorJoystick.runFlywheel().whileTrue(
         Commands.startEnd(
             turret.getF()::spinUp,
             turret.getF()::stop,
             turret));
 
-    testerJoystick.deployIntake().onTrue(
+    operatorJoystick.deployIntake().onTrue(
         Commands.startEnd(intake::deployIntakeMechanism, () -> {
         }, intake));
 
@@ -116,15 +117,20 @@ public class RobotContainer {
     // Commands.startEnd(intake::retractIntakeMechanism, () -> {
     // }, intake));
 
-    testerJoystick.runIntakeForward().whileTrue(
+    operatorJoystick.runIntakeForward().whileTrue(
         Commands.startEnd(intake.getR()::runIntake, intake.getR()::stopRollers,
             intake));
 
-    testerJoystick.runIntakeReverse().whileTrue(
+    operatorJoystick.runIntakeReverse().whileTrue(
         Commands.startEnd(() -> {
           intake.getR().runOuttake();
         }, intake.getR()::stopRollers,
             intake));
+
+    operatorJoystick.chatClipThat().onTrue(
+        new RunCommand(() -> {
+          vision.getL().rewindRecord(5);
+        }, vision));
 
   }
 

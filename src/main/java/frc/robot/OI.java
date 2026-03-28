@@ -67,10 +67,10 @@ public final class OI {
     }
   }
 
-  public static class XboxTester implements DrivingConstants.TesterActionSet {
+  public static class XboxOperator implements DrivingConstants.OperatorActionSet {
     private final CommandXboxController stick;
 
-    public XboxTester(int port) {
+    public XboxOperator(int port) {
       stick = new CommandXboxController(port);
     }
 
@@ -97,6 +97,11 @@ public final class OI {
     @Override
     public Trigger runIntakeReverse() {
       return stick.rightTrigger();
+    }
+
+    @Override
+    public Trigger chatClipThat() {
+      return stick.povLeft();
     }
   }
 }

@@ -47,7 +47,7 @@ public final class DrivingConstants {
   //
   //
   //
-  public interface TesterActionSet {
+  public interface OperatorActionSet {
     Trigger runFlywheel();
 
     Trigger deployIntake();
@@ -57,5 +57,7 @@ public final class DrivingConstants {
     Trigger runIntakeForward();
 
     Trigger runIntakeReverse();
+
+    Trigger chatClipThat();
   }
 }

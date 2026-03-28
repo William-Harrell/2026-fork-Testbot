@@ -8,7 +8,7 @@ public final class TurretConstants {
   // ^ "Motors are moving, but how much of that is transferred to the ball?"
   //
   //
-  // Yaw
+  // Yaw'll
   public static final double YAW_TOLERANCE = 2.0 + 1.5; // degrees
   public static final double MAX_YAW = 300 - YAW_TOLERANCE;
   public static final double MIN_YAW = 0.0 + YAW_TOLERANCE;

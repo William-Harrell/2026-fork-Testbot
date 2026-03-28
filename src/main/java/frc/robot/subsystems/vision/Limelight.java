@@ -13,7 +13,8 @@ public class Limelight {
     public Limelight(String n) {
         name = n;
         LimelightHelpers.setPipelineIndex(name, 0);
-        pose_cache = getPose3d();
+        LimelightHelpers.setRewindEnabled(name, true);
+        pose_cache = getPose3d().get();
     }
 
     public boolean hasTarget() {
@@ -28,19 +29,23 @@ public class Limelight {
         return Optional.of(pose_cache);
     }
 
-    public Pose3d getPose3d() {
+    public Optional<Pose3d> getPose3d() {
         var results = getResults();
 
         if (results.targets_Fiducials.length <= 0) {
-            return pose_cache;
+            return Optional.of(pose_cache);
         }
         // X, Y, Z, & Rotation
         // 0 degrees rot is facing camera
-        
+
         var tag = results.targets_Fiducials[0]; // best tag
         Pose3d new_pose = tag.getCameraPose_TargetSpace();
 
         pose_cache = new_pose;
-        return new_pose;
+        return Optional.of(new_pose);
+    }
+
+    public void rewindRecord(double time) {
+        LimelightHelpers.triggerRewindCapture(name, time);
     }
 }

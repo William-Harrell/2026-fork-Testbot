@@ -34,7 +34,7 @@ public class Physics {
 
         // Rhys' math
 
-        return theta;
+        return 0.0;
     }
 
     // Calculate yaw required x, y (constant z)

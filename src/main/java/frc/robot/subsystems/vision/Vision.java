@@ -46,7 +46,7 @@ public class Vision extends SubsystemBase {
     return limelight;
   }
 
-  // Once per heartbeat
+  @Override
   public void periodic() {
     photon.invalidateCache();
   }

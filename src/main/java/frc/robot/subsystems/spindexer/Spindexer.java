@@ -2,9 +2,10 @@ package frc.robot.subsystems.spindexer;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.spindexer.SpindexerState.spindexer_state;
 
-public class Spindexer {
+public class Spindexer extends SubsystemBase{
     private final SpindexerState state;
     private final Spinner spinner;
 
@@ -23,6 +24,7 @@ public class Spindexer {
         state.set(spindexer_state.SLOWING);
     }
 
+    @Override
     public void periodic() {
         boolean atSpeed = spinner.isAtSpeed();
         var cState = state.get();

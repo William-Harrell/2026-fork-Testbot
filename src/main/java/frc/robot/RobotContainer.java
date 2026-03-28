@@ -13,7 +13,7 @@ import frc.robot.OI.XboxTester;
 import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.spindexer.Spindexer;
-import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.constants.DrivingConstants;
@@ -22,15 +22,15 @@ public class RobotContainer {
   // Controllers
   private final XboxDriver driverJoystick;
   private final XboxTester testerJoystick;
-  
+
   // Auto
   private final SendableChooser<Command> autoChooser;
-  
+
   // Swerve
   private int speedExponent = 1;
-  
+
   // Subsystems
-  private final SwerveDrive swerve;
+  private final Swerve swerve;
   private final Vision vision;
   private final Turret turret;
   private final Intake intake;
@@ -48,11 +48,11 @@ public class RobotContainer {
 
     // Subsystems
     vision = new Vision();
-    swerve = new SwerveDrive(vision);
+    swerve = new Swerve(vision);
     turret = new Turret(vision);
     spindexer = new Spindexer();
     intake = new Intake();
-    
+
     // Init methods
     setupDrive();
     configureButtonBindings();
@@ -69,7 +69,7 @@ public class RobotContainer {
     swerve.setDefaultCommand(teleopDriveCommand);
 
     // Gyro
-    swerve.resetYaw(Rotation2d.fromDegrees(
+    swerve.getH().setYaw(Rotation2d.fromDegrees(
         (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red)
             ? 180
             : 0));
@@ -89,15 +89,13 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     // DRIVER
-    driverJoystick.resetGyroTo().onTrue(swerve.resetGyroCommandTo());
-    driverJoystick.resetGyroAway().onTrue(swerve.resetGyroCommandAway());
 
     // driverJoystick.toggleFieldRelative().onTrue(new
     // InstantCommand(swerve::toggleFieldRelative));
 
     driverJoystick
         .skiStop()
-        .onTrue(SwerveCommands.skiStopCommand(swerve).until(driverJoystick::isMovementCommanded));
+        .onTrue(SwerveCommands.SkiStop(swerve).until(driverJoystick::isMovementCommanded));
 
     driverJoystick
         .toggleSpeed()

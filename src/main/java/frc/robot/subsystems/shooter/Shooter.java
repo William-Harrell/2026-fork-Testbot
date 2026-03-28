@@ -9,9 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.shooter.Physics.VisionAimedShot;
 import frc.robot.subsystems.shooter.ShooterState.shooter_state;
-import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.vision.Vision;
-import frc.robot.util.Elastic;
 
 public class Shooter extends SubsystemBase {
   // Sub-subsystems
@@ -23,7 +22,7 @@ public class Shooter extends SubsystemBase {
   // Track hub active state for shift change notifications
   // private boolean lastHubActive = true;
 
-  public Shooter(Vision vision, SwerveDrive swerve) {
+  public Shooter(Vision vision, Swerve swerve) {
     orientation = new Orientation(new SparkFlex(ShooterConstants.HOOD_MOTOR_ID1, MotorType.kBrushless),
         new SparkFlex(ShooterConstants.HOOD_MOTOR_ID2, MotorType.kBrushless));
     physics = new Physics(vision, swerve);

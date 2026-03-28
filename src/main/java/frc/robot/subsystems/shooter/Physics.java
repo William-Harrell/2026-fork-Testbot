@@ -8,7 +8,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import frc.robot.subsystems.swerve.SwerveDrive;
+import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.templates.VisionUpdate;
 import frc.robot.util.constants.FieldConstants;
@@ -18,7 +18,7 @@ public class Physics {
   private double x, y, z;
   private Rotation2d heading;
   private final Vision vision;
-  private final SwerveDrive swerve;
+  private final Swerve swerve;
   private double[] hub = new double[2];
   private Alliance alliance;
 
@@ -29,7 +29,7 @@ public class Physics {
       1.0,
       0.0);
 
-  public Physics(Vision myV, SwerveDrive mySD) {
+  public Physics(Vision myV, Swerve mySD) {
     vision = myV;
     swerve = mySD;
     refreshAlliance();

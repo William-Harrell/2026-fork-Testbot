@@ -72,6 +72,7 @@ public class Turret extends SubsystemBase {
         // If found, maintain current Yaw orientation and optimize pitch
     }
 
+    @Override
     public void periodic() {
         // Trust pitch & yaw to auto-update, since they change slightly every loop
         if (state.get() == turret_state.SPINNING_UP && flywheel.atTargetRPM()) {

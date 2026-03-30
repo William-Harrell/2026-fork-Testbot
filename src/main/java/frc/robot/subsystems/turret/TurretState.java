@@ -1,6 +1,5 @@
 package frc.robot.subsystems.turret;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class TurretState {
   public enum turret_state {

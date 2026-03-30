@@ -90,7 +90,6 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     // DRIVER
-
     // driverJoystick.toggleFieldRelative().onTrue(new
     // InstantCommand(swerve::toggleFieldRelative));
 
@@ -140,18 +139,10 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    // if (USE_DIP_SWITCH) {
-    // dipSwitchSelector.lockSelection();
-    // int selection = dipSwitchSelector.getSelection();
-    // return AutoRoutines.getAutoFromSelection(
-    // selection, swerve, intake, shooter, vision, null);
-    // } else {
     return autoChooser.getSelected();
-    // }
   }
 
   public void onDisabled() {
-    // dipSwitchSelector.unlockSelection();
   }
 
   public void onEnabled() {

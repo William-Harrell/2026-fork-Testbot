@@ -1,7 +1,5 @@
 package frc.robot.subsystems.spindexer;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 public class SpindexerState {
   public enum spindexer_state {
     IDLE,

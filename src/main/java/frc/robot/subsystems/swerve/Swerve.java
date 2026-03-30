@@ -1,17 +1,16 @@
 package frc.robot.subsystems.swerve;
 
-import java.util.ArrayList;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -43,7 +42,6 @@ public class Swerve extends SubsystemBase {
                 hardware.getPositions(),
                 new Pose2d() // (0,0) & forward direction
         );
-
     }
 
     public void setFieldRelative(boolean b) {
@@ -57,7 +55,7 @@ public class Swerve extends SubsystemBase {
     public Pose2d getPose() {
         return estimator.getEstimatedPosition();
     }
-    
+
     public void resetPose(Pose2d pose) {
         estimator.resetPosition(hardware.getYaw(), hardware.getPositions(), pose);
     }
@@ -76,7 +74,22 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
-        dashboard.updateLogs(estimator.getEstimatedPosition(), hardware.getStates());
+        vision.getP().invalidateCache();
+
+        vision.getBestVisionUpdateRaw(getPose()).ifPresent((update) -> {
+            // Standard deviation for distance error
+            double xyStdDev = 0.1 + (Math.pow(update.avgDistanceMeters(), 2) * 0.1);
+
+            estimator.addVisionMeasurement(
+                    update.pose2d(),
+                    update.timestampSeconds(),
+                    VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(90)));
+        });
+
+        vision.getBestVisionUpdateRaw(getPose())
+                .ifPresent((update) -> addVisionMeasurement(update.pose2d(), update.timestampSeconds()));
+
+        dashboard.updateLogs(getPose(), hardware.getStates());
     }
 
     // Driving methods

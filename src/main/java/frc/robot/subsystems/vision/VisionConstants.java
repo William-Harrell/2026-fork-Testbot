@@ -13,8 +13,10 @@ public final class VisionConstants {
 
         // Limelight
         public static final String LIMELIGHT_NAME = "ye";
+
+        // Photon
         public static final double AMBIGUITY_THRESHOLD = 0.2;
-        public static final double MAX_TAG_DISTANCE = 5.0; // meters
+        public static final double MAX_TAG_DISTANCE = 4.5; // meters
         public static final double MAX_FRAME_AGE = 0.3; // seconds
         public static final int MIN_TAG_COUNT = 1;
         public static final double MIN_AREA = 0.05; // meters squared

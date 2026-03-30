@@ -47,22 +47,18 @@ public class Vision extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
-    photon.invalidateCache();
+  public void periodic() { // Invalidated in swerve periodic
   }
 
-  // Parameter is odometry
-  public Optional<Pose2d> getPose2d(Pose2d robotPose) {
-    return photon.getBestVisionUpdate(robotPose).map(VisionUpdate::pose2d);
+  public Optional<Pose2d> getPose2d(Pose2d odom_estimate) {
+    return photon.getBestVisionUpdate(odom_estimate).map(VisionUpdate::pose2d);
   }
 
-  // Parameter is odometry
-  public Optional<Pose3d> getPose3d(Pose2d robotPose) {
-    return photon.getBestVisionUpdate(robotPose).map(VisionUpdate::pose3d);
+  public Optional<Pose3d> getPose3d(Pose2d odom_estimate) {
+    return photon.getBestVisionUpdate(odom_estimate).map(VisionUpdate::pose3d);
   }
 
-  // Parameter is odometry
-  public Optional<VisionUpdate> getBestVisionUpdateRaw(Pose2d robotPose) {
-    return photon.getBestVisionUpdate(robotPose);
+  public Optional<VisionUpdate> getBestVisionUpdateRaw(Pose2d odom_estimate) {
+    return photon.getBestVisionUpdate(odom_estimate);
   }
 }

@@ -7,6 +7,7 @@ import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -78,36 +79,54 @@ public class Swerve extends SubsystemBase {
 
         vision.getBestVisionUpdateRaw(getPose()).ifPresent((update) -> {
             // Standard deviation for distance error
-            double xyStdDev = 0.1 + (Math.pow(update.avgDistanceMeters(), 2) * 0.1);
+            double xyStdDev = SwerveConstants.XY_BASE_STDDEV
+                    + (Math.pow(update.avgDistanceMeters(), 2) * SwerveConstants.XY_DIST_FACTOR);
+            double thetaStdDev = SwerveConstants.HEADING_BASE_STDDEV
+                    + (Math.pow(update.avgDistanceMeters(), 2) * SwerveConstants.HEADING_DIST_FACTOR);
 
             estimator.addVisionMeasurement(
                     update.pose2d(),
                     update.timestampSeconds(),
-                    VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(90)));
+                    VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(thetaStdDev)));
         });
 
-        vision.getBestVisionUpdateRaw(getPose())
-                .ifPresent((update) -> addVisionMeasurement(update.pose2d(), update.timestampSeconds()));
-
         dashboard.updateLogs(getPose(), hardware.getStates());
+    }
+
+    public void zeroHeading() {
+        estimator.resetPosition(
+                hardware.getYaw(),
+                hardware.getPositions(),
+                new Pose2d(getPose().getTranslation(), new Rotation2d()));
     }
 
     // Driving methods
     public Command teleopCommand(DoubleSupplier forward, DoubleSupplier strafe, DoubleSupplier turn) {
         return new RunCommand(
-                () -> {
+                () -> { // WPIlib autoflips coord sys when alliance color changes
                     double vx = forward.getAsDouble() * SwerveConstants.MAX_SPEED;
                     double vy = strafe.getAsDouble() * SwerveConstants.MAX_SPEED;
                     double omega = turn.getAsDouble() * SwerveConstants.MAX_ANGULAR_VELOCITY;
 
-                    if (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red) {
-                        vx = -vx;
-                        vy = -vy;
-                    }
-
                     drive(new Translation2d(vx, vy), omega);
                 },
                 this);
+    }
+
+    public void drive(Translation2d translation, double rotation) {
+        ChassisSpeeds speeds;
+
+        if (config.field_relative) { // Field-relative means forward direction is always @ far end of field
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                    translation.getX(),
+                    translation.getY(),
+                    rotation,
+                    hardware.getYaw());
+        } else { // Robo-relative means forward direction is always @ the front of the robot
+            speeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
+        }
+
+        drive(speeds);
     }
 
     public void drive(ChassisSpeeds speeds) {
@@ -121,28 +140,6 @@ public class Swerve extends SubsystemBase {
         for (int i = 0; i < modules.length; i++) {
             modules[i].setDesiredState(states[i], config.open_loop);
         }
-    }
-
-    public void drive(Translation2d translation, double rotation) {
-        ChassisSpeeds speeds;
-
-        // if (fieldRelative) {
-        // // FIELD-RELATIVE: Adjust for robot's current heading
-        // // "Forward" means toward the far end of the field, regardless of robot
-        // // orientation
-        // speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
-        // translation.getX(), // Field X velocity
-        // translation.getY(), // Field Y velocity
-        // rotation, // Rotation velocity
-        // getYaw() // Current robot heading (to convert field->robot)
-        // );
-        // } else {
-        // ROBOT-RELATIVE: No adjustment needed
-        // "Forward" means wherever the robot is facing
-        speeds = new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
-        // }
-
-        drive(speeds);
     }
 
     // Sub-subsystem getters

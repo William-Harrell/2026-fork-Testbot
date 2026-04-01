@@ -1,8 +1,17 @@
-package frc.robot.subsystems.swerve;
+package frc.robot.subsystems.swerve;// ethan feet was here
 
 import edu.wpi.first.math.util.Units;
 
 public final class SwerveConstants {
+  // Pose Estimation TODO-tune w/ practice
+  public static double XY_BASE_STDDEV = 0.1;
+  public static double XY_DIST_FACTOR = 0.1;
+
+  public static double HEADING_BASE_STDDEV = 0.1;
+  public static double HEADING_DIST_FACTOR = 0.5;
+
+
+  // Hardware
   public static final double TRACK_WIDTH = Units.inchesToMeters(18.5); // Left to right
   public static final double WHEEL_BASE = Units.inchesToMeters(24.75); // Front to back
 

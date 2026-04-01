@@ -70,10 +70,14 @@ public class RobotContainer {
     swerve.setDefaultCommand(teleopDriveCommand);
 
     // Gyro
-    swerve.getH().setYaw(Rotation2d.fromDegrees(
-        (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) == DriverStation.Alliance.Red)
-            ? 180
-            : 0));
+    swerve.getH().setYaw(new Rotation2d());
+    swerve.zeroHeading();
+
+    // .setYaw(Rotation2d.fromDegrees(
+    // (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) ==
+    // DriverStation.Alliance.Red)
+    // ? 180
+    // : 0));
 
     SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
   }
@@ -146,6 +150,6 @@ public class RobotContainer {
   }
 
   public void onEnabled() {
-
+    swerve.zeroHeading();
   }
 }

@@ -12,7 +12,7 @@ public class Yaw {
         encoder = motor.getEncoder();
     }
 
-    public double get() {
+    public double getRotations() {
         return encoder.getPosition();
     }
 
@@ -20,7 +20,11 @@ public class Yaw {
         motor.set(goal);
     }
 
-    public void reset() {
-        
+    public void resetEncoder() {
+        encoder.setPosition(0);
+    }
+
+    public void resetEncoder(double pos) {
+        encoder.setPosition(pos);
     }
 }

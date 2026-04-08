@@ -17,10 +17,9 @@ public class Pitch {
     }
 
     public void turnTo(double goal) {
-
+        
     }
 
     public void reset() {
-
     }
 }

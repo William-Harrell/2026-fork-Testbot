@@ -32,10 +32,10 @@ public class RobotContainer {
 
   // Subsystems
   private final Swerve swerve;
-  private final Vision vision;
-  private final Turret turret;
-  private final Intake intake;
-  private final Spindexer spindexer;
+  // private final Vision vision;
+  // private final Turret turret;
+  // private final Intake intake;
+  // private final Spindexer spindexer;
 
   public RobotContainer() {
     // Controllers
@@ -48,11 +48,12 @@ public class RobotContainer {
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
     // Subsystems
-    vision = new Vision();
-    swerve = new Swerve(vision);
-    turret = new Turret(vision);
-    spindexer = new Spindexer();
-    intake = new Intake();
+    // swerve = new Swerve(vision);
+    swerve = new Swerve();
+    // vision = new Vision();
+    // turret = new Turret(vision);
+    // spindexer = new Spindexer();
+    // intake = new Intake();
 
     // Init methods
     setupDrive();
@@ -94,8 +95,9 @@ public class RobotContainer {
 
   private void configureButtonBindings() {
     // DRIVER
-    // driverJoystick.toggleFieldRelative().onTrue(new
-    // InstantCommand(swerve::toggleFieldRelative));
+    driverJoystick.toggleFieldRelative().onTrue(new InstantCommand(() -> {
+      swerve.setFieldRelative(!swerve.isFieldRelative());
+    }));
 
     driverJoystick
         .skiStop()
@@ -106,34 +108,34 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
     // OPERATOR
-    operatorJoystick.runFlywheel().whileTrue(
-        Commands.startEnd(
-            turret.getF()::spinUp,
-            turret.getF()::stop,
-            turret));
+    // operatorJoystick.runFlywheel().whileTrue(
+    // Commands.startEnd(
+    // turret.getF()::spinUp,
+    // turret.getF()::stop,
+    // turret));
 
-    operatorJoystick.deployIntake().onTrue(
-        Commands.startEnd(intake::deployIntakeMechanism, () -> {
-        }, intake));
-
-    // testerJoystick.retractIntake().onTrue(
-    // Commands.startEnd(intake::retractIntakeMechanism, () -> {
+    // operatorJoystick.deployIntake().onTrue(
+    // Commands.startEnd(intake::deployIntakeMechanism, () -> {
     // }, intake));
 
-    operatorJoystick.runIntakeForward().whileTrue(
-        Commands.startEnd(intake.getR()::runIntake, intake.getR()::stopRollers,
-            intake));
+    // // testerJoystick.retractIntake().onTrue(
+    // // Commands.startEnd(intake::retractIntakeMechanism, () -> {
+    // // }, intake));
 
-    operatorJoystick.runIntakeReverse().whileTrue(
-        Commands.startEnd(() -> {
-          intake.getR().runOuttake();
-        }, intake.getR()::stopRollers,
-            intake));
+    // operatorJoystick.runIntakeForward().whileTrue(
+    // Commands.startEnd(intake.getR()::runIntake, intake.getR()::stopRollers,
+    // intake));
 
-    operatorJoystick.chatClipThat().onTrue(
-        new RunCommand(() -> {
-          vision.getL().rewindRecord(5);
-        }, vision));
+    // operatorJoystick.runIntakeReverse().whileTrue(
+    // Commands.startEnd(() -> {
+    // intake.getR().runOuttake();
+    // }, intake.getR()::stopRollers,
+    // intake));
+
+    // operatorJoystick.chatClipThat().onTrue(
+    // new RunCommand(() -> {
+    // vision.getL().rewindRecord(5);
+    // }, vision));
 
   }
 

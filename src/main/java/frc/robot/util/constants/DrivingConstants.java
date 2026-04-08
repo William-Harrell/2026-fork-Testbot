@@ -32,13 +32,15 @@ public final class DrivingConstants {
 
     double turn();
 
-    Trigger resetGyroTo();
+    // Trigger resetGyroTo();
 
-    Trigger resetGyroAway();
+    // Trigger resetGyroAway();
+
+    Trigger zeroHeading();
 
     Trigger toggleSpeed();
 
-    // Trigger toggleFieldRelative();
+    Trigger toggleFieldRelative();
 
     Trigger skiStop();
 

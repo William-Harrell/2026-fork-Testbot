@@ -20,7 +20,7 @@ import frc.robot.subsystems.vision.Vision;
 
 public class Swerve extends SubsystemBase {
     // Dependencies
-    private final Vision vision;
+    // private final Vision vision;
 
     // Sub-subsystems
     private final Config config;
@@ -29,8 +29,9 @@ public class Swerve extends SubsystemBase {
     private final Dashboard dashboard;
     private final SwerveDrivePoseEstimator estimator;
 
-    public Swerve(Vision vision) {
-        this.vision = vision;
+    public Swerve() {
+    // public Swerve(Vision vision) {
+        // this.vision = vision;
 
         // Sub-subsystems
         config = new Config();
@@ -75,20 +76,20 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic() {
-        vision.getP().invalidateCache();
+        // vision.getP().invalidateCache();
 
-        vision.getBestVisionUpdateRaw(getPose()).ifPresent((update) -> {
-            // Standard deviation for distance error
-            double xyStdDev = SwerveConstants.XY_BASE_STDDEV
-                    + (Math.pow(update.avgDistanceMeters(), 2) * SwerveConstants.XY_DIST_FACTOR);
-            double thetaStdDev = SwerveConstants.HEADING_BASE_STDDEV
-                    + (Math.pow(update.avgDistanceMeters(), 2) * SwerveConstants.HEADING_DIST_FACTOR);
+        // vision.getBestVisionUpdateRaw(getPose()).ifPresent((update) -> {
+        //     // Standard deviation for distance error
+        //     double xyStdDev = SwerveConstants.XY_BASE_STDDEV
+        //             + (Math.pow(update.avgDistanceMeters(), 2) * SwerveConstants.XY_DIST_FACTOR);
+        //     double thetaStdDev = SwerveConstants.HEADING_BASE_STDDEV
+        //             + (Math.pow(update.avgDistanceMeters(), 2) * SwerveConstants.HEADING_DIST_FACTOR);
 
-            estimator.addVisionMeasurement(
-                    update.pose2d(),
-                    update.timestampSeconds(),
-                    VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(thetaStdDev)));
-        });
+        //     estimator.addVisionMeasurement(
+        //             update.pose2d(),
+        //             update.timestampSeconds(),
+        //             VecBuilder.fill(xyStdDev, xyStdDev, Units.degreesToRadians(thetaStdDev)));
+        // });
 
         dashboard.updateLogs(getPose(), hardware.getStates());
     }
@@ -116,7 +117,7 @@ public class Swerve extends SubsystemBase {
     public void drive(Translation2d translation, double rotation) {
         ChassisSpeeds speeds;
 
-        if (config.field_relative) { // Field-relative means forward direction is always @ far end of field
+        if (config.field_relative == true) { // Field-relative means forward direction is always @ far end of field
             speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
                     translation.getX(),
                     translation.getY(),

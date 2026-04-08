@@ -38,7 +38,7 @@ public class Physics {
     }
 
     // Calculate yaw required x, y (constant z)
-    public double getYawError() {
+    public double getYawRequired() {
         var pose_container = limelight.getPose3d();
 
         if (pose_container.isEmpty()) {

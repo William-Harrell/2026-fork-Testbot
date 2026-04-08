@@ -38,7 +38,7 @@ public class Turret extends SubsystemBase {
         yaw = new Yaw(new SparkMax(TurretConstants.TURN_MOTOR_ID, MotorType.kBrushless));
 
         pitch.reset();
-        yaw.reset();
+        yaw.resetEncoder();
     }
 
     // Start shooting
@@ -58,7 +58,7 @@ public class Turret extends SubsystemBase {
     }
 
     public double getYaw() {
-        return yaw.get();
+        return yaw.getRotations();
     }
 
     public double getPitch() {
@@ -85,6 +85,7 @@ public class Turret extends SubsystemBase {
         }
 
         // Update angles & encoders here
+
     }
 
     public Flywheel getF() {

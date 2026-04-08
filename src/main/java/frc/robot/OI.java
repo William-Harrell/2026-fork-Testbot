@@ -41,20 +41,25 @@ public final class OI {
       return stick.b();
     }
 
+    // @Override
+    // public Trigger resetGyroTo() {
+    //   return stick.povUp();
+    // }
+
+    // @Override
+    // public Trigger resetGyroAway() {
+    //   return stick.povDown();
+    // }
+
     @Override
-    public Trigger resetGyroTo() {
+    public Trigger zeroHeading() {
       return stick.povUp();
     }
 
     @Override
-    public Trigger resetGyroAway() {
+    public Trigger toggleFieldRelative() {
       return stick.povDown();
     }
-
-    // @Override
-    // public Trigger toggleFieldRelative() {
-    //   return stick.povDown();
-    // }
 
     @Override
     public Trigger skiStop() {

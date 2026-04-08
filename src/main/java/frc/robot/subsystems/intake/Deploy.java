@@ -1,4 +1,3 @@
-//CHECK//
 
 package frc.robot.subsystems.intake;
 
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/** Two Vortex (SparkFlex) motors that deploy/retract the intake mechanism */
 public class Deploy {
   private final SparkFlex deployMotor;
   private final SparkFlex deployMotor2;
@@ -28,7 +26,6 @@ public class Deploy {
   private double targetPosition;
   private boolean homed = false;
 
-  /** {@code motor1} is the left side, {@code motor2} is the right side (inverted) */
   public Deploy(SparkFlex motor1, SparkFlex motor2) {
     deployMotor = motor1;
     deployMotor2 = motor2;

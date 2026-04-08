@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Config {
     protected boolean field_relative = false;
-    protected boolean open_loop = true;
+    protected boolean open_loop = false;
 
     public Config() {
     }

@@ -58,10 +58,10 @@ public final class SwerveConstants {
   // 3. Read the CANCoder value in Phoenix Tuner
   // 4. Put that value here (may need to add/subtract 180)
 
-  public static final double FL_ENCODER_OFFSET = 90 + 40.0;
-  public static final double FR_ENCODER_OFFSET = 180 + 40.0;
-  public static final double RL_ENCODER_OFFSET = 90 + 35.0;
-  public static final double RR_ENCODER_OFFSET = -90 + 3.0;
+  public static final double FL_ENCODER_OFFSET = 0;
+  public static final double FR_ENCODER_OFFSET = 0;
+  public static final double RL_ENCODER_OFFSET = 0;
+  public static final double RR_ENCODER_OFFSET = 0;
 
   // DRIVE MOTOR PID - Tuning for wheel speed control
 

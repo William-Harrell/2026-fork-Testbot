@@ -69,7 +69,7 @@ public class Turret extends SubsystemBase {
         // Turn while probing limelight
         // If not found by the time a limit is reached, turn in the opposite direction
         // Run every heartbeat or so
-        // If found, maintain current Yaw orientation and optimize pitch
+        // If found, turn to face hub and optimize pitch
     }
 
     @Override

@@ -63,7 +63,7 @@ public class SwerveModule {
       double encoderOffset,
       boolean invertDrive) {
     this.moduleNumber = moduleNumber;
-    this.encoderOffset = Rotation2d.fromDegrees(encoderOffset);
+    this.encoderOffset = Rotation2d.fromRotations(encoderOffset);
     this.invertDrive = invertDrive;
 
     // Drive motor (TalonFX)

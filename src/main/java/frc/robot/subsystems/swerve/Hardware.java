@@ -44,13 +44,13 @@ public class Hardware {
                         SwerveConstants.RL_AZIMUTH_ID,
                         SwerveConstants.RL_CANCODER_ID,
                         SwerveConstants.RL_ENCODER_OFFSET,
-                        false),
+                        true),
                 new SwerveModule(
                         3,
                         SwerveConstants.RR_DRIVE_ID,
                         SwerveConstants.RR_AZIMUTH_ID,
                         SwerveConstants.RR_CANCODER_ID,
-                        SwerveConstants.RR_ENCODER_OFFSET, false)
+                        SwerveConstants.RR_ENCODER_OFFSET, true)
         };
     }
 

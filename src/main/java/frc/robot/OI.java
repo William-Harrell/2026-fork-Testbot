@@ -108,5 +108,10 @@ public final class OI {
     public Trigger chatClipThat() {
       return stick.povLeft();
     }
+
+    @Override
+    public Trigger runSpintake() {
+      return stick.a();
+    }
   }
 }

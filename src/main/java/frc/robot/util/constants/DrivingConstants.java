@@ -61,5 +61,7 @@ public final class DrivingConstants {
     Trigger runIntakeReverse();
 
     Trigger chatClipThat();
+
+    Trigger runSpintake();
   }
 }

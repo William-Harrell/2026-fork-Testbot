@@ -19,7 +19,7 @@ public class Spindexer extends SubsystemBase{
         state.set(spindexer_state.SPEEDING);
     }
 
-    public void haltFeed() {
+    public void stopFeed() {
         spinner.setRPM(SpindexerConstants.OFFRPM);
         state.set(spindexer_state.SLOWING);
     }

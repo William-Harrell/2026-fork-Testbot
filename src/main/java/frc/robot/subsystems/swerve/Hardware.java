@@ -48,7 +48,7 @@ public class Hardware {
                 new SwerveModule(
                         3,
                         SwerveConstants.RR_DRIVE_ID,
-                        SwerveConstants.RR_AZIMUTH_ID,
+                        SwerveConstants.RR_AZIMUTH_ID, 
                         SwerveConstants.RR_CANCODER_ID,
                         SwerveConstants.RR_ENCODER_OFFSET, true)
         };

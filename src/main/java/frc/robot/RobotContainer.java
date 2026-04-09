@@ -35,7 +35,7 @@ public class RobotContainer {
   // private final Vision vision;
   // private final Turret turret;
   // private final Intake intake;
-  // private final Spindexer spindexer;
+  private final Spindexer spindexer;
 
   public RobotContainer() {
     // Controllers
@@ -52,7 +52,7 @@ public class RobotContainer {
     swerve = new Swerve();
     // vision = new Vision();
     // turret = new Turret(vision);
-    // spindexer = new Spindexer();
+    spindexer = new Spindexer();
     // intake = new Intake();
 
     // Init methods
@@ -80,7 +80,7 @@ public class RobotContainer {
     // ? 180
     // : 0));
 
-    SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
+    // SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
   }
 
   private double applySpeedCurve(double input) {
@@ -108,6 +108,8 @@ public class RobotContainer {
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
     // OPERATOR
+    operatorJoystick.runSpintake().whileTrue(Commands.startEnd(spindexer::startFeed, spindexer::stopFeed, spindexer));
+
     // operatorJoystick.runFlywheel().whileTrue(
     // Commands.startEnd(
     // turret.getF()::spinUp,
@@ -117,7 +119,7 @@ public class RobotContainer {
     // operatorJoystick.deployIntake().onTrue(
     // Commands.startEnd(intake::deployIntakeMechanism, () -> {
     // }, intake));
- 
+
     // // testerJoystick.retractIntake().onTrue(
     // // Commands.startEnd(intake::retractIntakeMechanism, () -> {
     // // }, intake));

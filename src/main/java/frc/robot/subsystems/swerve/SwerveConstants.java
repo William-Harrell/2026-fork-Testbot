@@ -25,25 +25,25 @@ public final class SwerveConstants {
   public static final double DRIVE_GEAR_RATIO = 6.75; // motor spins 6.75 times per wheel rotation
   public static final double AZIMUTH_GEAR_RATIO = 150.0 / 7.0;
 
-  // Front Left Module (IDs 1–3)
-  public static final int FL_DRIVE_ID = 1;
-  public static final int FL_AZIMUTH_ID = 2;
-  public static final int FL_CANCODER_ID = 3;
+  // Front Left Module (IDs 7-9)
+  public static final int FL_DRIVE_ID = 7;
+  public static final int FL_AZIMUTH_ID = 9;
+  public static final int FL_CANCODER_ID = 8;
 
-  // Front Right Module (IDs 4–6)
+  // Front Right Module (IDs 4-6)
   public static final int FR_DRIVE_ID = 4;
-  public static final int FR_AZIMUTH_ID = 5;
-  public static final int FR_CANCODER_ID = 6;
+  public static final int FR_AZIMUTH_ID = 6;
+  public static final int FR_CANCODER_ID = 5;
 
-  // Rear Left Module (IDs 7–9)
-  public static final int RL_DRIVE_ID = 7;
-  public static final int RL_AZIMUTH_ID = 8;
-  public static final int RL_CANCODER_ID = 9;
+  // Rear Left Module (IDs 10-12)
+  public static final int RL_DRIVE_ID = 10;
+  public static final int RL_AZIMUTH_ID = 12;
+  public static final int RL_CANCODER_ID = 11;
 
-  // Rear Right Module (IDs 10–12)
-  public static final int RR_DRIVE_ID = 10;
-  public static final int RR_AZIMUTH_ID = 11;
-  public static final int RR_CANCODER_ID = 12;
+  // Rear Right Module (IDs 1-3)
+  public static final int RR_DRIVE_ID = 1;
+  public static final int RR_AZIMUTH_ID = 3;
+  public static final int RR_CANCODER_ID = 2;
 
   // Gyro ID (Pigeon2)
   public static final int PIGEON_ID = 0;

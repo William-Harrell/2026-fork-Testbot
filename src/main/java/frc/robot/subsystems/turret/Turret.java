@@ -55,7 +55,7 @@ public class Turret extends SubsystemBase {
     }
 
     public double getPitch() {
-        return pitch.getHoodDegrees();
+        return pitch.getDegrees();
     }
 
     @Override
@@ -72,7 +72,7 @@ public class Turret extends SubsystemBase {
 
         // Update angles & encoders here
         yaw.moveTo(physics.getYawError() + yaw.getDegrees());
-        pitch.turnTo(physics.getPitchRequired());
+        pitch.turnTo(physics.getPitchRequired(flywheel.getRPM()));
     }
 
     public Flywheel getFlywheel() {

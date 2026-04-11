@@ -37,7 +37,7 @@ public class Pitch {
         rel_encoder.setPosition(target_angle);
     }
 
-    public double getHoodDegrees() {
+    public double getDegrees() {
         return rel_encoder.getPosition() * TurretConstants.PITCH_DEGREE_RATIO;
     }
 
@@ -46,7 +46,7 @@ public class Pitch {
     }
 
     public boolean isPitchAtTarget() {
-        return Math.abs(getHoodDegrees() - target_angle) < TurretConstants.PITCH_TOLERANCE;
+        return Math.abs(getDegrees() - target_angle) < TurretConstants.PITCH_TOLERANCE;
     }
 
     public void turnTo(double goal) {

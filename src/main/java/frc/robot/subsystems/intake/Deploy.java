@@ -20,18 +20,18 @@ public class Deploy {
 
   public Deploy(SparkFlex motor) {
     this.motor = motor;
-    deployEncoder = motor.getEncoder();
-    deployController = motor.getClosedLoopController();
+    deployEncoder = this.motor.getEncoder();
+    deployController = this.motor.getClosedLoopController();
 
     targetPosition = IntakeConstants.STOW_POS;
 
     SparkFlexConfig config = new SparkFlexConfig();
-    config.idleMode(IdleMode.kBrake).smartCurrentLimit(40);
+    config.idleMode(IdleMode.kBrake).smartCurrentLimit(IntakeConstants.DEPLOY_MOTOR_CURRENT_LIMIT);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
 
-    motor.configure(
+    this.motor.configure(
         config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // limitSwitch = new DigitalInput(IntakeConstants.DEPLOY_LIMIT_SWITCH_DIO);
@@ -44,19 +44,16 @@ public class Deploy {
     deployController.setSetpoint(targetPosition, SparkFlex.ControlType.kPosition);
   }
 
-  /** Check if intake is at deployed position */
   public boolean isDeployed() {
     return Math
         .abs(deployEncoder.getPosition() - IntakeConstants.DEPLOY_POS) < IntakeConstants.TOLERANCE;
   }
 
-  /** Check if intake is at stowed position */
   public boolean isStowed() {
     return Math.abs(deployEncoder.getPosition() - IntakeConstants.STOW_POS) < IntakeConstants.TOLERANCE;
   }
 
-  /** Get current deploy position */
-  public double getDeployPosition() {
+  public double getRotations() {
     return deployEncoder.getPosition();
   }
 

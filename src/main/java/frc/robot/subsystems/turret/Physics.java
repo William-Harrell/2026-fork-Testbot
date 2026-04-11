@@ -18,7 +18,7 @@ public class Physics {
     }
 
     // Calculate pitch required from x, y (constant z)
-    public double getPitchRequired() {
+    public double getPitchRequired(double current_rpm) {
         var pose_container = limelight.getPose3d();
 
         if (pose_container.isEmpty()) {
@@ -27,14 +27,17 @@ public class Physics {
 
         var pose = pose_container.get();
 
+        double gravity = 9.81;
         double dist = pose.getTranslation().getNorm();
         double height = FieldConstants.HUB_HEIGHT - RobotPhysicalConstants.TURRET_HEIGHT;
-        double velocity = TurretConstants.FLYWHEEL_SHOT_VELOCITY;
-        double gravity = 9.81;
+        double velocity = (2 * Math.PI * TurretConstants.FLYWHEEL_RADIUS * current_rpm) / 60;
+        velocity *= TurretConstants.FLYWHEEL_EFFICIENCY;
+
         // Theta is the angle btwn trajectory & horizontal
         double theta = Math.atan((Math.pow(velocity, 2) / (gravity * dist))
                 + Math.sqrt((Math.pow(velocity, 4) / Math.pow(gravity * dist, 2))
                         - ((2 * height * Math.pow(velocity, 2)) / (gravity * Math.pow(dist, 2))) - 1));
+        theta += TurretConstants.OFFSET_PITCH;
 
         last_pitch_req = Math.max(TurretConstants.MIN_PITCH, Math.min(theta, TurretConstants.MAX_PITCH));
         return last_pitch_req;

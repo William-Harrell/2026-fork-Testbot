@@ -2,6 +2,7 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.vision.templates.Config;
@@ -97,9 +98,7 @@ public class Photon {
       return Optional.empty();
     }
 
-    estimator.setReferencePose(robotPose);
-
-    Optional<EstimatedRobotPose> estOpt = estimator.update(result);
+    Optional<EstimatedRobotPose> estOpt = estimator.estimateClosestToReferencePose(result, new Pose3d(robotPose));
 
     // Did the estimator get a result?
     if (estOpt.isEmpty()) {

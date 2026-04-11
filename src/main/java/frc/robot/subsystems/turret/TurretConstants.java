@@ -27,12 +27,12 @@ public final class TurretConstants {
   //
   //
   // CAN IDs
-  public static final int HOOD_MOTOR_1_ID = 16; // Pitch
+  public static final int HOOD_MOTOR_ID = 21; // Pitch
 
-  public static final int FLYWHEEL_MOTOR_1_ID = 18; // Shooter
+  public static final int FLYWHEEL_MOTOR_ID = 20; // Shooter
 
   // Yaw
-  public static final int TURN_MOTOR_ID = 0; // TODO: placeholders
+  public static final int TURN_MOTOR_ID = 22; // Yasw
   //
   //
   //

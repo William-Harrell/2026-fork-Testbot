@@ -14,8 +14,7 @@ public class Intake extends SubsystemBase {
   public Intake() {
     state_machine = new IntakeState();
     deploy = new Deploy(
-        new SparkFlex(IntakeConstants.DEPLOY_MOTOR_ID, MotorType.kBrushless),
-        new SparkFlex(IntakeConstants.DEPLOY_MOTOR_2_ID, MotorType.kBrushless));
+        new SparkFlex(IntakeConstants.DEPLOY_MOTOR_ID, MotorType.kBrushless));
     roller =
         new Roller(
             new TalonFX(IntakeConstants.ROLLER_MOTOR_ID),

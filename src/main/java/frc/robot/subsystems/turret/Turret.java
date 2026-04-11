@@ -26,12 +26,12 @@ public class Turret extends SubsystemBase {
         this.vision = vision;
         this.limelight = vision.getL();
 
-        flywheel = new Flywheel(new TalonFX(TurretConstants.FLYWHEEL_MOTOR_1_ID));
+        flywheel = new Flywheel(new TalonFX(TurretConstants.FLYWHEEL_MOTOR_ID));
 
         state = new TurretState();
 
         pitch = new Pitch(
-                new TalonFX(TurretConstants.HOOD_MOTOR_1_ID),
+                new TalonFX(TurretConstants.HOOD_MOTOR_ID),
                 null // TODO: Implement encoder logic
         );
 

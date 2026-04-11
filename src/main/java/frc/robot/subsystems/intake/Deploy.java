@@ -16,23 +16,17 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Deploy {
-  private final SparkFlex deployMotor;
-  private final SparkFlex deployMotor2;
+  private final SparkFlex motor;
   private final RelativeEncoder deployEncoder;
-  private final RelativeEncoder deployEncoder2;
   private final SparkClosedLoopController deployController;
-  private final SparkClosedLoopController deployController2;
   private final DigitalInput limitSwitch;
   private double targetPosition;
   private boolean homed = false;
 
-  public Deploy(SparkFlex motor1, SparkFlex motor2) {
-    deployMotor = motor1;
-    deployMotor2 = motor2;
-    deployEncoder = deployMotor.getEncoder();
-    deployEncoder2 = deployMotor2.getEncoder();
-    deployController = deployMotor.getClosedLoopController();
-    deployController2 = deployMotor2.getClosedLoopController();
+  public Deploy(SparkFlex motor) {
+    this.motor = motor;
+    deployEncoder = motor.getEncoder();
+    deployController = motor.getClosedLoopController();
 
     targetPosition = IntakeConstants.STOWED_POSITION;
 
@@ -48,35 +42,21 @@ public class Deploy {
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
 
-    deployMotor.configure(
+    motor.configure(
         deployConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    deployMotor2.configure(
-        motor2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     limitSwitch = new DigitalInput(IntakeConstants.DEPLOY_LIMIT_SWITCH_DIO);
 
     // If already at home position on boot, zero immediately
     if (isAtHome()) {
       deployEncoder.setPosition(0);
-      deployEncoder2.setPosition(0);
       homed = true;
     }
-  }
-
-  /**
-   * @deprecated Do NOT call set() directly on the returned controller — doing so bypasses the
-   *     state machine and will desync physical and logical state. Use the methods on {@link Deploy}
-   *     or {@link IntakeCommands} instead. This accessor exists only for legacy telemetry reads.
-   */
-  @Deprecated
-  public SparkFlex get() {
-    return deployMotor;
   }
 
   public void setTargetPosition(double newPos) {
     targetPosition = newPos;
     deployController.setSetpoint(targetPosition, SparkFlex.ControlType.kPosition);
-    deployController2.setSetpoint(targetPosition, SparkFlex.ControlType.kPosition);
   }
 
   /** Check if intake is at deployed position */
@@ -119,20 +99,16 @@ public class Deploy {
         // Already home — just zero
         Commands.runOnce(() -> {
           deployEncoder.setPosition(0);
-          deployEncoder2.setPosition(0);
           homed = true;
         }, owner),
         // Not home — drive slowly toward stow until switch triggers
         Commands.run(() -> {
-          deployMotor.set(IntakeConstants.HOMING_SPEED);
-          deployMotor2.set(IntakeConstants.HOMING_SPEED);
+          motor.set(IntakeConstants.HOMING_SPEED);
         }, owner)
             .until(this::isAtHome)
             .andThen(Commands.runOnce(() -> {
-              deployMotor.set(0);
-              deployMotor2.set(0);
+              motor.set(0);
               deployEncoder.setPosition(0);
-              deployEncoder2.setPosition(0);
               homed = true;
             }, owner)),
         this::isAtHome)
@@ -145,14 +121,10 @@ public class Deploy {
       if (Math.abs(deployEncoder.getPosition()) > IntakeConstants.POSITION_TOLERANCE) {
         deployEncoder.setPosition(0);
       }
-      if (Math.abs(deployEncoder2.getPosition()) > IntakeConstants.POSITION_TOLERANCE) {
-        deployEncoder2.setPosition(0);
-      }
       homed = true;
     }
 
     SmartDashboard.putNumber("Intake/Position", deployEncoder.getPosition());
-    SmartDashboard.putNumber("Intake/Position2", deployEncoder2.getPosition());
     SmartDashboard.putBoolean("Intake/IsDeployed", isDeployed());
     SmartDashboard.putBoolean("Intake/IsStowed", isStowed());
     SmartDashboard.putBoolean("Intake/LimitSwitch", isAtHome());

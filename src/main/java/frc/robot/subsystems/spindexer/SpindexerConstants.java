@@ -7,5 +7,5 @@ public final class SpindexerConstants {
     public static final int CURRENTLIMIT = 120; //TODO placeholder TBD
     public static final int SUPPLYCURRENTLIMIT = 80; //TODO placeholder TBD
     public static final int RAMPRATE = 20; //TODO placeholder TBD
-    public static final int ID = 27; //TODO placeholder TBD
+    public static final int SPINDEXER_ID = 17;
 }

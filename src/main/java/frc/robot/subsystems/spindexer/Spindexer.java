@@ -11,7 +11,7 @@ public class Spindexer extends SubsystemBase{
 
     public Spindexer() {
         state = new SpindexerState();
-        spinner = new Spinner(new TalonFX(SpindexerConstants.ID));
+        spinner = new Spinner(new TalonFX(SpindexerConstants.SPINDEXER_ID));
     }
 
     public void startFeed() {

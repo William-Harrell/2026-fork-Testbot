@@ -1,10 +1,9 @@
 package frc.robot.subsystems.intake;
 
 public final class IntakeConstants {
-  public static final int DEPLOY_MOTOR_ID = 13; // Vortex (SparkFlex)
-  public static final int DEPLOY_MOTOR_2_ID = 14; // Vortex (SparkFlex)
-  public static final int ROLLER_MOTOR_ID = 15; // Kraken X60 (TalonFX)
-
+  public static final int DEPLOY_MOTOR_ID = 15; // Vortex (SparkFlex)
+  public static final int ROLLER_MOTOR_ID = 16; // Kraken X60 (TalonFX)
+  public static final int KICKER_MOTOR_ID = 18; // SparkFlex
   // ---------------------------------------------------------------
   // DEPLOY POSITION CONSTANTS
   // Units: raw SparkFlex encoder rotations (no conversion factor set).

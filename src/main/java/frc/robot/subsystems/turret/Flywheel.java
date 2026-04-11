@@ -8,14 +8,13 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 public class Flywheel {
-  private final TalonFX flywheelMotor1;
+  private final TalonFX motor;
   private final VelocityVoltage velocityRequest = new VelocityVoltage(0).withSlot(0);
-
   private double targetFlywheelRPM = 0.0;
 
-  public Flywheel(TalonFX motor1) {
-    flywheelMotor1 = motor1;
-    
+  public Flywheel(TalonFX motor) {
+    this.motor = motor;
+
     TalonFXConfiguration config = new TalonFXConfiguration();
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.CurrentLimits.StatorCurrentLimit = TurretConstants.FLYWHEEL_STATOR_CURRENT_LIMIT;
@@ -30,21 +29,21 @@ public class Flywheel {
     config.Slot0.kS = TurretConstants.FLYWHEEL_kS;
     config.Slot0.kA = TurretConstants.FLYWHEEL_kA;
 
-    flywheelMotor1.getConfigurator().apply(config);
+    motor.getConfigurator().apply(config);
   }
 
   private void setFlywheelRPM(double rpm) {
     targetFlywheelRPM = rpm;
 
     if (rpm <= 0) {
-      flywheelMotor1.set(0);
+      motor.set(0);
     } else {
-      flywheelMotor1.setControl(velocityRequest.withVelocity(rpm / 60.0));
+      motor.setControl(velocityRequest.withVelocity(RPMToVelocity(rpm)));
     }
   }
 
   public void spinUp() {
-    setFlywheelRPM(TurretConstants.FLYWHEEL_SHOT_VELOCITY * 60);
+    setFlywheelRPM(velocityToRPM(TurretConstants.FLYWHEEL_SHOT_VELOCITY));
   }
 
   public void stop() {
@@ -52,7 +51,7 @@ public class Flywheel {
   }
 
   public double getRPM() {
-    return flywheelMotor1.getVelocity().getValueAsDouble() * 60.0;
+    return velocityToRPM(motor.getVelocity().getValueAsDouble());
   }
 
   public boolean atTargetRPM() {
@@ -61,5 +60,13 @@ public class Flywheel {
 
   public double getTargetRPM() {
     return targetFlywheelRPM;
+  }
+
+  private double velocityToRPM(double v) {
+    return (v * 30) / (Math.PI * TurretConstants.FLYWHEEL_WHEEL_RADIUS_M);
+  }
+
+  private double RPMToVelocity(double rpm) {
+    return (rpm * Math.PI * TurretConstants.FLYWHEEL_WHEEL_RADIUS_M) / 30;
   }
 }

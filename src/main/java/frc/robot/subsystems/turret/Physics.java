@@ -2,6 +2,7 @@ package frc.robot.subsystems.turret;
 
 import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.constants.FieldConstants;
 import frc.robot.util.constants.RobotPhysicalConstants;
 
 public class Physics {
@@ -13,11 +14,11 @@ public class Physics {
 
     public Physics(Vision vision) {
         this.vision = vision;
-        this.limelight = vision.getL();
+        this.limelight = this.vision.getL();
     }
 
     // Calculate pitch required from x, y (constant z)
-    public double getPitch() {
+    public double getPitchRequired() {
         var pose_container = limelight.getPose3d();
 
         if (pose_container.isEmpty()) {
@@ -26,19 +27,21 @@ public class Physics {
 
         var pose = pose_container.get();
 
-        double dist = Math.hypot(pose.getX(), pose.getY()); // meters
-        double theta;
-        double height = RobotPhysicalConstants.TURRET_HEIGHT;
+        double dist = pose.getTranslation().getNorm();
+        double height = FieldConstants.HUB_HEIGHT - RobotPhysicalConstants.TURRET_HEIGHT;
+        double velocity = TurretConstants.FLYWHEEL_SHOT_VELOCITY;
+        double gravity = 9.81;
+        // Theta is the angle btwn trajectory & horizontal
+        double theta = Math.atan((Math.pow(velocity, 2) / (gravity * dist))
+                + Math.sqrt((Math.pow(velocity, 4) / Math.pow(gravity * dist, 2))
+                        - ((2 * height * Math.pow(velocity, 2)) / (gravity * Math.pow(dist, 2))) - 1));
 
-        // TODO Tristan says height changes with pitch
-
-        // Rhys' math
-
-        return 0.0;
+        last_pitch_req = Math.max(TurretConstants.MIN_PITCH, Math.min(theta, TurretConstants.MAX_PITCH));
+        return last_pitch_req;
     }
 
     // Calculate yaw required x, y (constant z)
-    public double getYawRequired() {
+    public double getYawError() {
         var pose_container = limelight.getPose3d();
 
         if (pose_container.isEmpty()) {
@@ -47,7 +50,10 @@ public class Physics {
 
         var pose = pose_container.get();
 
-        return Math.toDegrees(pose.getRotation().getZ());
+        // TODO: MAY need to be inverted (see when testing)
+        last_yaw_req = Math.toDegrees(pose.getRotation().getZ());
+
+        return last_yaw_req;
     }
 
 }

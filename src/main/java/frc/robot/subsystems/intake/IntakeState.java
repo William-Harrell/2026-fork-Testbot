@@ -1,7 +1,5 @@
 package frc.robot.subsystems.intake;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 public class IntakeState {
   public enum intake_state {
     STOWED,
@@ -40,7 +38,5 @@ public class IntakeState {
     } else if (state == intake_state.RETRACTING && stowed) {
       state = intake_state.STOWED;
     }
-
-    SmartDashboard.putString("Intake/State", state.toString());
   }
 }

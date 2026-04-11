@@ -12,16 +12,23 @@ public final class TurretConstants {
   public static final double YAW_TOLERANCE = 2.0 + 1.5; // degrees
   public static final double MAX_YAW = 300 - YAW_TOLERANCE;
   public static final double MIN_YAW = 0.0 + YAW_TOLERANCE;
-  public static final double INIT_YAW = 180; // TODO: placeholder
-  public static final double YAW_DEGREE_RATIO = 10.0; // TODO: get new gear ratio from design
+  public static final double INIT_YAW = 0.0;
+  public static final double OFFSET_YAW = 0.0; // TODO: calibrate
+  public static final double YAW_kP = 0.1; // TODO: placeholder
+  public static final double YAW_kI = 0.0; // TODO: placeholder
+  public static final double YAW_kD = 0.01; // TODO: placeholder
   //
   //
   // Pitch
   public static final double PITCH_TOLERANCE = 2.0 + 1.5; // degrees
   public static final double MAX_PITCH = 60.0 - PITCH_TOLERANCE;
   public static final double MIN_PITCH = 5.0 + PITCH_TOLERANCE;
-  public static final double INIT_PITCH = 45.0; // TODO: placeholder
-  public static final double PITCH_DEGREE_RATIO = 10.0; // TODO: get new gear ratio from design
+  public static final double INIT_PITCH = 0.0;
+  public static final double PITCH_DEGREE_RATIO = 3.0/25.0; // 25 motor rot = 3 big rot | 1:8.33
+  public static final double PITCH_kP = 0.5; // (unused)
+  public static final double PITCH_kI = 0.0; // (unused)
+  public static final double PITCH_kD = 0.0; // (unused)
+  public static final int PITCH_CURRENT_LIMIT = 70;
   // ^ Degrees changed in pitch per encoder rotation
   //
   //
@@ -53,11 +60,4 @@ public final class TurretConstants {
 
   public static final int FLYWHEEL_STATOR_CURRENT_LIMIT = 120; // Amps stator
   public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 80; // Amps from battery
-  //
-  //
-  //
-  // Pitch Motor Configuration
-  // public static final double HOOD_kP = 0.5;
-  // public static final double HOOD_kI = 0.0;
-  // public static final double HOOD_kD = 0.0;
 }

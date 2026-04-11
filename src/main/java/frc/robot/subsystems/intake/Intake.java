@@ -38,15 +38,15 @@ public class Intake extends SubsystemBase {
     if (state_machine.get() == intake_state.DEPLOYING
         || state_machine.get() == intake_state.DEPLOYED) return;
 
-    deploy.setTargetPosition(IntakeConstants.DEPLOYED_POSITION);
+    deploy.setTargetPosition(IntakeConstants.DEPLOY_POS);
     state_machine.set(intake_state.DEPLOYING);
   }
 
   public void retractIntakeMechanism() {
     if (state_machine.get() == intake_state.RETRACTING
         || state_machine.get() == intake_state.STOWED) return;
-    roller.stopRollers();
-    deploy.setTargetPosition(IntakeConstants.STOWED_POSITION);
+    roller.stop();
+    deploy.setTargetPosition(IntakeConstants.STOW_POS);
     state_machine.set(intake_state.RETRACTING);
   }
 

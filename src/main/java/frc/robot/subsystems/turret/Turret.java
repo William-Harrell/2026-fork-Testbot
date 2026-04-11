@@ -7,11 +7,9 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.turret.TurretState.turret_state;
-import frc.robot.subsystems.vision.Limelight;
 import frc.robot.subsystems.vision.Vision;
 
 public class Turret extends SubsystemBase {
-    private final Limelight limelight;
     private final Vision vision;
 
     // Sub-subsystems
@@ -21,38 +19,29 @@ public class Turret extends SubsystemBase {
     private final Pitch pitch;
     private final Yaw yaw;
 
-    private double pitch_goal; // Degrees
-    private double yaw_goal; // Radians
-
     public Turret(Vision vision) {
         this.vision = vision;
-        this.limelight = vision.getL();
 
         flywheel = new Flywheel(new TalonFX(TurretConstants.FLYWHEEL_MOTOR_ID));
 
         state = new TurretState();
 
-        pitch = new Pitch(
-                new SparkFlex(TurretConstants.HOOD_MOTOR_ID, MotorType.kBrushless),
-                null // TODO: Implement encoder logic
-        );
+        pitch = new Pitch(new SparkFlex(TurretConstants.HOOD_MOTOR_ID, MotorType.kBrushless));
+        pitch.reset();
 
         yaw = new Yaw(new SparkMax(TurretConstants.TURN_MOTOR_ID, MotorType.kBrushless));
 
-        pitch.reset();
-        yaw.resetEncoder();
-
-        physics = new Physics(vision);
+        physics = new Physics(this.vision);
     }
 
     // Start shooting
-    public void start() {
+    public void startFlywheel() {
         flywheel.spinUp();
         state.set(turret_state.SPINNING_UP);
     }
 
     // Stop shooting
-    public void stop() {
+    public void stopFlywheel() {
         flywheel.stop();
         state.set(turret_state.SPINNING_DOWN);
     }
@@ -62,19 +51,11 @@ public class Turret extends SubsystemBase {
     }
 
     public double getYaw() {
-        return yaw.getRotations();
+        return yaw.getDegrees();
     }
 
     public double getPitch() {
-        return pitch.getAbsoluteAngle();
-    }
-
-    public void FindHub() {
-
-        // Turn while probing limelight
-        // If not found by the time a limit is reached, turn in the opposite direction
-        // Run every heartbeat or so
-        // If found, turn to face hub and optimize pitch
+        return pitch.getHoodDegrees();
     }
 
     @Override
@@ -90,10 +71,11 @@ public class Turret extends SubsystemBase {
         }
 
         // Update angles & encoders here
-
+        yaw.moveTo(physics.getYawError() + yaw.getDegrees());
+        pitch.turnTo(physics.getPitchRequired());
     }
 
-    public Flywheel getF() {
+    public Flywheel getFlywheel() {
         return flywheel;
     }
 

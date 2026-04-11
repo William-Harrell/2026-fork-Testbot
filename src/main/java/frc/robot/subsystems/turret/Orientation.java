@@ -1,5 +1,3 @@
-//CHECK//
-
 package frc.robot.subsystems.turret;
 
 import com.revrobotics.PersistMode;
@@ -17,9 +15,7 @@ public class Orientation {
   private final SparkClosedLoopController hoodController;
   private final SparkFlex hoodMotor2;
   private final SparkClosedLoopController hoodController2;
-  // private final DigitalInput limitSwitch;
   private double targetPitchAngle;
-  // private boolean homed = false;
 
   public Orientation(SparkFlex motor, SparkFlex motor2) {
     hoodMotor = motor;
@@ -32,9 +28,6 @@ public class Orientation {
     config.idleMode(IdleMode.kBrake).smartCurrentLimit(70);
     config.closedLoop
         .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-    // .p(TurretConstants.HOOD_kP)
-    // .i(TurretConstants.HOOD_kI)
-    // .d(TurretConstants.HOOD_kD)
     ;
 
     hoodMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

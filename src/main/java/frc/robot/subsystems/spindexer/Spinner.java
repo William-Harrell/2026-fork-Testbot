@@ -1,7 +1,5 @@
 package frc.robot.subsystems.spindexer;
 
-import java.nio.MappedByteBuffer;
-
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;

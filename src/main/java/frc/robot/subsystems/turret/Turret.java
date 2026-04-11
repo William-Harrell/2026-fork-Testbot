@@ -1,6 +1,7 @@
 package frc.robot.subsystems.turret;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -16,6 +17,7 @@ public class Turret extends SubsystemBase {
     // Sub-subsystems
     private final Flywheel flywheel;
     private final TurretState state;
+    private final Physics physics;
     private final Pitch pitch;
     private final Yaw yaw;
 
@@ -31,7 +33,7 @@ public class Turret extends SubsystemBase {
         state = new TurretState();
 
         pitch = new Pitch(
-                new TalonFX(TurretConstants.HOOD_MOTOR_ID),
+                new SparkFlex(TurretConstants.HOOD_MOTOR_ID, MotorType.kBrushless),
                 null // TODO: Implement encoder logic
         );
 
@@ -39,6 +41,8 @@ public class Turret extends SubsystemBase {
 
         pitch.reset();
         yaw.resetEncoder();
+
+        physics = new Physics(vision);
     }
 
     // Start shooting
@@ -62,10 +66,11 @@ public class Turret extends SubsystemBase {
     }
 
     public double getPitch() {
-        return pitch.get();
+        return pitch.getAbsoluteAngle();
     }
 
     public void FindHub() {
+
         // Turn while probing limelight
         // If not found by the time a limit is reached, turn in the opposite direction
         // Run every heartbeat or so

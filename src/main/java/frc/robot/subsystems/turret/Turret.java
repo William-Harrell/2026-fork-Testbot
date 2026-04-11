@@ -18,6 +18,7 @@ public class Turret extends SubsystemBase {
     private final Physics physics;
     private final Pitch pitch;
     private final Yaw yaw;
+    private final Kicker kicker;
 
     public Turret(Vision vision) {
         this.vision = vision;
@@ -32,16 +33,20 @@ public class Turret extends SubsystemBase {
         yaw = new Yaw(new SparkMax(TurretConstants.TURN_MOTOR_ID, MotorType.kBrushless));
 
         physics = new Physics(this.vision);
+
+        kicker = new Kicker(new SparkFlex(TurretConstants.KICKER_MOTOR_ID, MotorType.kBrushless));
     }
 
     // Start shooting
     public void startFlywheel() {
         flywheel.spinUp();
+        kicker.run();
         state.set(turret_state.SPINNING_UP);
     }
 
     // Stop shooting
     public void stopFlywheel() {
+        kicker.stop();
         flywheel.stop();
         state.set(turret_state.SPINNING_DOWN);
     }

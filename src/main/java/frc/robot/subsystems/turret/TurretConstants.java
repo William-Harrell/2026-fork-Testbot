@@ -28,9 +28,9 @@ public final class TurretConstants {
   public static final double MIN_PITCH = 5.0 + PITCH_TOLERANCE;
   public static final double INIT_PITCH = 0.0;
   public static final double PITCH_DEGREE_RATIO = 3.0 / 25.0; // 25 motor rot = 3 big rot | 1:8.33
-  public static final double PITCH_kP = 0.5; // (unused)
-  public static final double PITCH_kI = 0.0; // (unused)
-  public static final double PITCH_kD = 0.0; // (unused)
+  public static final double PITCH_kP = 0.5;
+  public static final double PITCH_kI = 0.0;
+  public static final double PITCH_kD = 0.0;
   public static final int PITCH_CURRENT_LIMIT = 80;
   public static final double OFFSET_PITCH = 0.0; // degrees TODO: calibrate
   // ^ Degrees changed in pitch per encoder rotation

@@ -20,6 +20,7 @@ public final class TurretConstants {
   public static final double YAW_kP = 0.1; // TODO: placeholder
   public static final double YAW_kI = 0.0; // TODO: placeholder
   public static final double YAW_kD = 0.01; // TODO: placeholder
+  public static final int YAW_CURRENT_LIMIT = 40; // amps
   //
   //
   // Pitch

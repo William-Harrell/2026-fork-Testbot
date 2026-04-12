@@ -6,9 +6,11 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 public final class DrivingConstants {
   // Controller stuff
   public static final int DRIVER_PORT = 0;
-  public static final int TESTER_PORT = 1;
-
+  public static final int OPERATOR_PORT = 1;
   public static final double JOYSTICK_DEADBAND = 0.1;
+  
+  public static final double YAW_INCREMENT_MAGNITUDE = 1;
+  public static final double PITCH_INCREMENT_MAGNITUDE = 1;
 
   public static final boolean OPEN_LOOP = false;
   //
@@ -21,6 +23,7 @@ public final class DrivingConstants {
   // radians & seconds
   public static final double TURN_MAX_VEL = SwerveConstants.MAX_ANGULAR_VELOCITY;
   public static final double TURN_MAX_ACC = 12.0;
+
   //
   //
   // Action Sets
@@ -32,20 +35,19 @@ public final class DrivingConstants {
 
     double turn();
 
-    // Trigger resetGyroTo();
-
-    // Trigger resetGyroAway();
-
-    Trigger zeroHeading();
-
-    Trigger toggleSpeed();
-
     Trigger toggleFieldRelative();
 
-    Trigger skiStop();
+    // Trigger zeroHeading();
 
-    boolean isMovementCommanded();
+    Trigger resetGyro();
+
+    Trigger toggleSpeedExponent();
+
+    // Trigger skiStop();
+
+    // boolean isMovementCommanded();
   }
+
   //
   //
   //
@@ -54,16 +56,20 @@ public final class DrivingConstants {
 
     Trigger deployIntake();
 
-    Trigger retractIntake();
+    Trigger runIntake();
 
-    Trigger runIntakeForward();
-
-    Trigger runIntakeReverse();
+    Trigger runSpindexer();
 
     Trigger turretLeft();
 
     Trigger turretRight();
 
-    Trigger runSpintake();
+    Trigger posPitch();
+
+    Trigger negPitch();
+
+    Trigger posYaw();
+
+    Trigger negYaw();
   }
 }

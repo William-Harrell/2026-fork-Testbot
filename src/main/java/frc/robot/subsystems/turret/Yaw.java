@@ -40,6 +40,7 @@ public class Yaw {
     }
 
     public void moveTo(double goal) {
+        goal = Math.min(Math.max(goal, TurretConstants.MIN_YAW), TurretConstants.MAX_YAW);
         controller.setSetpoint(goal + TurretConstants.OFFSET_YAW, ControlType.kPosition);
     }
 }

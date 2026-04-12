@@ -69,6 +69,14 @@ public class Turret extends SubsystemBase {
         return pitch.getDegrees();
     }
 
+    public void moveYawTo(double goal) {
+        yaw.moveTo(goal);
+    }
+
+    public void turnPitchTo(double goal) {
+        pitch.turnTo(goal);
+    }
+
     @Override
     public void periodic() {
         // Trust pitch & yaw to auto-update, since they change slightly every loop
@@ -82,8 +90,10 @@ public class Turret extends SubsystemBase {
         }
 
         // Update angles & encoders here
-        yaw.moveTo(physics.getYawError() + yaw.getDegrees());
-        pitch.turnTo(physics.getPitchRequired(flywheel.getRPM()));
+        if (TurretConstants.AUTO_AIM_ENABLED) {
+            yaw.moveTo(physics.getYawError() + yaw.getDegrees());
+            pitch.turnTo(physics.getPitchRequired(flywheel.getRPM()));
+        }
     }
 
     public Flywheel getFlywheel() {

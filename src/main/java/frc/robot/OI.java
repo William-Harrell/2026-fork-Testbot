@@ -38,12 +38,12 @@ public final class OI {
 
     @Override
     public Trigger toggleSpeedExponent() {
-      return stick.b();
+      return stick.povLeft();
     }
 
     @Override
     public Trigger toggleFieldRelative() {
-      return stick.povDown();
+      return stick.povUp();
     }
 
     @Override

@@ -13,8 +13,8 @@ public final class SpindexerConstants {
     // SpinDexer Motor Configs
     public static final int SPINDEXER_ID = 17; // Vortex (Spark Flex)
 
-    public static final int SPIN_STATOR_CURRENT_LIMIT = 120;
-    public static final int SPIN_SUPPLY_CURRENT_LIMIT = 80;
+    public static final int SPIN_STATOR_CURRENT_LIMIT = 60;
+    public static final int SPIN_SUPPLY_CURRENT_LIMIT = 40;
         // true = coast, false = brake
     public static final boolean SPIN_COAST = true;
 }

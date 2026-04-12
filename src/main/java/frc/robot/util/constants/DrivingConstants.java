@@ -60,9 +60,7 @@ public final class DrivingConstants {
 
     Trigger runSpindexer();
 
-    Trigger turretLeft();
-
-    Trigger turretRight();
+    Trigger chatClipThat();
 
     Trigger posPitch();
 

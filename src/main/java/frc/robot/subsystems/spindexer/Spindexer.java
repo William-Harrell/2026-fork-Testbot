@@ -1,6 +1,7 @@
 package frc.robot.subsystems.spindexer;
 
-import com.ctre.phoenix6.hardware.TalonFX;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.spindexer.SpindexerState.spindexer_state;
@@ -11,7 +12,7 @@ public class Spindexer extends SubsystemBase{
 
     public Spindexer() {
         state = new SpindexerState();
-        spinner = new Spinner(new TalonFX(SpindexerConstants.SPINDEXER_ID));
+        spinner = new Spinner(new SparkFlex(SpindexerConstants.SPINDEXER_ID, MotorType.kBrushless));
     }
 
     public void startFeed() {

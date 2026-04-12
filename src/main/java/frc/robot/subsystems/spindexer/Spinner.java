@@ -1,36 +1,38 @@
 package frc.robot.subsystems.spindexer;
 
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.VelocityVoltage;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.config.SparkFlexConfig;
+
 
 public class Spinner {
-    private final TalonFX spindmotor;
+    private final SparkFlex spindmotor;
+    private final RelativeEncoder SpinEncoder;
     private double targetRPM;
-    private final VelocityVoltage velVolts = new VelocityVoltage(0).withSlot(0);
 
-    public Spinner(TalonFX motor) {
+    public Spinner(SparkFlex motor) {
         spindmotor = motor;
+        SpinEncoder = motor.getEncoder();
 
-        var config = new TalonFXConfiguration();
+    SparkFlexConfig config = new SparkFlexConfig();
+      config.idleMode(SpindexerConstants.SPIN_COAST ? 
+        IdleMode.kCoast : IdleMode.kBrake)
+        .smartCurrentLimit(
+          SpindexerConstants.SPIN_STATOR_CURRENT_LIMIT, 
+          SpindexerConstants.SPIN_SUPPLY_CURRENT_LIMIT);
 
-        // Current stuff
-        config.CurrentLimits.StatorCurrentLimitEnable = true;
-        config.CurrentLimits.SupplyCurrentLimitEnable = true;
-        config.CurrentLimits.StatorCurrentLimit = SpindexerConstants.CURRENTLIMIT;
-        config.CurrentLimits.SupplyCurrentLimit = SpindexerConstants.SUPPLYCURRENTLIMIT;
+      config.closedLoopRampRate(SpindexerConstants.RAMPRATE);
 
-        // etc
-        config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SpindexerConstants.RAMPRATE;
-        config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-
-        spindmotor.getConfigurator().apply(config);
+    spindmotor.configure(config, 
+        ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     public void setRPM(double rpm) {
         targetRPM = rpm;
-        spindmotor.setControl(velVolts.withVelocity(rpm / 60.0));
+        spindmotor.set(rpm / SpindexerConstants.RPMMAX);
     }
 
     public double getTargetRPM() {
@@ -38,7 +40,8 @@ public class Spinner {
     }
 
     public double getRPM() {
-        return spindmotor.getVelocity().getValueAsDouble() * 60;
+        var currentRPM = SpinEncoder.getVelocity();
+        return currentRPM;
     }
 
     public boolean isAtSpeed() {

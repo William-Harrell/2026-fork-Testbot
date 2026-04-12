@@ -29,7 +29,9 @@ public class Spinner {
           SpindexerConstants.SPIN_SUPPLY_CURRENT_LIMIT);
 
       config.closedLoopRampRate(SpindexerConstants.RAMPRATE);
-
+        
+    // (For future reference)
+    // All slots are default (kSlot0)
       config.closedLoop
           .p(SpindexerConstants.SPIN_kP)
           .i(SpindexerConstants.SPIN_kI)

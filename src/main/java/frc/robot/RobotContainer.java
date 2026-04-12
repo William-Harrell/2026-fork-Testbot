@@ -102,8 +102,8 @@ public class RobotContainer {
         .toggleSpeedExponent()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    driverJoystick.resetGyro().onTrue(null); // TODO: fill this in once new swerve system is in-place
-
+    driverJoystick.resetGyro().onTrue(new InstantCommand(() -> swerve.zeroGyro())); 
+    
     // driverJoystick
     // .skiStop()
     // .onTrue(SwerveCommands.SkiStop(swerve).until(driverJoystick::isMovementCommanded));

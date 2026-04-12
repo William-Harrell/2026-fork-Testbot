@@ -97,6 +97,10 @@ public class Swerve extends SubsystemBase {
                 new Pose2d(getPose().getTranslation(), new Rotation2d()));
     }
 
+    public void zeroGyro() {
+        hardware.setYaw(new Rotation2d());
+    }
+
     // Driving methods
     public Command teleopCommand(DoubleSupplier forward, DoubleSupplier strafe, DoubleSupplier turn) {
         return new RunCommand(

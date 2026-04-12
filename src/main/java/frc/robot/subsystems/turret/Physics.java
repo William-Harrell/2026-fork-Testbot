@@ -48,7 +48,7 @@ public class Physics {
         var pose_container = limelight.getPose3d();
 
         if (pose_container.isEmpty()) {
-            return last_pitch_req;
+            return last_yaw_req;
         }
 
         var pose = pose_container.get();

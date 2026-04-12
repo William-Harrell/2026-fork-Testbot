@@ -47,11 +47,11 @@ public class Robot extends TimedRobot {
       System.out.println("Error loading path: " + e.getMessage());
     }
     
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    // autonomousCommand = robotContainer.getAutonomousCommand();
 
-    if (autonomousCommand != null) {
-      CommandScheduler.getInstance().schedule(autonomousCommand);
-    }
+    // if (autonomousCommand != null) {
+    //   CommandScheduler.getInstance().schedule(autonomousCommand);
+    // }
   }
 
   @Override

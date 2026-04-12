@@ -1,6 +1,10 @@
 package frc.robot.subsystems.turret;
 
 public final class TurretConstants {
+  // Config
+  public static final boolean AUTO_AIM_ENABLED = false;
+  //
+  //
   // Physical
   public static final double FLYWHEEL_RADIUS = 0.0508; // meters
   public static final double FLYWHEEL_EFFICIENCY = 1; // TODO: calibrate

@@ -37,23 +37,8 @@ public final class OI {
     }
 
     @Override
-    public Trigger toggleSpeed() {
+    public Trigger toggleSpeedExponent() {
       return stick.b();
-    }
-
-    // @Override
-    // public Trigger resetGyroTo() {
-    //   return stick.povUp();
-    // }
-
-    // @Override
-    // public Trigger resetGyroAway() {
-    //   return stick.povDown();
-    // }
-
-    @Override
-    public Trigger zeroHeading() {
-      return stick.povUp();
     }
 
     @Override
@@ -62,14 +47,24 @@ public final class OI {
     }
 
     @Override
-    public Trigger skiStop() {
-      return stick.rightBumper();
+    public Trigger resetGyro() {
+      return stick.povDown();
     }
 
-    @Override
-    public boolean isMovementCommanded() {
-      return Math.abs(forward()) + Math.abs(strafe()) + Math.abs(turn()) > 0.01;
-    }
+    // @Override
+    // public Trigger zeroHeading() {
+    // return stick.povUp();
+    // }
+
+    // @Override
+    // public Trigger skiStop() {
+    // return stick.rightBumper();
+    // }
+
+    // @Override
+    // public boolean isMovementCommanded() {
+    // return Math.abs(forward()) + Math.abs(strafe()) + Math.abs(turn()) > 0.01;
+    // }
   }
 
   public static class XboxOperator implements DrivingConstants.OperatorActionSet {
@@ -81,37 +76,47 @@ public final class OI {
 
     @Override
     public Trigger runFlywheel() {
-      return stick.x();
+      return stick.y();
     }
 
     @Override
     public Trigger deployIntake() {
-      return stick.leftBumper();
+      return stick.x();
     }
 
     @Override
-    public Trigger retractIntake() {
-      return stick.rightBumper();
+    public Trigger runIntake() {
+      return stick.a();
     }
 
     @Override
-    public Trigger runIntakeForward() {
-      return stick.leftTrigger();
+    public Trigger runSpindexer() {
+      return stick.b();
     }
 
     @Override
-    public Trigger runIntakeReverse() {
-      return stick.rightTrigger();
+    public Trigger posPitch() {
+      return stick.povUp();
+    }
+
+    @Override
+    public Trigger negPitch() {
+      return stick.povDown();
+    }
+
+    @Override
+    public Trigger posYaw() {
+      return stick.povLeft();
+    }
+
+    @Override
+    public Trigger negYaw() {
+      return stick.povRight();
     }
 
     @Override
     public Trigger chatClipThat() {
       return stick.povLeft();
-    }
-
-    @Override
-    public Trigger runSpintake() {
-      return stick.a();
     }
   }
 }

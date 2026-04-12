@@ -7,6 +7,7 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Yaw {
@@ -21,6 +22,9 @@ public class Yaw {
         controller = this.motor.getClosedLoopController();
 
         SparkMaxConfig config = new SparkMaxConfig();
+        config.idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(TurretConstants.YAW_CURRENT_LIMIT);
+
         config.absoluteEncoder
                 .positionConversionFactor(360.0) // (rotations to degrees)
                 .velocityConversionFactor(60.0) // (rotations to degrees) per second
@@ -41,6 +45,6 @@ public class Yaw {
 
     public void moveTo(double goal) {
         goal = Math.min(Math.max(goal, TurretConstants.MIN_YAW), TurretConstants.MAX_YAW);
-        controller.setSetpoint(goal + TurretConstants.OFFSET_YAW, ControlType.kPosition);
+        controller.setSetpoint(goal, ControlType.kPosition);
     }
 }

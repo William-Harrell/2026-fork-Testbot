@@ -4,6 +4,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
@@ -11,11 +13,13 @@ import com.revrobotics.spark.config.SparkFlexConfig;
 public class Spinner {
     private final SparkFlex spindmotor;
     private final RelativeEncoder SpinEncoder;
+    private final SparkClosedLoopController controller;
     private double targetRPM;
 
     public Spinner(SparkFlex motor) {
         spindmotor = motor;
         SpinEncoder = motor.getEncoder();
+        controller = motor.getClosedLoopController();
 
     SparkFlexConfig config = new SparkFlexConfig();
       config.idleMode(SpindexerConstants.SPIN_COAST ? 
@@ -25,6 +29,14 @@ public class Spinner {
           SpindexerConstants.SPIN_SUPPLY_CURRENT_LIMIT);
 
       config.closedLoopRampRate(SpindexerConstants.RAMPRATE);
+        
+    // (For future reference)
+    // All slots are default (kSlot0)
+      config.closedLoop
+          .p(SpindexerConstants.SPIN_kP)
+          .i(SpindexerConstants.SPIN_kI)
+          .d(SpindexerConstants.SPIN_kD)
+          .velocityFF(SpindexerConstants.SPIN_kFF);
 
     spindmotor.configure(config, 
         ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
@@ -32,7 +44,11 @@ public class Spinner {
 
     public void setRPM(double rpm) {
         targetRPM = rpm;
-        spindmotor.set(rpm / SpindexerConstants.RPMMAX);
+        if (rpm == 0) {
+            spindmotor.set(0);
+        } else {
+            controller.setSetpoint(rpm, ControlType.kVelocity);
+        }
     }
 
     public double getTargetRPM() {

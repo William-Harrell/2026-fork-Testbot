@@ -96,6 +96,8 @@ public class SwerveModule {
     driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     if (invertDrive) {
       driveConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    } else {
+      driveConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     }
     driveConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_CURRENT_LIMIT;
     driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;

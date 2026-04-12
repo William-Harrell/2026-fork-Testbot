@@ -26,13 +26,18 @@ public class Deploy {
     targetPosition = IntakeConstants.STOW_POS;
 
     SparkFlexConfig config = new SparkFlexConfig();
-    config.idleMode(IdleMode.kBrake).smartCurrentLimit(IntakeConstants.DEPLOY_MOTOR_CURRENT_LIMIT);
-    config.closedLoop
-        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
+      config.idleMode(IntakeConstants.DEPLOY_COAST ? 
+        IdleMode.kCoast : IdleMode.kBrake)
+        .smartCurrentLimit(
+          IntakeConstants.DEPLOY_STATOR_CURRENT_LIMIT, 
+          IntakeConstants.DEPLOY_SUPPLY_CURRENT_LIMIT);
+
+      config.closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
 
     this.motor.configure(
-        config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
     // limitSwitch = new DigitalInput(IntakeConstants.DEPLOY_LIMIT_SWITCH_DIO);
 

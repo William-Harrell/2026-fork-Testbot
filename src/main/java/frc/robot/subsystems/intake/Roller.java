@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -19,7 +20,17 @@ public class Roller {
     this.deploy = deploy;
 
     TalonFXConfiguration config = new TalonFXConfiguration();
-    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config.MotorOutput.NeutralMode = IntakeConstants.ROLLER_COAST ? 
+        NeutralModeValue.Coast : NeutralModeValue.Brake;
+    config.CurrentLimits.StatorCurrentLimit = 
+      IntakeConstants.ROLLER_STATOR_CURRENT_LIMIT;
+    config.CurrentLimits.StatorCurrentLimitEnable = 
+      IntakeConstants.ROLLER_STATOR_CURRENT_LIMIT_ENABLE;
+    config.CurrentLimits.SupplyCurrentLimit = 
+      IntakeConstants.ROLLER_SUPPLY_CURRENT_LIMIT;
+    config.CurrentLimits.SupplyCurrentLimitEnable = 
+      IntakeConstants.ROLLER_SUPPLY_CURRENT_LIMIT_ENABLE;
+
     this.motor.getConfigurator().apply(config);
   }
 

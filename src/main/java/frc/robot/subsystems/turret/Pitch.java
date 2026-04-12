@@ -26,11 +26,19 @@ public class Pitch {
 
         SparkFlexConfig config = new SparkFlexConfig();
         config.encoder
-                .positionConversionFactor(360.0) // (rotations to degrees)
-                .velocityConversionFactor(60.0); // (rotations to degrees) per second
+                .positionConversionFactor(360.0 * TurretConstants.PITCH_DEGREE_RATIO)
+                .velocityConversionFactor(60.0 * TurretConstants.PITCH_DEGREE_RATIO);
         config.idleMode(IdleMode.kBrake).smartCurrentLimit(TurretConstants.PITCH_CURRENT_LIMIT);
         config.closedLoop
-                .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                .p(TurretConstants.PITCH_kP)
+                .i(TurretConstants.PITCH_kI)
+                .d(TurretConstants.PITCH_kD);
+        config.softLimit
+                .forwardSoftLimit(TurretConstants.MAX_PITCH)
+                .forwardSoftLimitEnabled(true)
+                .reverseSoftLimit(TurretConstants.MIN_PITCH)
+                .reverseSoftLimitEnabled(true);
 
         this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
@@ -38,10 +46,6 @@ public class Pitch {
     }
 
     public double getDegrees() {
-        return rel_encoder.getPosition() * TurretConstants.PITCH_DEGREE_RATIO;
-    }
-
-    public double getMotorDegrees() {
         return rel_encoder.getPosition();
     }
 
@@ -50,8 +54,9 @@ public class Pitch {
     }
 
     public void turnTo(double goal) {
-        target_angle = Math.min(TurretConstants.MAX_PITCH, Math.min(goal, TurretConstants.MIN_PITCH));
-        controller.setSetpoint(goal, ControlType.kPosition);
+        target_angle = Math.max(TurretConstants.MIN_PITCH,
+                Math.min(TurretConstants.MAX_PITCH, goal));
+        controller.setSetpoint(target_angle, ControlType.kPosition);
     }
 
     public void reset() {

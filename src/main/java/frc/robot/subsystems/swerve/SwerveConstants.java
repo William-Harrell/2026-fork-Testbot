@@ -12,7 +12,8 @@ public final class SwerveConstants {
 
 
   // Hardware
-  public static final double TRACK_WIDTH = Units.inchesToMeters(18.5); // Left to right
+      //From wheel center axle TODO: measure
+  public static final double TRACK_WIDTH = Units.inchesToMeters(18.5); // Left to right 
   public static final double WHEEL_BASE = Units.inchesToMeters(24.75); // Front to back
 
   public static final double MAX_SPEED = 4.2; // meters per second
@@ -51,18 +52,22 @@ public final class SwerveConstants {
   // ENCODER OFFSETS - Calibration for wheel angles
 
   // These values tell the robot what "forward" looks like for each wheel.
-  //
   // HOW TO CALIBRATE:
   // 1. Put robot on blocks (wheels off ground)
   // 2. Rotate each wheel so it points forward
-  // 3. Read the CANCoder value in Phoenix Tuner
-  // 4. Put that value here (may need to add/subtract 180)
+  // 3. Read the CANCoder value in Phoenix Tuner and put it in the encoder offset
+  // 4. use an angle finder and fine tune it
+  
+  // What are the things below:
+    // BLANK_IRL_Degrees = 0.0 (whether or not CW or CCW) ((Angle measure) / 180.0);
+    // BLANK_ENCODER_OFFSET = 0.0 (sign from Phoenix tuner) (Value from Phoenix Tuner) + BLANK_IRL_Degrees;
 
-  // From the degree caliber in real life (units: Degrees) (CCW +)
-  private static final double FL_IRL_Degrees = 0 + (0.0 / 360);
-  private static final double FR_IRL_Degrees = 0 + (0.0 / 360);
-  private static final double BL_IRL_Degrees = 0 + (3.0 / 360);
-  private static final double BR_IRL_Degrees = 0 - (1.0 / 360);
+  // From the degree caliber in real life (units: Degrees) (CCW +) 
+  //    (why is it 180?: tbh I don't know) 
+  private static final double FL_IRL_Degrees = 0.0 + (0.0 / 180);
+  private static final double FR_IRL_Degrees = 0.0 + (0.0 / 180);
+  private static final double BL_IRL_Degrees = 0.0 + (0.0 / 180);
+  private static final double BR_IRL_Degrees = 0.0 + (0.0 / 180);
  
   // (units: rotations)
   public static final double FL_ENCODER_OFFSET = 0.0 + 0.362305 + FL_IRL_Degrees;
@@ -90,10 +95,41 @@ public final class SwerveConstants {
 
   // CURRENT LIMITS - Protects motors from overheating
 
-  public static final int DRIVE_CURRENT_LIMIT = 59; // Amps stator (was 60 — lowered for breaker safety)
-  public static final int DRIVE_SUPPLY_CURRENT_LIMIT = 35; // Amps from battery
+  public static final int DRIVE_STATOR_LIMIT = 60; // Amps stator (was 60 — lowered for breaker safety)
+  public static final int DRIVE_SUPPLY_LIMIT = 40; // Amps from battery
+  public static final boolean DRIVE_STATOR_LIMIT_ENABLE = true;
+  public static final boolean DRIVE_SUPPLY_LIMIT_ENABLE = true;
 
-  public static final int AZIMUTH_CURRENT_LIMIT = 20; // Amps (was 30 — steering mostly holds position)
+  public static final int AZIMUTH_STATOR_LIMIT = 30; // Amps (was 30 — steering mostly holds position)
+  public static final int AZIMUTH_SUPPLY_LIMIT = 20; // Supply limit
+  public static final boolean AZIMUTH_STATOR_LIMIT_ENABLE = true;
+  public static final boolean AZIMUTH_SUPPLY_LIMIT_ENABLE = true;
+
+  // COAST OR BRAKE MOTOR - whether or not motor resists rotation when neutral
+    // True = Coast, False = brake
+  public static final boolean DRIVE_COAST = true;
+  public static final boolean AZIMUTH_COAST = false;
+
+  // INVERT MOTORS / CANcoders - whether or not a motor is inverted
+    // True = CW +, False = CCW +  
+    //            or  
+    // True = Invert, False = no Invert
+
+  public static final boolean FL_DRIVE_INVERT = true;
+  public static final boolean FL_AZIMUTH_INVERT = true;
+  public static final boolean FL_CANcoder_INVERT = false;
+
+  public static final boolean FR_DRIVE_INVERT = true;
+  public static final boolean FR_AZIMUTH_INVERT = true;
+  public static final boolean FR_CANcoder_INVERT = false;
+
+  public static final boolean BL_DRIVE_INVERT = true;
+  public static final boolean BL_AZIMUTH_INVERT = true;
+  public static final boolean BL_CANcoder_INVERT = false;
+
+  public static final boolean BR_DRIVE_INVERT = true;
+  public static final boolean BR_AZIMUTH_INVERT = true;
+  public static final boolean BR_CANcoder_INVERT = false;
 
   // RAMP RATES - How quickly motors speed up
 

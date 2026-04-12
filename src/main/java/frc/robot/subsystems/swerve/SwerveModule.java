@@ -35,6 +35,8 @@ public class SwerveModule {
 
   private final int moduleNumber;
   private final boolean invertDrive;
+  private final boolean invertAzimuth;
+  private final boolean invertCANcoder;
 
   private final TalonFX driveMotor;
   private final TalonFX azimuthMotor;
@@ -52,7 +54,9 @@ public class SwerveModule {
       int azimuthMotorId,
       int canCoderId,
       double encoderOffset) {
-    this(moduleNumber, driveMotorId, azimuthMotorId, canCoderId, encoderOffset, false);
+    this(moduleNumber, driveMotorId, azimuthMotorId, canCoderId, 
+        encoderOffset, 
+        false, false, false);
   }
 
   public SwerveModule(
@@ -61,10 +65,14 @@ public class SwerveModule {
       int azimuthMotorId,
       int canCoderId,
       double encoderOffset,
-      boolean invertDrive) {
+      boolean invertDrive,
+      boolean invertAzimuth,
+      boolean invertCANcoder) {
     this.moduleNumber = moduleNumber;
     this.encoderOffset = Rotation2d.fromRotations(encoderOffset);
     this.invertDrive = invertDrive;
+    this.invertAzimuth = invertAzimuth;
+    this.invertCANcoder = invertCANcoder;
 
     // Drive motor (TalonFX)
     driveMotor = new TalonFX(driveMotorId);
@@ -93,16 +101,17 @@ public class SwerveModule {
     // ================================================================
     TalonFXConfiguration driveConfig = new TalonFXConfiguration();
 
-    driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    if (invertDrive) {
-      driveConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    } else {
-      driveConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
-    }
-    driveConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_CURRENT_LIMIT;
-    driveConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    driveConfig.CurrentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_SUPPLY_CURRENT_LIMIT;
-    driveConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
+    driveConfig.MotorOutput.NeutralMode = SwerveConstants.DRIVE_COAST ? 
+      NeutralModeValue.Coast : NeutralModeValue.Brake;
+
+    driveConfig.MotorOutput.Inverted = invertDrive ?
+      InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+
+    driveConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_STATOR_LIMIT;
+    driveConfig.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.DRIVE_STATOR_LIMIT_ENABLE;
+    driveConfig.CurrentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_SUPPLY_LIMIT;
+    driveConfig.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.DRIVE_SUPPLY_LIMIT_ENABLE;
+
     driveConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SwerveConstants.DRIVE_OPEN_LOOP_RAMP;
     driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SwerveConstants.DRIVE_CLOSED_LOOP_RAMP;
 
@@ -117,10 +126,16 @@ public class SwerveModule {
     // ================================================================
     TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
 
-    azimuthConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    azimuthConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    azimuthConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.AZIMUTH_CURRENT_LIMIT;
-    azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    azimuthConfig.MotorOutput.NeutralMode = SwerveConstants.AZIMUTH_COAST ? 
+      NeutralModeValue.Coast : NeutralModeValue.Brake;
+
+    azimuthConfig.MotorOutput.Inverted = invertAzimuth ?
+      InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+
+    azimuthConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.AZIMUTH_STATOR_LIMIT;
+    azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.AZIMUTH_STATOR_LIMIT_ENABLE;
+    azimuthConfig.CurrentLimits.SupplyCurrentLimit = SwerveConstants.AZIMUTH_SUPPLY_LIMIT;
+    azimuthConfig.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.AZIMUTH_SUPPLY_LIMIT_ENABLE;
 
     // Use the remote CANCoder as the feedback sensor for closed-loop
     azimuthConfig.Feedback.FeedbackRemoteSensorID = canCoder.getDeviceID();
@@ -139,11 +154,13 @@ public class SwerveModule {
   }
 
   private void configureCANCoder() {
-    CANcoderConfiguration config = new CANcoderConfiguration();
-    config.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
+    CANcoderConfiguration CANcoderconfig = new CANcoderConfiguration();
+    CANcoderconfig.MagnetSensor.SensorDirection = invertCANcoder ?
+      SensorDirectionValue.Clockwise_Positive : SensorDirectionValue.CounterClockwise_Positive;
+
     // Apply the magnet offset so CANCoder reads 0 when wheel faces forward
-    config.MagnetSensor.MagnetOffset = -encoderOffset.getRotations();
-    canCoder.getConfigurator().apply(config);
+    CANcoderconfig.MagnetSensor.MagnetOffset = encoderOffset.getRotations();
+    canCoder.getConfigurator().apply(CANcoderconfig);
   }
 
   /** Sync is not needed — CANCoder is the direct feedback sensor for the azimuth TalonFX. */

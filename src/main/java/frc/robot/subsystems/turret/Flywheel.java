@@ -43,7 +43,7 @@ public class Flywheel {
   }
 
   public void spinUp() {
-    setFlywheelRPM(velocityToRPM(TurretConstants.FLYWHEEL_SHOT_RPM));
+    setFlywheelRPM(TurretConstants.FLYWHEEL_SHOT_RPM);
   }
 
   public void stop() {
@@ -62,11 +62,11 @@ public class Flywheel {
     return targetFlywheelRPM;
   }
 
-  private double velocityToRPM(double v) {
-    return (v * 30) / (Math.PI * TurretConstants.FLYWHEEL_RADIUS);
+  private double velocityToRPM(double rotPerSec) {
+    return rotPerSec * 60.0;
   }
 
   private double RPMToVelocity(double rpm) {
-    return (rpm * Math.PI * TurretConstants.FLYWHEEL_RADIUS) / 30;
+    return rpm / 60.0;
   }
 }

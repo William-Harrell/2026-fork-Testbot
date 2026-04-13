@@ -61,8 +61,8 @@ public final class TurretConstants {
   public static final double FLYWHEEL_kA = 0.015; // Acceleration Gain
   public static final double FLYWHEEL_kV = 12 / FLYWHEEL_SHOT_RPM * 60; // Velocity Gain
 
-  public static final int FLYWHEEL_STATOR_CURRENT_LIMIT = 120; // Amps stator
-  public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 80; // Amps from battery
+  public static final int FLYWHEEL_STATOR_CURRENT_LIMIT = 80; // Amps stator
+  public static final int FLYWHEEL_SUPPLY_CURRENT_LIMIT = 60; // Amps from battery
   //
   //
   // Kicker Motor Configuration

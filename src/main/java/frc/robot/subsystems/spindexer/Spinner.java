@@ -9,7 +9,6 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkFlexConfig;
 
-
 public class Spinner {
     private final SparkFlex spindmotor;
     private final RelativeEncoder SpinEncoder;
@@ -21,25 +20,25 @@ public class Spinner {
         SpinEncoder = motor.getEncoder();
         controller = motor.getClosedLoopController();
 
-    SparkFlexConfig config = new SparkFlexConfig();
-      config.idleMode(SpindexerConstants.SPIN_COAST ? 
-        IdleMode.kCoast : IdleMode.kBrake)
-        .smartCurrentLimit(
-          SpindexerConstants.SPIN_STATOR_CURRENT_LIMIT, 
-          SpindexerConstants.SPIN_SUPPLY_CURRENT_LIMIT);
+        SparkFlexConfig config = new SparkFlexConfig();
+        config.idleMode(SpindexerConstants.SPIN_COAST ? IdleMode.kCoast : IdleMode.kBrake)
+                .smartCurrentLimit(
+                        SpindexerConstants.SPIN_STATOR_CURRENT_LIMIT,
+                        SpindexerConstants.SPIN_SUPPLY_CURRENT_LIMIT);
 
-      config.closedLoopRampRate(SpindexerConstants.RAMPRATE);
-        
-    // (For future reference)
-    // All slots are default (kSlot0)
-      config.closedLoop
-          .p(SpindexerConstants.SPIN_kP)
-          .i(SpindexerConstants.SPIN_kI)
-          .d(SpindexerConstants.SPIN_kD)
-          .velocityFF(SpindexerConstants.SPIN_kFF);
+        config.closedLoopRampRate(SpindexerConstants.RAMPRATE);
 
-    spindmotor.configure(config, 
-        ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        // (For future reference)
+        // All slots are default (kSlot0)
+        config.closedLoop
+                .p(SpindexerConstants.SPIN_kP)
+                .i(SpindexerConstants.SPIN_kI)
+                .d(SpindexerConstants.SPIN_kD);
+
+        config.closedLoop.feedForward.kV(SpindexerConstants.SPIN_kV);
+
+        spindmotor.configure(config,
+                ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     public void setRPM(double rpm) {

@@ -15,6 +15,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.turret.Turret;
+import frc.robot.subsystems.turret.TurretConstants;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.constants.DrivingConstants;
 
@@ -102,8 +103,8 @@ public class RobotContainer {
         .toggleSpeedExponent()
         .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
 
-    driverJoystick.resetGyro().onTrue(new InstantCommand(() -> swerve.zeroGyro())); 
-    
+    driverJoystick.resetGyro().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
+
     // driverJoystick
     // .skiStop()
     // .onTrue(SwerveCommands.SkiStop(swerve).until(driverJoystick::isMovementCommanded));
@@ -111,24 +112,29 @@ public class RobotContainer {
     // OPERATOR
     operatorJoystick.runSpindexer().whileTrue(Commands.startEnd(spindexer::startFeed, spindexer::stopFeed, spindexer));
 
-    operatorJoystick.runFlywheel().whileTrue(
-        Commands.startEnd(
-            turret.getFlywheel()::spinUp,
-            turret.getFlywheel()::stop,
-            turret));
-
     operatorJoystick.deployIntake().onTrue(new InstantCommand(intake::deployIntakeMechanism));
 
     operatorJoystick.runIntake().whileTrue(
         Commands.startEnd(intake.getR()::runIntake, intake.getR()::stop,
             intake));
+            
+    if (!TurretConstants.AUTO_AIM_ENABLED) {
+      operatorJoystick.runFlywheel().whileTrue(
+          Commands.startEnd(
+              turret.getFlywheel()::spinUp,
+              turret.getFlywheel()::stop,
+              turret));
 
-    operatorJoystick.posPitch().onTrue(new InstantCommand(() -> turret.turnPitchTo(turret.getPitch() + DrivingConstants.PITCH_INCREMENT_MAGNITUDE)));
-    operatorJoystick.negPitch().onTrue(new InstantCommand(() -> turret.turnPitchTo(turret.getPitch() - DrivingConstants.PITCH_INCREMENT_MAGNITUDE)));
+      operatorJoystick.posPitch().onTrue(
+          new InstantCommand(() -> turret.turnPitchTo(turret.getPitch() + DrivingConstants.PITCH_INCREMENT_MAGNITUDE)));
+      operatorJoystick.negPitch().onTrue(
+          new InstantCommand(() -> turret.turnPitchTo(turret.getPitch() - DrivingConstants.PITCH_INCREMENT_MAGNITUDE)));
 
-    operatorJoystick.posYaw().onTrue(new InstantCommand(() -> turret.moveYawTo(turret.getYaw() + DrivingConstants.YAW_INCREMENT_MAGNITUDE)));
-    operatorJoystick.negYaw().onTrue(new InstantCommand(() -> turret.moveYawTo(turret.getYaw() - DrivingConstants.YAW_INCREMENT_MAGNITUDE)));
-
+      operatorJoystick.posYaw().onTrue(
+          new InstantCommand(() -> turret.moveYawTo(turret.getYaw() + DrivingConstants.YAW_INCREMENT_MAGNITUDE)));
+      operatorJoystick.negYaw().onTrue(
+          new InstantCommand(() -> turret.moveYawTo(turret.getYaw() - DrivingConstants.YAW_INCREMENT_MAGNITUDE)));
+    }
     // gone but not forgotten :( fly high chatClipThat command
     // operatorJoystick.chatClipThat().onTrue(
     // new RunCommand(() -> {

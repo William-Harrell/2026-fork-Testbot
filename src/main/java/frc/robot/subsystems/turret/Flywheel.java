@@ -42,8 +42,12 @@ public class Flywheel {
     }
   }
 
-  public void spinUp() {
+  public void spinFull() {
     setFlywheelRPM(TurretConstants.FLYWHEEL_SHOT_RPM);
+  }
+
+  public void spinStart() {
+    setFlywheelRPM(TurretConstants.FLYWHEEL_SHOT_RPM*TurretConstants.FLYWHEEL_STARTUP_RPM);
   }
 
   public void stop() {

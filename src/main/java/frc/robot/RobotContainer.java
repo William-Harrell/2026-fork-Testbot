@@ -117,13 +117,16 @@ public class RobotContainer {
     operatorJoystick.runIntake().whileTrue(
         Commands.startEnd(intake.getR()::runIntake, intake.getR()::stop,
             intake));
-            
+
     if (!TurretConstants.AUTO_AIM_ENABLED) {
       operatorJoystick.runFlywheel().whileTrue(
-          Commands.startEnd(
-              turret.getFlywheel()::spinUp,
-              turret.getFlywheel()::stop,
-              turret));
+          Commands.sequence(
+              Commands.runOnce(turret.getFlywheel()::spinStart, turret),
+              Commands.waitUntil(() -> {
+                return turret.getFlywheel().atTargetRPM();
+              }),
+              Commands.run(turret.getFlywheel()::spinFull, turret))
+              .finallyDo(() -> turret.getFlywheel().stop()));
 
       operatorJoystick.posPitch().onTrue(
           new InstantCommand(() -> turret.turnPitchTo(turret.getPitch() + DrivingConstants.PITCH_INCREMENT_MAGNITUDE)));

@@ -39,7 +39,7 @@ public class Turret extends SubsystemBase {
 
     // Start shooting
     public void startFlywheel() {
-        flywheel.spinUp();
+        flywheel.spinFull();
         kicker.run();
         state.set(turret_state.SPINNING_UP);
     }

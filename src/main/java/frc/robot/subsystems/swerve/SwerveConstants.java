@@ -12,7 +12,7 @@ public final class SwerveConstants {
 
 
   // Hardware
-      //From wheel center axle TODO: measure
+      //From wheel center axle TODO: measure for auto
   public static final double TRACK_WIDTH = Units.inchesToMeters(18.5); // Left to right 
   public static final double WHEEL_BASE = Units.inchesToMeters(24.75); // Front to back
 

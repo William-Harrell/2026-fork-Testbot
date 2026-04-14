@@ -33,7 +33,7 @@ public class Limelight {
         var results = getResults();
 
         if (results.targets_Fiducials.length <= 0) {
-            return Optional.of(pose_cache);
+            return Optional.ofNullable(pose_cache);
         }
         // X, Y, Z, & Rotation
         // 0 degrees rot is facing camera

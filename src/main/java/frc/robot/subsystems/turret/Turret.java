@@ -10,18 +10,18 @@ import frc.robot.subsystems.turret.TurretState.turret_state;
 import frc.robot.subsystems.vision.Vision;
 
 public class Turret extends SubsystemBase {
-    private final Vision vision;
+    // private final Vision vision;
 
     // Sub-subsystems
     private final Flywheel flywheel;
     private final TurretState state;
-    private final Physics physics;
+    // private final Physics physics;
     private final Pitch pitch;
     private final Yaw yaw;
     private final Kicker kicker;
 
-    public Turret(Vision vision) {
-        this.vision = vision;
+    public Turret() { // Suppose to pass vision through here
+        // this.vision = vision;
 
         flywheel = new Flywheel(new TalonFX(TurretConstants.FLYWHEEL_MOTOR_ID));
 
@@ -32,7 +32,7 @@ public class Turret extends SubsystemBase {
 
         yaw = new Yaw(new SparkMax(TurretConstants.TURN_MOTOR_ID, MotorType.kBrushless));
 
-        physics = new Physics(this.vision);
+        //physics = new Physics(this.vision);
 
         kicker = new Kicker(new SparkFlex(TurretConstants.KICKER_MOTOR_ID, MotorType.kBrushless));
     }
@@ -90,10 +90,11 @@ public class Turret extends SubsystemBase {
         }
 
         // Update angles & encoders here
-        if (TurretConstants.AUTO_AIM_ENABLED) {
-            yaw.moveTo(physics.getYawError() + yaw.getDegrees());
-            pitch.turnTo(physics.getPitchRequired(flywheel.getRPM()));
-        }
+        // TODO: Reenable if vision is working
+        //if (TurretConstants.AUTO_AIM_ENABLED) {
+        //    yaw.moveTo(physics.getYawError() + yaw.getDegrees());
+        //    pitch.turnTo(physics.getPitchRequired(flywheel.getRPM()));
+        //}
     }
 
     public Flywheel getFlywheel() {

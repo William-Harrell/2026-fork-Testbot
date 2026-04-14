@@ -3,6 +3,7 @@ package frc.robot;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,7 +33,7 @@ public class RobotContainer {
 
   // Subsystems
   private final Swerve swerve;
-  private final Vision vision;
+  //private final Vision vision;
   private final Turret turret;
   private final Intake intake;
   private final Spindexer spindexer;
@@ -50,8 +51,8 @@ public class RobotContainer {
     // Subsystems
     // swerve = new Swerve(vision);
     swerve = new Swerve();
-    vision = new Vision();
-    turret = new Turret(vision);
+    //vision = new Vision();
+    turret = new Turret(); // should be passing through vision
     spindexer = new Spindexer();
     intake = new Intake();
 
@@ -80,7 +81,7 @@ public class RobotContainer {
     // ? 180
     // : 0));
 
-    // SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
+    SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
   }
 
   private double applySpeedCurve(double input) {

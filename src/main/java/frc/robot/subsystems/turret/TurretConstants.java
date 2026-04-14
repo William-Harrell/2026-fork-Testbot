@@ -46,7 +46,7 @@ public final class TurretConstants {
   //
   //
   // Flywheel Motor Configuration
-  public static final double FLYWHEEL_RPM_LIMIT = 8000;
+  public static final double FLYWHEEL_RPM_LIMIT = 6000;
   public static final double FLYWHEEL_SHOT_RPM = FLYWHEEL_RPM_LIMIT;
   public static final double FLYWHEEL_STARTUP_RPM = FLYWHEEL_RPM_LIMIT * 0.5;
   public static final double FLYWHEEL_RPM_TOLERANCE = 50.0;

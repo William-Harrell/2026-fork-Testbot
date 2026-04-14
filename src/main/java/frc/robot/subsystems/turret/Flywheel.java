@@ -47,7 +47,7 @@ public class Flywheel {
   }
 
   public void spinStart() {
-    setFlywheelRPM(TurretConstants.FLYWHEEL_SHOT_RPM*TurretConstants.FLYWHEEL_STARTUP_RPM);
+    setFlywheelRPM(TurretConstants.FLYWHEEL_STARTUP_RPM);
   }
 
   public void stop() {

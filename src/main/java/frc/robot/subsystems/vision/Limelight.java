@@ -26,7 +26,7 @@ public class Limelight {
     }
 
     public Optional<Pose3d> getLastPose3d() {
-        return Optional.of(pose_cache);
+        return Optional.ofNullable(pose_cache);
     }
 
     public Optional<Pose3d> getPose3d() {
@@ -42,7 +42,7 @@ public class Limelight {
         Pose3d new_pose = tag.getCameraPose_TargetSpace();
 
         pose_cache = new_pose;
-        return Optional.of(new_pose);
+        return Optional.ofNullable(new_pose);
     }
 
     public void rewindRecord(double time) {

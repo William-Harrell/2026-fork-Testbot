@@ -113,10 +113,11 @@ public final class OI {
     public Trigger negYaw() {
       return stick.povRight();
     }
-
+/* 
     @Override
     public Trigger chatClipThat() {
       return stick.povLeft();
     }
+      */
   }
 }

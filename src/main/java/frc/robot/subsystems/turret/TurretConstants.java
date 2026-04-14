@@ -67,5 +67,13 @@ public final class TurretConstants {
   //
   //
   // Kicker Motor Configuration
-  public static final int KICKER_CURRENT_LIMIT = 80;
+  public static final int KICKER_STATOR_CURRENT_LIMIT = 80;
+  public static final int KICKER_SUPPLY_CURRENT_LIMIT = 40;
+    // True = coast, false = break
+  public static final boolean KICKER_COAST = false;
+    // True = motor reverse, false = motor spin forward.
+  public static final boolean KICKER_SPIN_REVERSE = false;
+
+  public static final int KICKER_SPIN_SPEED_MAX = 100; // TODO:Measure w/ rev client
+  public static final int KICKER_SPIN_SPEED = 50; // TODO: Measure w/ rev client
 }

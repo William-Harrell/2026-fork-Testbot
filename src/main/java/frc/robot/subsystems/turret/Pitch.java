@@ -27,8 +27,8 @@ public class Pitch {
         SparkFlexConfig config = new SparkFlexConfig();
         config.encoder
                 .positionConversionFactor(360.0 * TurretConstants.PITCH_DEGREE_RATIO)
-                .velocityConversionFactor(60.0 * TurretConstants.PITCH_DEGREE_RATIO);
-        config.idleMode(IdleMode.kBrake).smartCurrentLimit(TurretConstants.PITCH_CURRENT_LIMIT);
+                .velocityConversionFactor(360.0 * 60.0 * TurretConstants.PITCH_DEGREE_RATIO);
+        
         config.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .p(TurretConstants.PITCH_kP)
@@ -39,8 +39,11 @@ public class Pitch {
                 .forwardSoftLimitEnabled(true)
                 .reverseSoftLimit(TurretConstants.MIN_PITCH)
                 .reverseSoftLimitEnabled(true);
-
-        this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        config.smartCurrentLimit(TurretConstants.PITCH_STATOR_CURRENT_LIMIT,
+            TurretConstants.PITCH_SUPPLY_CURRENT_LIMIT);
+        config.idleMode(TurretConstants.PITCH_COAST ?
+            IdleMode.kCoast : IdleMode.kBrake);
+        this.motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
 
         rel_encoder.setPosition(target_angle);
     }
@@ -60,6 +63,6 @@ public class Pitch {
     }
 
     public void reset() {
-        turnTo(0.0);
+        turnTo(TurretConstants.INIT_PITCH);
     }
 }

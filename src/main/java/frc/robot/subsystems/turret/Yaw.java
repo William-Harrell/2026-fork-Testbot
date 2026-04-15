@@ -22,13 +22,16 @@ public class Yaw {
         controller = this.motor.getClosedLoopController();
 
         SparkMaxConfig config = new SparkMaxConfig();
-        config.idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(TurretConstants.YAW_CURRENT_LIMIT);
+        config.smartCurrentLimit(TurretConstants.YAW_STATOR_CURRENT_LIMIT,
+            TurretConstants.YAW_SUPPLY_CURRENT_LIMIT);
+        config.idleMode(TurretConstants.YAW_COAST ?
+            IdleMode.kCoast : IdleMode.kBrake);
 
         config.absoluteEncoder
                 .positionConversionFactor(360.0) // (rotations to degrees)
-                .velocityConversionFactor(60.0) // (rotations to degrees) per second
-                .zeroOffset(TurretConstants.OFFSET_YAW);
+                .velocityConversionFactor(360.0 * 60.0) // (rotations/m to degrees) per second (360 * 60)
+                .zeroOffset(TurretConstants.OFFSET_YAW)
+                .inverted(TurretConstants.INVERT_ABS_ENCODER);
 
         config.closedLoop
                 .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
@@ -36,7 +39,13 @@ public class Yaw {
                 .i(TurretConstants.YAW_kI)
                 .d(TurretConstants.YAW_kD);
 
-        this.motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        config.softLimit
+                .forwardSoftLimit(TurretConstants.MAX_YAW)
+                .forwardSoftLimitEnabled(true)
+                .reverseSoftLimit(TurretConstants.MIN_YAW)
+                .reverseSoftLimitEnabled(true);
+
+        this.motor.configure(config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     public double getDegrees() {

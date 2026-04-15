@@ -17,10 +17,15 @@ public final class TurretConstants {
   public static final double MIN_YAW = 0.0 + YAW_TOLERANCE;
   public static final double INIT_YAW = 0.0;
   public static final double OFFSET_YAW = 0.0; // degrees TODO: calibrate
+  public static final boolean INVERT_ABS_ENCODER = false;
   public static final double YAW_kP = 0.1; // TODO: placeholder
   public static final double YAW_kI = 0.0; // TODO: placeholder
   public static final double YAW_kD = 0.01; // TODO: placeholder
-  public static final int YAW_CURRENT_LIMIT = 40; // amps
+  public static final int YAW_STATOR_CURRENT_LIMIT = 40;
+  public static final int YAW_SUPPLY_CURRENT_LIMIT = 30;
+    // True = coast, false = break
+  public static final boolean YAW_COAST = false;
+
   //
   //
   // Pitch
@@ -32,7 +37,10 @@ public final class TurretConstants {
   public static final double PITCH_kP = 0.5;
   public static final double PITCH_kI = 0.0;
   public static final double PITCH_kD = 0.0;
-  public static final int PITCH_CURRENT_LIMIT = 80;
+  public static final int PITCH_STATOR_CURRENT_LIMIT = 40;
+  public static final int PITCH_SUPPLY_CURRENT_LIMIT = 30;
+    // True = coast, false = break
+  public static final boolean PITCH_COAST = false;
   public static final double OFFSET_PITCH = 0.0; // degrees TODO: calibrate
   // ^ Degrees changed in pitch per encoder rotation
   //
@@ -42,7 +50,7 @@ public final class TurretConstants {
   public static final int HOOD_MOTOR_ID = 21; // Pitch
   public static final int FLYWHEEL_MOTOR_ID = 20; // Shooter
   public static final int KICKER_MOTOR_ID = 18; // Kicker
-  public static final int TURN_MOTOR_ID = 22; // Yasw
+  public static final int TURN_MOTOR_ID = 22; // Yaw
   //
   //
   // Flywheel Motor Configuration

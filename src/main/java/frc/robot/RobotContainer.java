@@ -33,7 +33,7 @@ public class RobotContainer {
 
   // Subsystems
   private final Swerve swerve;
-  //private final Vision vision;
+  private final Vision vision;
   private final Turret turret;
   private final Intake intake;
   private final Spindexer spindexer;
@@ -51,7 +51,7 @@ public class RobotContainer {
     // Subsystems
     // swerve = new Swerve(vision);
     swerve = new Swerve();
-    //vision = new Vision();
+    vision = new Vision();
     turret = new Turret(); // should be passing through vision
     spindexer = new Spindexer();
     intake = new Intake();

@@ -14,7 +14,7 @@ public class Limelight {
         name = n;
         LimelightHelpers.setPipelineIndex(name, 0);
         LimelightHelpers.setRewindEnabled(name, true);
-        pose_cache = getPose3d().get().orElse(null);
+        pose_cache = getPose3d().orElse(null);
     }
 
     public boolean hasTarget() {

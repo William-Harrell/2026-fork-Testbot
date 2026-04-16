@@ -68,7 +68,8 @@ public class Yaw {
     }
 
     public void moveTo(double goal) {
-        goal = Math.min(Math.max(goal, TurretConstants.MIN_YAW), TurretConstants.MAX_YAW);
-        controller.setSetpoint(goal, ControlType.kPosition);
+        // goal = Math.min(Math.max(goal, TurretConstants.MIN_YAW), TurretConstants.MAX_YAW);
+        // controller.setSetpoint(goal, ControlType.kPosition);
+        System.out.println("YAW DISABLED");
     }
 }

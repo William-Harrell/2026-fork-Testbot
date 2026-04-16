@@ -124,14 +124,37 @@ public class RobotContainer {
             intake));
 
     // Shoot
-    operatorJoystick.runFlywheel().whileTrue(
+    operatorJoystick.runFlywheelKicker().whileTrue(
         Commands.sequence(
+          Commands.runOnce(turret::spinFlywheel50, turret),
+          Commands.waitUntil(() -> {
+            return turret.getFlywheel().atTargetRPM();
+          }),
+          Commands.runOnce(turret::spinFlywheel100, turret),
+          Commands.waitUntil(() -> {
+            return turret.getFlywheel().atTargetRPM();
+          }),
+          Commands.runOnce(turret::startFlywheel, turret)
+        )
+      .finallyDo(() -> turret.stopFlywheel())
+    );
+
+
+/* 
             Commands.runOnce(turret.getFlywheel()::spinStart, turret),
             Commands.waitUntil(() -> {
               return turret.getFlywheel().atTargetRPM();
             }),
-            Commands.run(turret.getFlywheel()::spinFull, turret))
-            .finallyDo(() -> turret.getFlywheel().stop()));
+            Commands.run(turret.getFlywheel()::spinFull, turret)),
+            Commands.waitUntil(() -> {
+              return turret.getFlywheel().atTargetRPM();
+            }),
+            Commands.run(turret.getKicker()::run, turret));
+
+    operatorJoystick.runFlywheel().onFalse(
+      new InstantCommand(turret::stopFlywheel)
+    );
+    */
 
     // Toggle auto aim
     operatorJoystick.toggleAutoAim().onTrue(new InstantCommand(turret::toggleAutoAimEnabled));

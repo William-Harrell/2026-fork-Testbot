@@ -52,7 +52,7 @@ public final class DrivingConstants {
   //
   //
   public interface OperatorActionSet {
-    Trigger runFlywheel();
+    Trigger runFlywheelKicker();
 
     Trigger deployIntake();
 

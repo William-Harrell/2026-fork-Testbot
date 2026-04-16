@@ -40,6 +40,18 @@ public class Turret extends SubsystemBase {
         kicker = new Kicker(new SparkFlex(TurretConstants.KICKER_MOTOR_ID, MotorType.kBrushless));
     }
 
+    // Spin up Flywheel to 50%
+    public void spinFlywheel50() {
+        flywheel.spinStart();
+        state.set(turret_state.SPINNING_UP);
+    }
+
+    // Spin up Flywheel to 100%
+    public void spinFlywheel100() {
+        flywheel.spinFull();
+        state.set(turret_state.SPINNING_UP);
+    }
+
     // Start shooting
     public void startFlywheel() {
         flywheel.spinFull();

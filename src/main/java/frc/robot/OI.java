@@ -75,7 +75,7 @@ public final class OI {
     }
 
     @Override
-    public Trigger runFlywheel() {
+    public Trigger runFlywheelKicker() {
       return stick.y();
     }
 

@@ -5,8 +5,12 @@ import frc.robot.subsystems.swerve.SwerveConstants;
 
 public final class DrivingConstants {
   // Controller stuff
+  public static final boolean OPERATORorTEST = true; 
+      // True = 2nd port is operator, false = 2nd port is test
   public static final int DRIVER_PORT = 0;
-  public static final int OPERATOR_PORT = 1;
+  public static final int OPERATOR_PORT = 2;
+  public static final int TEST_PORT = 2;
+
   public static final double JOYSTICK_DEADBAND = 0.1;
   
   public static final double YAW_INCREMENT_MAGNITUDE = 1;
@@ -73,5 +77,15 @@ public final class DrivingConstants {
     Trigger toggleAutoAim();
 
     Trigger zeroYaw();
+  }
+
+  public interface TesterActionSet {
+    Trigger runFlywheel();
+    Trigger runIntake ();
+    Trigger runSpindexer();
+    Trigger runKicker();
+    Trigger DeployIntake();
+    Trigger posPitch();
+    Trigger negPitch();
   }
 }

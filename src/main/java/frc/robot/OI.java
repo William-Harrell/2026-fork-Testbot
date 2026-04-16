@@ -130,4 +130,47 @@ public final class OI {
     }
       */
   }
+  
+  public static class XboxTester implements DrivingConstants.TesterActionSet {
+    private final CommandXboxController stick;
+
+    public XboxTester(int port) {
+      this.stick = new CommandXboxController(port);
+    }
+
+    @Override
+    public Trigger runIntake() {
+      return stick.a();
+    }
+
+    @Override
+    public Trigger runSpindexer() {
+      return stick.b();
+    }
+
+    @Override
+    public Trigger runKicker() {
+      return stick.y();
+    }
+
+    @Override
+    public Trigger runFlywheel() {
+      return stick.x();
+    }
+
+    @Override
+    public Trigger DeployIntake() {
+      return stick.povLeft();
+    }
+
+    @Override
+    public Trigger posPitch() {
+      return stick.povUp();
+    }
+
+    @Override
+    public Trigger negPitch() {
+      return stick.povDown();
+    }
+  }
 }

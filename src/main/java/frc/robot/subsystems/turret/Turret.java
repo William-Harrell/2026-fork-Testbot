@@ -135,4 +135,8 @@ public class Turret extends SubsystemBase {
     public turret_state getState() {
         return state.get();
     }
+
+    public Kicker getKicker() {
+        return kicker;
+    }
 }

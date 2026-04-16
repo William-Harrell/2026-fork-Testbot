@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.OI.XboxDriver;
 import frc.robot.OI.XboxOperator;
+import frc.robot.OI.XboxTester;
 // import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.spindexer.Spindexer;
@@ -23,6 +24,8 @@ public class RobotContainer {
   // Controllers
   private final XboxDriver driverJoystick;
   private final XboxOperator operatorJoystick;
+  private final XboxTester  testerJoystick;
+  
 
   // Auto
   // private final SendableChooser<Command> autoChooser;
@@ -42,6 +45,7 @@ public class RobotContainer {
     DriverStation.silenceJoystickConnectionWarning(true);
     driverJoystick = new XboxDriver(DrivingConstants.DRIVER_PORT);
     operatorJoystick = new XboxOperator(DrivingConstants.OPERATOR_PORT);
+    testerJoystick = new XboxTester(DrivingConstants.TEST_PORT);
 
     // Auto
     // autoChooser = new SendableChooser<>();
@@ -114,76 +118,107 @@ public class RobotContainer {
     // .skiStop()
     // .onTrue(SwerveCommands.SkiStop(swerve).until(driverJoystick::isMovementCommanded));
 
+   
     // OPERATOR
-    operatorJoystick.runSpindexer().whileTrue(Commands.startEnd(spindexer::startFeed, spindexer::stopFeed, spindexer));
+    if (DrivingConstants.OPERATORorTEST) {
+      operatorJoystick.runSpindexer().whileTrue(Commands.startEnd(spindexer::startFeed, spindexer::stopFeed, spindexer));
 
-    operatorJoystick.deployIntake().onTrue(new InstantCommand(intake::deployIntakeMechanism));
+      operatorJoystick.deployIntake().onTrue(new InstantCommand(intake::deployIntakeMechanism));
 
-    operatorJoystick.runIntake().whileTrue(
-        Commands.startEnd(intake.getR()::runIntake, intake.getR()::stop,
-            intake));
+      operatorJoystick.runIntake().whileTrue(
+          Commands.startEnd(intake.getR()::runIntake, intake.getR()::stop,
+              intake));
 
-    // Shoot
-    operatorJoystick.runFlywheelKicker().whileTrue(
-        Commands.sequence(
-          Commands.runOnce(turret::spinFlywheel50, turret),
-          Commands.waitUntil(() -> {
-            return turret.getFlywheel().atTargetRPM();
-          }),
-          Commands.runOnce(turret::spinFlywheel100, turret),
-          Commands.waitUntil(() -> {
-            return turret.getFlywheel().atTargetRPM();
-          }),
-          Commands.runOnce(turret::startFlywheel, turret)
-        )
-      .finallyDo(() -> turret.stopFlywheel())
-    );
+      // Shoot
+      operatorJoystick.runFlywheelKicker().whileTrue(
+          Commands.sequence(
+            Commands.runOnce(turret::spinFlywheel50, turret),
+            Commands.waitUntil(() -> {
+              return turret.getFlywheel().atTargetRPM();
+            }),
+            Commands.runOnce(turret::spinFlywheel100, turret),
+            Commands.waitUntil(() -> {
+              return turret.getFlywheel().atTargetRPM();
+            }),
+            Commands.runOnce(turret::startFlywheel, turret)
+          )
+        .finallyDo(() -> turret.stopFlywheel())
+      );
 
-    // Toggle auto aim
-    operatorJoystick.toggleAutoAim().onTrue(new InstantCommand(turret::toggleAutoAimEnabled));
+      // Toggle auto aim
+      operatorJoystick.toggleAutoAim().onTrue(new InstantCommand(turret::toggleAutoAimEnabled));
 
-    // Pitch
-    operatorJoystick.posPitch().onTrue(
+      // Pitch
+      operatorJoystick.posPitch().onTrue(
+          new InstantCommand(() -> {
+            if (turret.getAutoAimEnabled()) {
+              turret.turnPitchTo(turret.getPitch() + DrivingConstants.PITCH_INCREMENT_MAGNITUDE);
+            }
+          }));
+
+      operatorJoystick.negPitch().onTrue(
+          new InstantCommand(() -> {
+            if (turret.getAutoAimEnabled()) {
+              turret.turnPitchTo(turret.getPitch() - DrivingConstants.PITCH_INCREMENT_MAGNITUDE);
+            }
+          }));
+
+      // Yaw
+      operatorJoystick.posYaw().onTrue(
+          new InstantCommand(() -> {
+            if (turret.getAutoAimEnabled()) {
+              turret.moveYawTo(turret.getYaw() + DrivingConstants.YAW_INCREMENT_MAGNITUDE);
+            }
+          }));
+
+      operatorJoystick.negYaw().onTrue(
+          new InstantCommand(() -> {
+            if (turret.getAutoAimEnabled()) {
+              turret.moveYawTo(turret.getYaw() - DrivingConstants.YAW_INCREMENT_MAGNITUDE);
+            }
+          }));
+
+      operatorJoystick.zeroYaw().onTrue(
         new InstantCommand(() -> {
           if (turret.getAutoAimEnabled()) {
-            turret.turnPitchTo(turret.getPitch() + DrivingConstants.PITCH_INCREMENT_MAGNITUDE);
+            turret.zeroTurretYaw();
           }
         }));
 
-    operatorJoystick.negPitch().onTrue(
-        new InstantCommand(() -> {
-          if (turret.getAutoAimEnabled()) {
-            turret.turnPitchTo(turret.getPitch() - DrivingConstants.PITCH_INCREMENT_MAGNITUDE);
-          }
-        }));
+      // gone but not forgotten :( fly high chatClipThat command
+      // operatorJoystick.chatClipThat().onTrue(
+      // new RunCommand(() -> {
+      // vision.getL().rewindRecord(5);
+      // }, vision));
+    } else {
+      testerJoystick.runIntake().whileTrue(
+        Commands.startEnd(intake.getR()::runIntake, intake.getR()::stop, intake));
+      
+      testerJoystick.runSpindexer().whileTrue(
+        Commands.startEnd(spindexer::startFeed, spindexer::stopFeed, spindexer));
+      /* 
+      testerJoystick.runKicker().whileTrue(
+        Commands.startEnd(turret.getKicker()::run), turret.getKicker()::stop, turret);
+      
+      testerJoystick.runFlywheel().whileTrue(null);
+      */
+      testerJoystick.DeployIntake().onTrue(new InstantCommand(intake::deployIntakeMechanism));
 
-    // Yaw
-    operatorJoystick.posYaw().onTrue(
-        new InstantCommand(() -> {
-          if (turret.getAutoAimEnabled()) {
-            turret.moveYawTo(turret.getYaw() + DrivingConstants.YAW_INCREMENT_MAGNITUDE);
-          }
-        }));
+        // Pitch
+      testerJoystick.posPitch().onTrue(
+          new InstantCommand(() -> {
+            if (turret.getAutoAimEnabled()) {
+              turret.turnPitchTo(turret.getPitch() + DrivingConstants.PITCH_INCREMENT_MAGNITUDE);
+            }
+          }));
 
-    operatorJoystick.negYaw().onTrue(
-        new InstantCommand(() -> {
-          if (turret.getAutoAimEnabled()) {
-            turret.moveYawTo(turret.getYaw() - DrivingConstants.YAW_INCREMENT_MAGNITUDE);
-          }
-        }));
-
-    operatorJoystick.zeroYaw().onTrue(
-      new InstantCommand(() -> {
-        if (turret.getAutoAimEnabled()) {
-          turret.zeroTurretYaw();
-        }
-      }));
-
-    // gone but not forgotten :( fly high chatClipThat command
-    // operatorJoystick.chatClipThat().onTrue(
-    // new RunCommand(() -> {
-    // vision.getL().rewindRecord(5);
-    // }, vision));
+      testerJoystick.negPitch().onTrue(
+          new InstantCommand(() -> {
+            if (turret.getAutoAimEnabled()) {
+              turret.turnPitchTo(turret.getPitch() - DrivingConstants.PITCH_INCREMENT_MAGNITUDE);
+            }
+          }));
+    }
 
   }
 

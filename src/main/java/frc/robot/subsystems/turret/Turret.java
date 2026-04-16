@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.turret.TurretState.turret_state;
 // import frc.robot.subsystems.vision.Vision;
@@ -93,6 +94,10 @@ public class Turret extends SubsystemBase {
                 && flywheel.getRPM() < TurretConstants.FLYWHEEL_RPM_TOLERANCE) {
             state.set(turret_state.IDLE);
 
+        }
+
+        if (TurretConstants.printYawPosition) {
+            SmartDashboard.putNumber("Yaw Position", yaw.getDegrees());
         }
 
         // Update angles & encoders here

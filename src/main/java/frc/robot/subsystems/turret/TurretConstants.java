@@ -26,6 +26,7 @@ public final class TurretConstants {
   // True = coast, false = break
   public static final boolean YAW_COAST = false;
   public static final double YawGearRatio = 462; // TODO: Measure gear ratio b/c from armabot website
+  public static final boolean printYawPosition = true; //prints the current Yaw encoder position to the dashboard when enabled. In periodic of turret subsystem.
 
   //
   //

@@ -71,5 +71,7 @@ public final class DrivingConstants {
     Trigger negYaw();
 
     Trigger toggleAutoAim();
+
+    Trigger zeroYaw();
   }
 }

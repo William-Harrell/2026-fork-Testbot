@@ -165,6 +165,13 @@ public class RobotContainer {
           }
         }));
 
+    operatorJoystick.zeroYaw().onTrue(
+      new InstantCommand(() -> {
+        if (turret.getAutoAimEnabled()) {
+          turret.zeroTurretYaw();
+        }
+      }));
+
     // gone but not forgotten :( fly high chatClipThat command
     // operatorJoystick.chatClipThat().onTrue(
     // new RunCommand(() -> {

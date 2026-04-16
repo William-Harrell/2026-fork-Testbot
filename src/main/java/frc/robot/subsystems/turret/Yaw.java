@@ -1,23 +1,24 @@
 package frc.robot.subsystems.turret;
 
 import com.revrobotics.spark.FeedbackSensor;
-import com.revrobotics.spark.SparkAbsoluteEncoder;
+// import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class Yaw {
     private final SparkMax motor;
-    private final SparkAbsoluteEncoder encoder;
+    private final RelativeEncoder rel_Encoder;
     private final SparkClosedLoopController controller;
 
     public Yaw(SparkMax motor) {
         this.motor = motor;
-        encoder = this.motor.getAbsoluteEncoder();
+        rel_Encoder = this.motor.getEncoder();
 
         controller = this.motor.getClosedLoopController();
 
@@ -27,11 +28,17 @@ public class Yaw {
         config.idleMode(TurretConstants.YAW_COAST ?
             IdleMode.kCoast : IdleMode.kBrake);
 
+        /*
         config.absoluteEncoder
                 .positionConversionFactor(360.0) // (rotations to degrees)
-                .velocityConversionFactor(360.0 * 60.0) // (rotations/m to degrees) per second (360 * 60)
+                .velocityConversionFactor((360.0 * 60.0)) // (rotations/m to degrees) per second (360 * 60)
                 .zeroOffset(TurretConstants.OFFSET_YAW)
                 .inverted(TurretConstants.INVERT_ABS_ENCODER);
+        */
+
+        config.encoder
+            .positionConversionFactor(360.0) // (rotations to degrees)
+                .velocityConversionFactor((360.0 * 60.0)); // (rotations/m to degrees) per second (360 * 60)
 
         config.closedLoop
                 .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
@@ -49,7 +56,15 @@ public class Yaw {
     }
 
     public double getDegrees() {
-        return encoder.getPosition();
+        return rel_Encoder.getPosition();
+    }
+
+    public double getVelocity() {
+        return rel_Encoder.getVelocity();
+    }
+
+    public void zeroYaw(){
+       rel_Encoder.setPosition(0);
     }
 
     public void moveTo(double goal) {

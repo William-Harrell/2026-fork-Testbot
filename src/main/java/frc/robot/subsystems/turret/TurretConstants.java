@@ -12,9 +12,9 @@ public final class TurretConstants {
   //
   //
   // Yaw'll
-  public static final double YAW_TOLERANCE = 2.0 + 1.5; // degrees
-  public static final double MAX_YAW = 300 - YAW_TOLERANCE;
-  public static final double MIN_YAW = 0.0 + YAW_TOLERANCE;
+  public static final double YAW_TOLERANCE = 1.0; // degrees
+  public static final double MAX_YAW = 30.0 - YAW_TOLERANCE;
+  public static final double MIN_YAW = 30.0 + YAW_TOLERANCE;
   public static final double INIT_YAW = 0.0;
   public static final double OFFSET_YAW = 0.0; // degrees TODO: calibrate
   public static final boolean INVERT_ABS_ENCODER = false;
@@ -25,7 +25,7 @@ public final class TurretConstants {
   public static final int YAW_SUPPLY_CURRENT_LIMIT = 30;
   // True = coast, false = break
   public static final boolean YAW_COAST = false;
-  public static final double YawGearRatio = 1; // TODO: Measure gear ratio
+  public static final double YawGearRatio = 462; // TODO: Measure gear ratio b/c from armabot website
 
   //
   //

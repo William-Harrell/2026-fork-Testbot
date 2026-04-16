@@ -41,7 +41,7 @@ public class Yaw {
                 .velocityConversionFactor((360.0 * 60.0) * TurretConstants.YawGearRatio); // (rotations/m to degrees) per second (360 * 60)
 
         config.closedLoop
-                .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .p(TurretConstants.YAW_kP)
                 .i(TurretConstants.YAW_kI)
                 .d(TurretConstants.YAW_kD);

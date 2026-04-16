@@ -25,6 +25,7 @@ public final class TurretConstants {
   public static final int YAW_SUPPLY_CURRENT_LIMIT = 30;
   // True = coast, false = break
   public static final boolean YAW_COAST = false;
+  public static final double YawGearRatio = 1; // TODO: Measure gear ratio
 
   //
   //

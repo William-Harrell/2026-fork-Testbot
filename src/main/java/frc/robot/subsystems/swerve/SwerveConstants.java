@@ -70,10 +70,10 @@ public final class SwerveConstants {
   private static final double BR_IRL_Degrees = 0.0 + (0.0 / 180);
  
   // (units: rotations)
-  public static final double FL_ENCODER_OFFSET = 0.0 + 0.362305 + FL_IRL_Degrees;
-  public static final double FR_ENCODER_OFFSET = 0.0 + 0.346924 + FR_IRL_Degrees;
-  public static final double RL_ENCODER_OFFSET = 0.0 + 0.494629 + BL_IRL_Degrees;
-  public static final double RR_ENCODER_OFFSET = 0.0 - 0.143066 + BR_IRL_Degrees;
+  public static final double FL_ENCODER_OFFSET = 0.0 + 0.140381 + FL_IRL_Degrees;
+  public static final double FR_ENCODER_OFFSET = 0.0 + 0.154297 + FR_IRL_Degrees;
+  public static final double RL_ENCODER_OFFSET = 0.0 - 0.006592 + BL_IRL_Degrees;
+  public static final double RR_ENCODER_OFFSET = 0.0 - 0.361572 + BR_IRL_Degrees;
 
   // DRIVE MOTOR PID - Tuning for wheel speed control
 

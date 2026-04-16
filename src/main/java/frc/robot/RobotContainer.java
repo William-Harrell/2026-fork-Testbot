@@ -53,6 +53,7 @@ public class RobotContainer {
     swerve = new Swerve();
     vision = new Vision();
     turret = new Turret(); // should be passing through vision
+    // turret = new Turret(vision);
     spindexer = new Spindexer();
     intake = new Intake();
 
@@ -102,7 +103,9 @@ public class RobotContainer {
 
     driverJoystick
         .toggleSpeedExponent()
-        .onTrue(new InstantCommand(() -> speedExponent = (speedExponent == 1) ? 2 : 1));
+        .onTrue(new InstantCommand(() -> {
+          speedExponent = (speedExponent == 1) ? 2 : 1;
+        }));
 
     driverJoystick.resetGyro().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
 
@@ -119,15 +122,16 @@ public class RobotContainer {
         Commands.startEnd(intake.getR()::runIntake, intake.getR()::stop,
             intake));
 
+    operatorJoystick.runFlywheel().whileTrue(
+        Commands.sequence(
+            Commands.runOnce(turret.getFlywheel()::spinStart, turret),
+            Commands.waitUntil(() -> {
+              return turret.getFlywheel().atTargetRPM();
+            }),
+            Commands.run(turret.getFlywheel()::spinFull, turret))
+            .finallyDo(() -> turret.getFlywheel().stop()));
+
     if (!TurretConstants.AUTO_AIM_ENABLED) {
-      operatorJoystick.runFlywheel().whileTrue(
-          Commands.sequence(
-              Commands.runOnce(turret.getFlywheel()::spinStart, turret),
-              Commands.waitUntil(() -> {
-                return turret.getFlywheel().atTargetRPM();
-              }),
-              Commands.run(turret.getFlywheel()::spinFull, turret))
-              .finallyDo(() -> turret.getFlywheel().stop()));
 
       operatorJoystick.posPitch().onTrue(
           new InstantCommand(() -> turret.turnPitchTo(turret.getPitch() + DrivingConstants.PITCH_INCREMENT_MAGNITUDE)));

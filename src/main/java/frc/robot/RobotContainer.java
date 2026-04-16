@@ -16,8 +16,7 @@ import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.turret.Turret;
-import frc.robot.subsystems.turret.TurretConstants;
-import frc.robot.subsystems.vision.Vision;
+// import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.constants.DrivingConstants;
 
 public class RobotContainer {
@@ -33,7 +32,7 @@ public class RobotContainer {
 
   // Subsystems
   private final Swerve swerve;
-  private final Vision vision;
+  // private final Vision vision;
   private final Turret turret;
   private final Intake intake;
   private final Spindexer spindexer;
@@ -51,7 +50,7 @@ public class RobotContainer {
     // Subsystems
     // swerve = new Swerve(vision);
     swerve = new Swerve();
-    vision = new Vision();
+    // vision = new Vision();
     turret = new Turret(); // should be passing through vision
     // turret = new Turret(vision);
     spindexer = new Spindexer();

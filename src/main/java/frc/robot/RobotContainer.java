@@ -75,6 +75,8 @@ public class RobotContainer {
     // Gyro
     swerve.getH().setYaw(new Rotation2d());
     swerve.zeroHeading();
+    turret.zeroTurretYaw();
+    
 
     // .setYaw(Rotation2d.fromDegrees(
     // (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) ==

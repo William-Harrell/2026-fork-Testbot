@@ -2,7 +2,7 @@ package frc.robot.subsystems.turret;
 
 public final class TurretConstants {
   // Config
-  public static final boolean AUTO_AIM_ENABLED = false;
+  // public static final boolean AUTO_AIM_ENABLED = false;
   //
   //
   // Physical
@@ -23,7 +23,7 @@ public final class TurretConstants {
   public static final double YAW_kD = 0.01; // TODO: placeholder
   public static final int YAW_STATOR_CURRENT_LIMIT = 40;
   public static final int YAW_SUPPLY_CURRENT_LIMIT = 30;
-    // True = coast, false = break
+  // True = coast, false = break
   public static final boolean YAW_COAST = false;
 
   //
@@ -39,7 +39,7 @@ public final class TurretConstants {
   public static final double PITCH_kD = 0.0;
   public static final int PITCH_STATOR_CURRENT_LIMIT = 40;
   public static final int PITCH_SUPPLY_CURRENT_LIMIT = 30;
-    // True = coast, false = break
+  // True = coast, false = break
   public static final boolean PITCH_COAST = false;
   public static final double OFFSET_PITCH = 0.0; // degrees TODO: calibrate
   // ^ Degrees changed in pitch per encoder rotation
@@ -77,9 +77,9 @@ public final class TurretConstants {
   // Kicker Motor Configuration
   public static final int KICKER_STATOR_CURRENT_LIMIT = 80;
   public static final int KICKER_SUPPLY_CURRENT_LIMIT = 40;
-    // True = coast, false = break
+  // True = coast, false = break
   public static final boolean KICKER_COAST = false;
-    // True = motor reverse, false = motor spin forward.
+  // True = motor reverse, false = motor spin forward.
   public static final boolean KICKER_SPIN_REVERSE = false;
 
   public static final int KICKER_SPIN_SPEED_MAX = 100; // TODO:Measure w/ rev client

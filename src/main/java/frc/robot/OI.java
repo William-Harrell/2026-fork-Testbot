@@ -113,6 +113,11 @@ public final class OI {
     public Trigger negYaw() {
       return stick.povRight();
     }
+
+    @Override
+    public Trigger toggleAutoAim() {
+      return stick.rightTrigger();
+    }
 /* 
     @Override
     public Trigger chatClipThat() {

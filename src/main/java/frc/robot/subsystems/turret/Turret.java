@@ -20,6 +20,8 @@ public class Turret extends SubsystemBase {
     private final Yaw yaw;
     private final Kicker kicker;
 
+    private boolean auto_aim_enabled = false;
+
     public Turret() { // Suppose to pass vision through here
         // this.vision = vision;
 
@@ -91,10 +93,18 @@ public class Turret extends SubsystemBase {
 
         // Update angles & encoders here
         // TODO: Reenable if vision is working
-        //if (TurretConstants.AUTO_AIM_ENABLED) {
+        //if (auto_aim_enabled) {
         //    yaw.moveTo(physics.getYawError() + yaw.getDegrees());
         //    pitch.turnTo(physics.getPitchRequired(flywheel.getRPM()));
         //}
+    }
+
+    public boolean getAutoAimEnabled() {
+        return auto_aim_enabled;
+    }
+
+    public void toggleAutoAimEnabled() {
+        auto_aim_enabled = !auto_aim_enabled;
     }
 
     public Flywheel getFlywheel() {

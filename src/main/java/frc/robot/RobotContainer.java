@@ -122,6 +122,7 @@ public class RobotContainer {
         Commands.startEnd(intake.getR()::runIntake, intake.getR()::stop,
             intake));
 
+    // Shoot
     operatorJoystick.runFlywheel().whileTrue(
         Commands.sequence(
             Commands.runOnce(turret.getFlywheel()::spinStart, turret),
@@ -131,18 +132,39 @@ public class RobotContainer {
             Commands.run(turret.getFlywheel()::spinFull, turret))
             .finallyDo(() -> turret.getFlywheel().stop()));
 
-    if (!TurretConstants.AUTO_AIM_ENABLED) {
+    // Toggle auto aim
+    operatorJoystick.toggleAutoAim().onTrue(new InstantCommand(turret::toggleAutoAimEnabled));
 
-      operatorJoystick.posPitch().onTrue(
-          new InstantCommand(() -> turret.turnPitchTo(turret.getPitch() + DrivingConstants.PITCH_INCREMENT_MAGNITUDE)));
-      operatorJoystick.negPitch().onTrue(
-          new InstantCommand(() -> turret.turnPitchTo(turret.getPitch() - DrivingConstants.PITCH_INCREMENT_MAGNITUDE)));
+    // Pitch
+    operatorJoystick.posPitch().onTrue(
+        new InstantCommand(() -> {
+          if (turret.getAutoAimEnabled()) {
+            turret.turnPitchTo(turret.getPitch() + DrivingConstants.PITCH_INCREMENT_MAGNITUDE);
+          }
+        }));
 
-      operatorJoystick.posYaw().onTrue(
-          new InstantCommand(() -> turret.moveYawTo(turret.getYaw() + DrivingConstants.YAW_INCREMENT_MAGNITUDE)));
-      operatorJoystick.negYaw().onTrue(
-          new InstantCommand(() -> turret.moveYawTo(turret.getYaw() - DrivingConstants.YAW_INCREMENT_MAGNITUDE)));
-    }
+    operatorJoystick.negPitch().onTrue(
+        new InstantCommand(() -> {
+          if (turret.getAutoAimEnabled()) {
+            turret.turnPitchTo(turret.getPitch() - DrivingConstants.PITCH_INCREMENT_MAGNITUDE);
+          }
+        }));
+
+    // Yaw
+    operatorJoystick.posYaw().onTrue(
+        new InstantCommand(() -> {
+          if (turret.getAutoAimEnabled()) {
+            turret.moveYawTo(turret.getYaw() + DrivingConstants.YAW_INCREMENT_MAGNITUDE);
+          }
+        }));
+
+    operatorJoystick.negYaw().onTrue(
+        new InstantCommand(() -> {
+          if (turret.getAutoAimEnabled()) {
+            turret.moveYawTo(turret.getYaw() - DrivingConstants.YAW_INCREMENT_MAGNITUDE);
+          }
+        }));
+
     // gone but not forgotten :( fly high chatClipThat command
     // operatorJoystick.chatClipThat().onTrue(
     // new RunCommand(() -> {

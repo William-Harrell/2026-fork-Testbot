@@ -95,8 +95,8 @@ public final class SwerveConstants {
 
   // CURRENT LIMITS - Protects motors from overheating
 
-  public static final int DRIVE_STATOR_LIMIT = 60; // Amps stator (was 60 — lowered for breaker safety)
-  public static final int DRIVE_SUPPLY_LIMIT = 40; // Amps from battery
+  public static final int DRIVE_STATOR_LIMIT = 70; // Amps stator (was 60 — lowered for breaker safety)
+  public static final int DRIVE_SUPPLY_LIMIT = 50; // Amps from battery
   public static final boolean DRIVE_STATOR_LIMIT_ENABLE = true;
   public static final boolean DRIVE_SUPPLY_LIMIT_ENABLE = true;
 

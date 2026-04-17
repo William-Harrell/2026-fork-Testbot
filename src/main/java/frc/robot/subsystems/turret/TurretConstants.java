@@ -84,6 +84,6 @@ public final class TurretConstants {
   // True = motor reverse, false = motor spin forward.
   public static final boolean KICKER_SPIN_REVERSE = false;
 
-  public static final int KICKER_SPIN_SPEED_MAX = 100; // TODO:Measure w/ rev client
-  public static final int KICKER_SPIN_SPEED = 50; // TODO: Measure w/ rev client
+  public static final double KICKER_SPIN_SPEED_MAX = 100; // TODO:Measure w/ rev client
+  public static final double KICKER_SPIN_SPEED = 50; // TODO: Measure w/ rev client
 }

@@ -46,6 +46,8 @@ public class Swerve extends SubsystemBase {
         config.field_relative = b;
     }
 
+    
+
     public void setOpenLoop(boolean b) {
         config.open_loop = b;
     }
@@ -128,6 +130,10 @@ public class Swerve extends SubsystemBase {
         }
 
         drive(speeds);
+    }
+
+    public ChassisSpeeds getSpeeds() {
+        return kinematics.toChassisSpeeds(hardware.getStates());
     }
 
     public void drive(ChassisSpeeds speeds) {

@@ -8,23 +8,23 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.turret.TurretState.turret_state;
-// import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.Vision;
 
 public class Turret extends SubsystemBase {
-    // private final Vision vision;
+    private final Vision vision;
 
     // Sub-subsystems
     private final Flywheel flywheel;
     private final TurretState state;
-    // private final Physics physics;
+    private final Physics physics;
     private final Pitch pitch;
     private final Yaw yaw;
     private final Kicker kicker;
 
-    private boolean auto_aim_enabled = false;
+    private boolean auto_aim_enabled = TurretConstants.AUTO_AIM_ENABLED;
 
-    public Turret() { // Suppose to pass vision through here
-        // this.vision = vision;
+    public Turret(Vision) { // Suppose to pass vision through here
+        this.vision = vision;
 
         flywheel = new Flywheel(new TalonFX(TurretConstants.FLYWHEEL_MOTOR_ID));
 
@@ -35,7 +35,7 @@ public class Turret extends SubsystemBase {
 
         yaw = new Yaw(new SparkMax(TurretConstants.TURN_MOTOR_ID, MotorType.kBrushless));
 
-        //physics = new Physics(this.vision);
+        physics = new Physics(this.vision);
 
         kicker = new Kicker(new SparkFlex(TurretConstants.KICKER_MOTOR_ID, MotorType.kBrushless));
     }
@@ -113,11 +113,10 @@ public class Turret extends SubsystemBase {
         }
 
         // Update angles & encoders here
-        // TODO: Reenable if vision is working
-        //if (auto_aim_enabled) {
-        //    yaw.moveTo(physics.getYawError() + yaw.getDegrees());
-        //    pitch.turnTo(physics.getPitchRequired(flywheel.getRPM()));
-        //}
+        if (auto_aim_enabled) {
+            yaw.moveTo(physics.getYawError() + yaw.getDegrees());
+            pitch.turnTo(physics.getPitchRequired(flywheel.getRPM()));
+        }
     }
 
     public boolean getAutoAimEnabled() {

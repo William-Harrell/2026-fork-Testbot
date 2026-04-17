@@ -196,12 +196,12 @@ public class RobotContainer {
       
       testerJoystick.runSpindexer().whileTrue(
         Commands.startEnd(spindexer::startFeed, spindexer::stopFeed, spindexer));
-      /* 
+      
       testerJoystick.runKicker().whileTrue(
         Commands.startEnd(turret.getKicker()::run), turret.getKicker()::stop, turret);
       
       testerJoystick.runFlywheel().whileTrue(null);
-      */
+      
       testerJoystick.DeployIntake().onTrue(new InstantCommand(intake::deployIntakeMechanism));
 
         // Pitch

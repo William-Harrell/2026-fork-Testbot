@@ -2,7 +2,7 @@ package frc.robot.subsystems.turret;
 
 public final class TurretConstants {
   // Config
-  // public static final boolean AUTO_AIM_ENABLED = false;
+  public static final boolean AUTO_AIM_ENABLED = false;
   //
   //
   // Physical

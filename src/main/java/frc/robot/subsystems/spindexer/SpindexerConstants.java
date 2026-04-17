@@ -7,7 +7,7 @@ public final class SpindexerConstants {
 
     // SpinDexer Velo: (Find Max Velocity at Motor 100% -> put that in RPM MAX)
     
-    public static final int FEED_RPM = 1000; // TODO placeholder
+    public static final int FEED_RPM = 4000; // TODO placeholder
     public static final int MAX_RPM = 6400;
 
     // Closed-loop velocity PID

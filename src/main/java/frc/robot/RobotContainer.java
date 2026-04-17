@@ -204,7 +204,10 @@ public class RobotContainer {
             Commands.waitSeconds(1.5),
             Commands.runOnce(turret::spinFlywheel100, turret),     
             Commands.waitSeconds(1.5),
-            Commands.runOnce(turret::startFlywheel, turret)
+            Commands.runOnce(turret::startFlywheel, turret),
+            
+            Commands.idle(turret).andThen(
+            Commands.runOnce(turret::stopFlywheel, turret))
         )
       );
 

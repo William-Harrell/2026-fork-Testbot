@@ -34,7 +34,7 @@ public class Deploy {
 
       config.closedLoop
           .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-          .p(IntakeConstants.DEPLOY_kP).i(0).d(0);
+          .p(IntakeConstants.DEPLOY_kP).i(0).d(0.02);
 
     this.motor.configure(
         config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);

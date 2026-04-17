@@ -45,6 +45,7 @@ public final class TurretConstants {
   public static final boolean PITCH_COAST = false;
   public static final double OFFSET_PITCH = 0.0; // degrees TODO: calibrate
   // ^ Degrees changed in pitch per encoder rotation
+  public static final boolean printPitchPosition = true;
   //
   //
   //

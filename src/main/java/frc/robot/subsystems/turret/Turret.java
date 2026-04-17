@@ -112,6 +112,10 @@ public class Turret extends SubsystemBase {
             SmartDashboard.putNumber("Yaw Position", yaw.getDegrees());
         }
 
+        if(TurretConstants.printPitchPosition) {
+            SmartDashboard.putNumber("Pitch Position", pitch.getDegrees());
+        }
+
         // Update angles & encoders here
         if (auto_aim_enabled) {
             yaw.moveTo(physics.getYawError() + yaw.getDegrees());

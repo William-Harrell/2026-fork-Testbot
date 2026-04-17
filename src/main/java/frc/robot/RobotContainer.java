@@ -44,8 +44,8 @@ public class RobotContainer {
     // Controllers
     DriverStation.silenceJoystickConnectionWarning(true);
     driverJoystick = new XboxDriver(DrivingConstants.DRIVER_PORT);
-    operatorJoystick = new XboxOperator(DrivingConstants.OPERATOR_PORT);
-    testerJoystick = new XboxTester(DrivingConstants.TEST_PORT);
+    // operatorJoystick = new XboxOperator(DrivingConstants.OPERATOR_PORT);
+    // testerJoystick = new XboxTester(DrivingConstants.TEST_PORT);
 
     // Auto
     // autoChooser = new SendableChooser<>();

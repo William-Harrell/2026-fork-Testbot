@@ -15,6 +15,7 @@ public final class SpindexerConstants {
     public static final double SPIN_kI = 0.0;
     public static final double SPIN_kD = 0.0;
     public static final double SPIN_kV = 12.0 / MAX_RPM; // feedforward: duty per RPM at free speed
+    public static final double SPIN_kS = 0.05;
 
     // SpinDexer Motor Configs
     public static final int SPINDEXER_ID = 17; // Vortex (Spark Flex)

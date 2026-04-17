@@ -36,6 +36,7 @@ public class Spinner {
                 .d(SpindexerConstants.SPIN_kD);
 
         config.closedLoop.feedForward.kV(SpindexerConstants.SPIN_kV);
+        config.closedLoop.feedForward.kS(SpindexerConstants.SPIN_kS);
         config.voltageCompensation(12);
 
         spindmotor.configure(config,

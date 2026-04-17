@@ -140,9 +140,10 @@ public class RobotContainer {
             Commands.waitUntil(() -> {
               return turret.getFlywheel().atTargetRPM();
             }),
-            Commands.runOnce(turret::startFlywheel, turret)
-          )
-        .finallyDo(() -> turret.stopFlywheel())
+            Commands.runOnce(turret::startFlywheel, turret),          
+            Commands.idle(turret),
+            Commands.runOnce(turret::stopFlywheel, turret)
+        )
       );
 
       // Toggle auto aim

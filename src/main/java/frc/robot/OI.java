@@ -23,17 +23,17 @@ public final class OI {
 
     @Override
     public double forward() {
-      return deadband(stick.getLeftY(), DrivingConstants.JOYSTICK_DEADBAND);
+      return deadband(stick.getLeftY(), DrivingConstants.JOYSTICK_DEADBAND * .6);
     }
 
     @Override
     public double strafe() {
-      return deadband(stick.getLeftX(), DrivingConstants.JOYSTICK_DEADBAND);
+      return deadband(stick.getLeftX(), DrivingConstants.JOYSTICK_DEADBAND * .6);
     }
 
     @Override
     public double turn() {
-      return deadband(stick.getRightX(), DrivingConstants.JOYSTICK_DEADBAND);
+      return deadband(stick.getRightX(), DrivingConstants.JOYSTICK_DEADBAND * .6);
     }
 
     @Override

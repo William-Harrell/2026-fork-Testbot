@@ -1,5 +1,6 @@
 package frc.robot.subsystems.turret;
 
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.revrobotics.PersistMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
@@ -59,6 +60,7 @@ public class Pitch {
     public void turnTo(double goal) {
         target_angle = Math.max(TurretConstants.MIN_PITCH,
                 Math.min(TurretConstants.MAX_PITCH, goal));
+        target_angle = target_angle * -1;
         controller.setSetpoint(target_angle, ControlType.kPosition);
     }
 

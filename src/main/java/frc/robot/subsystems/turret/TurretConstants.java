@@ -86,5 +86,5 @@ public final class TurretConstants {
   public static final boolean KICKER_SPIN_REVERSE = false;
 
   public static final double KICKER_SPIN_SPEED_MAX = 100; // TODO:Measure w/ rev client
-  public static final double KICKER_SPIN_SPEED = 50; // TODO: Measure w/ rev client
+  public static final double KICKER_SPIN_SPEED = 25; // TODO: Measure w/ rev client
 }

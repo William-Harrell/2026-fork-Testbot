@@ -9,7 +9,7 @@ public final class DrivingConstants {
       // True = 2nd port is operator, false = 2nd port is test
   public static final int DRIVER_PORT = 0;
   public static final int OPERATOR_PORT = 2;
-  public static final int TEST_PORT = 2;
+  public static final int TEST_PORT = 100;
 
   public static final double JOYSTICK_DEADBAND = 0.1;
   

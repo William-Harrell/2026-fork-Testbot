@@ -33,7 +33,7 @@ public final class OI {
 
     @Override
     public double turn() {
-      return deadband(-stick.getRightX(), DrivingConstants.JOYSTICK_DEADBAND) * 0.4;
+      return deadband(stick.getRightX(), DrivingConstants.JOYSTICK_DEADBAND) * 0.4;
     }
 
     @Override

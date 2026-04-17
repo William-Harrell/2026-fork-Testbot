@@ -26,7 +26,7 @@ public final class DrivingConstants {
 
   // radians & seconds
   public static final double TURN_MAX_VEL = SwerveConstants.MAX_ANGULAR_VELOCITY;
-  public static final double TURN_MAX_ACC = 5.0;
+  public static final double TURN_MAX_ACC = 15.0;
 
   //
   //

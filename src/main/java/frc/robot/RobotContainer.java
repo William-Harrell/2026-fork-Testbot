@@ -201,16 +201,15 @@ public class RobotContainer {
       testerJoystick.runFlywheel().whileTrue(
           Commands.sequence(
             Commands.runOnce(turret::spinFlywheel50, turret),
-            Commands.waitUntil(() -> {
-              return turret.getFlywheel().atTargetRPM();
-            }),
-            Commands.runOnce(turret::spinFlywheel100, turret),
-            Commands.waitUntil(() -> {
-              return turret.getFlywheel().atTargetRPM();
-            }),
+            Commands.waitSeconds(1.5),
+            Commands.runOnce(turret::spinFlywheel100, turret),     
+            Commands.waitSeconds(1.5),
             Commands.runOnce(turret::startFlywheel, turret)
-          )
-        .finallyDo(() -> turret.stopFlywheel())
+        )
+      );
+
+      testerJoystick.runFlywheel().onFalse(
+        Commands.runOnce(turret.getFlywheel().stop(), turret)
       );
       
       testerJoystick.DeployIntake().onTrue(new InstantCommand(intake::deployIntakeMechanism));

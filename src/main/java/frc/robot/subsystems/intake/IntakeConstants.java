@@ -17,7 +17,7 @@ public final class IntakeConstants {
   public static final int DEPLOY_STATOR_CURRENT_LIMIT = 50;
   public static final int DEPLOY_SUPPLY_CURRENT_LIMIT = 40;
       // true = coast, false = brake
-  public static final boolean DEPLOY_COAST = true;
+  public static final boolean DEPLOY_COAST = false;
 
     // Roller Motor Configs
   public static final int ROLLER_MOTOR_ID = 16; // Kraken X60 (TalonFX)

@@ -67,7 +67,7 @@ public class Yaw {
        rel_Encoder.setPosition(0);
     }
 
-    public void moveTo(double goal) {
+    public void moveTo(double goal) { //TODO: UNCOMMENT WHEN YAW CAN MOVE
         // goal = Math.min(Math.max(goal, TurretConstants.MIN_YAW), TurretConstants.MAX_YAW);
         // controller.setSetpoint(goal, ControlType.kPosition);
         System.out.println("YAW DISABLED");

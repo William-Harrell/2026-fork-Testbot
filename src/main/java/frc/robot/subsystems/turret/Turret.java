@@ -23,7 +23,7 @@ public class Turret extends SubsystemBase {
 
     private boolean auto_aim_enabled = TurretConstants.AUTO_AIM_ENABLED;
 
-    public Turret(Vision) { // Suppose to pass vision through here
+    public Turret(Vision vision) { // Suppose to pass vision through here
         this.vision = vision;
 
         flywheel = new Flywheel(new TalonFX(TurretConstants.FLYWHEEL_MOTOR_ID));

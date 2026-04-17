@@ -55,7 +55,7 @@ public class Spinner {
     // }
 
     public void run(double rpm) {
-        spindmotor.set(rpm/SpindexerConstants.MAX_RPM);
+        spindmotor.set(-1 * (rpm/SpindexerConstants.MAX_RPM));
     }
 
     public void stop() {

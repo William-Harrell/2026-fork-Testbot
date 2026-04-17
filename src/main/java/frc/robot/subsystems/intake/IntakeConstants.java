@@ -7,8 +7,8 @@ public final class IntakeConstants {
   public static final double TOLERANCE = 0.05;
 
   public static final double DEPLOY_kP = 0.05;
-  public static final double INTAKE_SPEED = -.95;
-  public static final double OUTTAKE_SPEED = .7;
+  public static final double INTAKE_SPEED = -.45; //in duty cycle
+  public static final double OUTTAKE_SPEED = .7; //in duty cycle
 
 
     // Deploy Motor Configs

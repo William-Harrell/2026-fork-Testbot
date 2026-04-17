@@ -42,15 +42,25 @@ public class Spinner {
 
         spindmotor.configure(config,
                 ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
+        // setRPM(0);
     }
 
-    public void setRPM(double rpm) {
-        targetRPM = rpm;
-        if (rpm == 0) {
-            spindmotor.set(0);
-        } else {
-            controller.setSetpoint(rpm, ControlType.kVelocity);
-        }
+    // public void setRPM(double rpm) {
+    //     targetRPM = rpm;
+    //     if (rpm == 0) {
+    //         spindmotor.set(0);
+    //     } else {
+    //         controller.setSetpoint(rpm, ControlType.kVelocity);
+    //     }
+    // }
+
+    public void run(double rpm) {
+        spindmotor.set(rpm/SpindexerConstants.MAX_RPM);
+    }
+
+    public void stop() {
+        spindmotor.set(0);
     }
 
     public double getTargetRPM() {

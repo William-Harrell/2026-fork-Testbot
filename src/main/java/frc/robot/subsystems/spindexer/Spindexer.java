@@ -15,12 +15,12 @@ public class Spindexer extends SubsystemBase{
     }
 
     public void startFeed() {
-        spinner.setRPM(SpindexerConstants.FEED_RPM);
+        spinner.run(SpindexerConstants.FEED_RPM);
         state.set(spindexer_state.SPEEDING);
     }
 
     public void stopFeed() {
-        spinner.setRPM(SpindexerConstants.OFFRPM);
+        spinner.stop();
         state.set(spindexer_state.SLOWING);
     }
 

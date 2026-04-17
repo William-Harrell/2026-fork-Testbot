@@ -6,7 +6,7 @@ public final class IntakeConstants {
   public static final double STOW_POS = 0.0;
   public static final double TOLERANCE = 0.05;
 
-  public static final double DEPLOY_kP = 0.1;
+  public static final double DEPLOY_kP = 0.05;
   public static final double INTAKE_SPEED = -.95;
   public static final double OUTTAKE_SPEED = .7;
 

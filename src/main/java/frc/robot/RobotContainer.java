@@ -23,8 +23,8 @@ import frc.robot.util.constants.DrivingConstants;
 public class RobotContainer {
   // Controllers
   private final XboxDriver driverJoystick;
-  private final XboxOperator operatorJoystick;
-  private final XboxTester  testerJoystick;
+  // private final XboxOperator operatorJoystick;
+  // private final XboxTester  testerJoystick;
   
 
   // Auto
@@ -36,9 +36,9 @@ public class RobotContainer {
   // Subsystems
   private final Swerve swerve;
   private final Vision vision;
-  private final Turret turret;
-  private final Intake intake;
-  private final Spindexer spindexer;
+  // private final Turret turret;
+  // private final Intake intake;
+  // private final Spindexer spindexer;
 
   public RobotContainer() {
     // Controllers
@@ -55,10 +55,10 @@ public class RobotContainer {
     // swerve = new Swerve(vision);
     swerve = new Swerve();
     vision = new Vision();
-    //turret = new Turret(); // should be passing through vision
-    turret = new Turret(vision); 
-    spindexer = new Spindexer();
-    intake = new Intake();
+    // turret = new Turret(); // should be passing through vision
+    // turret = new Turret(vision); 
+    // spindexer = new Spindexer();
+    // intake = new Intake();
 
     // Init methods
     setupDrive();
@@ -78,7 +78,7 @@ public class RobotContainer {
     // Gyro
     swerve.getH().setYaw(new Rotation2d());
     swerve.zeroHeading();
-    turret.zeroTurretYaw();
+    // turret.zeroTurretYaw();
     
 
     // .setYaw(Rotation2d.fromDegrees(
@@ -118,7 +118,7 @@ public class RobotContainer {
     // .skiStop()
     // .onTrue(SwerveCommands.SkiStop(swerve).until(driverJoystick::isMovementCommanded));
 
-   
+   /*
     // OPERATOR
     if (DrivingConstants.OPERATORorTEST) {
       operatorJoystick.runSpindexer().whileTrue(Commands.startEnd(spindexer::startFeed, spindexer::stopFeed, spindexer));
@@ -232,7 +232,7 @@ public class RobotContainer {
             }
           }));
     }
-
+*/
   }
 
   // private void registerAutoRoutines() {

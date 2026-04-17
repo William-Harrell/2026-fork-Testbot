@@ -2,6 +2,8 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.path.PathPlannerPath;
+
 // import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.wpilibj.DataLogManager;
@@ -39,10 +41,11 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     robotContainer.onEnabled();
-    // AutoSetup.configure();
+    // AutoSetup.configure();/
     // CSPPathing.reset();
     try {
-      // PathPlannerPath testPath = PathPlannerPath.fromPathFile("src/main/deploy/paths/Juggernaut_Collect.path");
+      PathPlannerPath testPath = PathPlannerPath.fromPathFile("src/main/deploy/paths/roadis.path");
+      
     } catch (Exception e) {
       System.out.println("Error loading path: " + e.getMessage());
     }

@@ -2,7 +2,7 @@ package frc.robot.subsystems.intake;
 
 public final class IntakeConstants {
   
-  public static final double DEPLOY_POS = 2.425;
+  public static final double DEPLOY_POS = 26.382;
   public static final double STOW_POS = 0.0;
   public static final double TOLERANCE = 0.05;
 
@@ -17,7 +17,7 @@ public final class IntakeConstants {
   public static final int DEPLOY_STATOR_CURRENT_LIMIT = 50;
   public static final int DEPLOY_SUPPLY_CURRENT_LIMIT = 40;
       // true = coast, false = brake
-  public static final boolean DEPLOY_COAST = false;
+  public static final boolean DEPLOY_COAST = true;
 
     // Roller Motor Configs
   public static final int ROLLER_MOTOR_ID = 16; // Kraken X60 (TalonFX)

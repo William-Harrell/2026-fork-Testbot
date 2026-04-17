@@ -133,16 +133,13 @@ public class RobotContainer {
       operatorJoystick.runFlywheelKicker().whileTrue(
           Commands.sequence(
             Commands.runOnce(turret::spinFlywheel50, turret),
-            Commands.waitUntil(() -> {
-              return turret.getFlywheel().atTargetRPM();
-            }),
-            Commands.runOnce(turret::spinFlywheel100, turret),
-            Commands.waitUntil(() -> {
-              return turret.getFlywheel().atTargetRPM();
-            }),
-            Commands.runOnce(turret::startFlywheel, turret),          
-            Commands.idle(turret),
-            Commands.runOnce(turret::stopFlywheel, turret)
+            Commands.waitSeconds(1.5),
+            Commands.runOnce(turret::spinFlywheel100, turret),     
+            Commands.waitSeconds(1.5),
+            Commands.runOnce(turret::startFlywheel, turret),
+            
+            Commands.idle(turret).andThen(
+            Commands.runOnce(turret::stopFlywheel, turret))
         )
       );
 

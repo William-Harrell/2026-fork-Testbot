@@ -2,6 +2,7 @@ package frc.robot.subsystems.intake;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.subsystems.intake.IntakeState.intake_state;
 
@@ -29,6 +30,7 @@ public class Roller {
       IntakeConstants.ROLLER_SUPPLY_CURRENT_LIMIT;
     config.CurrentLimits.SupplyCurrentLimitEnable = 
       IntakeConstants.ROLLER_SUPPLY_CURRENT_LIMIT_ENABLE;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
     this.motor.getConfigurator().apply(config);
   }

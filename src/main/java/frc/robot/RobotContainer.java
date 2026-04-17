@@ -209,7 +209,7 @@ public class RobotContainer {
       );
 
       testerJoystick.runFlywheel().onFalse(
-        Commands.runOnce(turret.getFlywheel().stop(), turret)
+        new InstantCommand(turret::stopFlywheel)
       );
       
       testerJoystick.DeployIntake().onTrue(new InstantCommand(intake::deployIntakeMechanism));

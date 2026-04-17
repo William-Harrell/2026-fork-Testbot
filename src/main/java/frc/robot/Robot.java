@@ -43,12 +43,6 @@ public class Robot extends TimedRobot {
     robotContainer.onEnabled();
     // AutoSetup.configure();/
     // CSPPathing.reset();
-    try {
-      PathPlannerPath testPath = PathPlannerPath.fromPathFile("src/main/deploy/paths/roadis.path");
-      
-    } catch (Exception e) {
-      System.out.println("Error loading path: " + e.getMessage());
-    }
     
     autonomousCommand = robotContainer.getAutonomousCommand();
 

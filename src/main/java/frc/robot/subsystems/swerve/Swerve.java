@@ -92,6 +92,11 @@ public class Swerve extends SubsystemBase {
         dashboard.updateLogs(getPose(), hardware.getStates());
     }
 
+    @Override
+    public void simulationPeriodic() {
+        dashboard.updateLogs(getPose(), hardware.getStates());
+    }
+
     public void zeroHeading() {
         estimator.resetPosition(
                 hardware.getYaw(),

@@ -101,7 +101,7 @@ public class RobotContainer {
 
             var alliance = DriverStation.getAlliance();
             if (alliance.isPresent()) {
-              return alliance.get() == DriverStation.Alliance.Red;
+              return alliance.get() == DriverStation.Alliance.Blue;
             }
             return false;
           },
@@ -119,7 +119,7 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     try {
       // Load the path you want to follow using its name in the GUI
-      PathPlannerPath path = PathPlannerPath.fromPathFile("make them blue (l)");
+      PathPlannerPath path = PathPlannerPath.fromPathFile("simple straight");
 
       // Create a path following command using AutoBuilder. This will also trigger
       // event markers.

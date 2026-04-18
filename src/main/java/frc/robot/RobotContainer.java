@@ -27,6 +27,7 @@ import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.vision.Vision;
+import frc.robot.util.Elastic;
 import frc.robot.util.constants.DrivingConstants;
 
 public class RobotContainer {
@@ -149,7 +150,9 @@ public class RobotContainer {
     // ? 180
     // : 0));
 
-    SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
+    // SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
+    Elastic.sendNotification(new Elastic.Notification(Elastic.NotificationLevel.INFO, "Teleop Setup Complete",
+        "drive controls were set up successfully"));
   }
 
   private double applySpeedCurve(double input) {

@@ -5,28 +5,28 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.controllers.PathFollowingController;
+// import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.OI.XboxDriver;
-import frc.robot.OI.XboxOperator;
-import frc.robot.OI.XboxTester;
-import frc.robot.commands.SwerveCommands;
+// import frc.robot.OI.XboxOperator;
+// import frc.robot.OI.XboxTester;
 // import frc.robot.commands.SwerveCommands;
-import frc.robot.subsystems.intake.Intake;
-import frc.robot.subsystems.spindexer.Spindexer;
+// import frc.robot.commands.SwerveCommands;
+// import frc.robot.subsystems.intake.Intake;
+// import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.swerve.Swerve;
 import frc.robot.subsystems.swerve.SwerveConstants;
-import frc.robot.subsystems.turret.Turret;
-import frc.robot.subsystems.vision.Vision;
+// import frc.robot.subsystems.turret.Turret;
+// import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.Elastic;
 import frc.robot.util.constants.DrivingConstants;
 
@@ -44,7 +44,7 @@ public class RobotContainer {
 
   // Subsystems
   private final Swerve swerve;
-  private final Vision vision;
+  //private final Vision vision;
   // private final Turret turret;
   // private final Intake intake;
   // private final Spindexer spindexer;
@@ -63,7 +63,7 @@ public class RobotContainer {
     // Subsystems
     // swerve = new Swerve(vision);
     swerve = new Swerve();
-    vision = new Vision();
+    // vision = new Vision();
     // turret = new Turret(); // should be passing through vision
     // turret = new Turret(vision);
     // spindexer = new Spindexer();

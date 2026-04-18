@@ -19,10 +19,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.OI.XboxDriver;
 import frc.robot.OI.XboxOperator;
 import frc.robot.OI.XboxTester;
+import frc.robot.commands.SwerveCommands;
 // import frc.robot.commands.SwerveCommands;
 import frc.robot.subsystems.intake.Intake;
 import frc.robot.subsystems.spindexer.Spindexer;
 import frc.robot.subsystems.swerve.Swerve;
+import frc.robot.subsystems.swerve.SwerveConstants;
 import frc.robot.subsystems.turret.Turret;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.util.constants.DrivingConstants;
@@ -73,12 +75,17 @@ public class RobotContainer {
     RobotConfig config;
     try {
       config = RobotConfig.fromGUISettings();
-      
-      var controller = new PPHolonomicDriveController(null, null); 
-  
+
+      var controller = new PPHolonomicDriveController(
+          new PIDConstants(SwerveConstants.DRIVE_kP, SwerveConstants.DRIVE_kI, SwerveConstants.DRIVE_kD),
+          new PIDConstants(SwerveConstants.AIM_kP, SwerveConstants.AIM_kI, SwerveConstants.AIM_kD));
+
       AutoBuilder.configure(
           swerve::getPose, // Robot pose supplier
-          (a) -> {swerve.zeroHeading(); swerve.zeroGyro();}, // Method to reset odometry (will be called if your auto has a starting pose)
+          (a) -> {
+            swerve.zeroHeading();
+            swerve.zeroGyro();
+          }, // Method to reset odometry (will be called if your auto has a starting pose)
           swerve::getSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
           (speeds, feedforwards) -> swerve.drive(speeds), // Method that will drive the robot given ROBOT RELATIVE
                                                           // ChassisSpeeds. Also optionally outputs individual
@@ -90,14 +97,14 @@ public class RobotContainer {
             // alliance
             // This will flip the path being followed to the red side of the field.
             // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-  
+
             var alliance = DriverStation.getAlliance();
             if (alliance.isPresent()) {
               return alliance.get() == DriverStation.Alliance.Red;
             }
             return false;
           },
-          
+
           swerve // Reference to this subsystem to set requirements
       );
     } catch (Exception e) {

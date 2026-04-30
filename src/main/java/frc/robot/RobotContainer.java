@@ -36,7 +36,7 @@ public class RobotContainer {
   private final XboxDriver driverJoystick;
   // private final XboxOperator operatorJoystick;
   // private final XboxTester testerJoystick;
-  SlewRateLimiter slewlimiter = SlewRateLimiter(0.5);
+  SlewRateLimiter slewlimiter = new SlewRateLimiter(0.5);
   
   // Auto
   // private final SendableChooser<Command> autoChooser;

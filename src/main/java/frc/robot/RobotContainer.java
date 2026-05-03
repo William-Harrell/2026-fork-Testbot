@@ -41,6 +41,7 @@ public class RobotContainer {
   
   // Auto
   // private final SendableChooser<Command> autoChooser;
+  public final boolean AutoOn = false; //TODO: turn on and off
 
   // Swerve
   private int speedExponent = 1;
@@ -75,7 +76,7 @@ public class RobotContainer {
     // Init methods
     setupDrive();
     configureButtonBindings();
-    // setupAuto();
+    setupAuto();
   }
 
   public Command getAutonomousCommand() {

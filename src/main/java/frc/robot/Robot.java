@@ -43,8 +43,9 @@ public class Robot extends TimedRobot {
     robotContainer.onEnabled();
     // AutoSetup.configure();/
     // CSPPathing.reset();
-    
-    autonomousCommand = robotContainer.getAutonomousCommand();
+    if (robotContainer.AutoOn) {
+    autonomousCommand = robotContainer.getAutonomousCommand(); 
+  }
 
     if (autonomousCommand != null) {
       CommandScheduler.getInstance().schedule(autonomousCommand);

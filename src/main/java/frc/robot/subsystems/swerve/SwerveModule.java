@@ -17,16 +17,16 @@ package frc.robot.subsystems.swerve;
  */
 
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.signals.SensorDirectionValue;
-import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.PersistMode;
+import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -37,27 +37,16 @@ public class SwerveModule {
   private final boolean invertDrive;
   private final boolean invertAzimuth;
   private final boolean invertCANcoder;
+  
 
-  private final TalonFX driveMotor;
-  private final TalonFX azimuthMotor;
+  private final SparkMax driveMotor;
+  private final SparkMax azimuthMotor;
   private final CANcoder canCoder;
 
-  private final VelocityVoltage driveVelocityRequest = new VelocityVoltage(0).withSlot(0);
-  private final PositionVoltage azimuthPositionRequest = new PositionVoltage(0).withSlot(0);
-
-  private final SimpleMotorFeedforward driveFeedforward;
+  private final RelativeEncoder driveEncoder;
+  private final RelativeEncoder azimuthEncoder;
   private final Rotation2d encoderOffset;
 
-  public SwerveModule(
-      int moduleNumber,
-      int driveMotorId,
-      int azimuthMotorId,
-      int canCoderId,
-      double encoderOffset) {
-    this(moduleNumber, driveMotorId, azimuthMotorId, canCoderId, 
-        encoderOffset, 
-        false, false, false);
-  }
 
   public SwerveModule(
       int moduleNumber,
@@ -70,87 +59,76 @@ public class SwerveModule {
       boolean invertCANcoder) {
     this.moduleNumber = moduleNumber;
     this.encoderOffset = Rotation2d.fromRotations(encoderOffset);
+
     this.invertDrive = invertDrive;
     this.invertAzimuth = invertAzimuth;
     this.invertCANcoder = invertCANcoder;
 
-    // Drive motor (TalonFX)
-    driveMotor = new TalonFX(driveMotorId);
+    // Drive motor 
+    driveMotor = new SparkMax(driveMotorId, MotorType.kBrushless);
+    this.driveEncoder = driveMotor.getEncoder();
 
-    // Azimuth motor (TalonFX)
-    azimuthMotor = new TalonFX(azimuthMotorId);
+    // Azimuth motor 
+    azimuthMotor = new SparkMax(azimuthMotorId, MotorType.kBrushless);
+    this.azimuthEncoder = azimuthMotor.getEncoder();
 
     // CANCoder (absolute encoder)
     canCoder = new CANcoder(canCoderId);
 
-    // Feedforward for drive
-    driveFeedforward =
-        new SimpleMotorFeedforward(
-            SwerveConstants.DRIVE_kS,
-            SwerveConstants.DRIVE_kV,
-            SwerveConstants.DRIVE_kA);
-
-    configureMotors();
+    configureDriveMotor();
+    configureAzimuthMotor();
     configureCANCoder();
     resetToAbsolute();
   }
 
-  private void configureMotors() {
-    // ================================================================
-    // DRIVE MOTOR CONFIGURATION
-    // ================================================================
-    TalonFXConfiguration driveConfig = new TalonFXConfiguration();
+  private void configureDriveMotor() {
+    SparkMaxConfig configDrive = new SparkMaxConfig();
 
-    driveConfig.MotorOutput.NeutralMode = SwerveConstants.DRIVE_COAST ? 
-      NeutralModeValue.Coast : NeutralModeValue.Brake;
+    configDrive.idleMode(SwerveConstants.DRIVE_COAST ? 
+      IdleMode.kCoast : IdleMode.kBrake);
+    configDrive.inverted(invertDrive);
+    configDrive.smartCurrentLimit(SwerveConstants.DRIVE_STATOR_LIMIT, SwerveConstants.DRIVE_SUPPLY_LIMIT);
 
-    driveConfig.MotorOutput.Inverted = invertDrive ?
-      InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
+    configDrive.openLoopRampRate(SwerveConstants.DRIVE_OPEN_LOOP_RAMP);
+    configDrive.closedLoopRampRate(SwerveConstants.DRIVE_CLOSED_LOOP_RAMP);
 
-    driveConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.DRIVE_STATOR_LIMIT;
-    driveConfig.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.DRIVE_STATOR_LIMIT_ENABLE;
-    driveConfig.CurrentLimits.SupplyCurrentLimit = SwerveConstants.DRIVE_SUPPLY_LIMIT;
-    driveConfig.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.DRIVE_SUPPLY_LIMIT_ENABLE;
+    configDrive.closedLoop.pid(
+      SwerveConstants.DRIVE_kP,
+      SwerveConstants.DRIVE_kI,
+      SwerveConstants.DRIVE_kD);
 
-    driveConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = SwerveConstants.DRIVE_OPEN_LOOP_RAMP;
-    driveConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SwerveConstants.DRIVE_CLOSED_LOOP_RAMP;
+    configDrive.encoder.positionConversionFactor(SwerveConstants.DRIVE_GEAR_RATIO);
+    configDrive.encoder.velocityConversionFactor(SwerveConstants.DRIVE_GEAR_RATIO);
 
-    driveConfig.Slot0.kP = SwerveConstants.DRIVE_kP;
-    driveConfig.Slot0.kI = SwerveConstants.DRIVE_kI;
-    driveConfig.Slot0.kD = SwerveConstants.DRIVE_kD;
+    driveMotor.configure(configDrive, 
+    ResetMode.kResetSafeParameters, 
+    PersistMode.kPersistParameters);
+  }
 
-    driveMotor.getConfigurator().apply(driveConfig);
+  private void configureAzimuthMotor() {
+    SparkMaxConfig configAzimuth = new SparkMaxConfig();
 
-    // ================================================================
-    // AZIMUTH MOTOR CONFIGURATION (TalonFX with CANCoder feedback)
-    // ================================================================
-    TalonFXConfiguration azimuthConfig = new TalonFXConfiguration();
+    configAzimuth.idleMode(SwerveConstants.AZIMUTH_COAST ? 
+      IdleMode.kCoast : IdleMode.kBrake);
+    configAzimuth.inverted(invertAzimuth);
+    configAzimuth.smartCurrentLimit(SwerveConstants.AZIMUTH_STATOR_LIMIT, SwerveConstants.AZIMUTH_SUPPLY_LIMIT);
 
-    azimuthConfig.MotorOutput.NeutralMode = SwerveConstants.AZIMUTH_COAST ? 
-      NeutralModeValue.Coast : NeutralModeValue.Brake;
+    // configAzimuth.closedLoop.feedbackSensor(FeedbackSensor.kAbsoluteEncoder, CancoderID); TODO: maybe
+    configAzimuth.closedLoop.positionWrappingEnabled(true);
+      double mininput = -0.5;
+      double maxinput = 0.5;
+    configAzimuth.closedLoop.positionWrappingInputRange(mininput, maxinput);
+    configAzimuth.closedLoop.pid(
+      SwerveConstants.AZIMUTH_kP,
+      SwerveConstants.AZIMUTH_kI,
+      SwerveConstants.AZIMUTH_kD);
 
-    azimuthConfig.MotorOutput.Inverted = invertAzimuth ?
-      InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive;
-
-    azimuthConfig.CurrentLimits.StatorCurrentLimit = SwerveConstants.AZIMUTH_STATOR_LIMIT;
-    azimuthConfig.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.AZIMUTH_STATOR_LIMIT_ENABLE;
-    azimuthConfig.CurrentLimits.SupplyCurrentLimit = SwerveConstants.AZIMUTH_SUPPLY_LIMIT;
-    azimuthConfig.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.AZIMUTH_SUPPLY_LIMIT_ENABLE;
-
-    // Use the remote CANCoder as the feedback sensor for closed-loop
-    azimuthConfig.Feedback.FeedbackRemoteSensorID = canCoder.getDeviceID();
-    azimuthConfig.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
-    // Gear ratio between motor and CANCoder (motor rotations per CANCoder rotation)
-    azimuthConfig.Feedback.RotorToSensorRatio = SwerveConstants.AZIMUTH_GEAR_RATIO;
-
-    // Enable continuous wrap so the motor takes the shortest path (e.g., 350° → 10° goes +20°)
-    azimuthConfig.ClosedLoopGeneral.ContinuousWrap = true;
-
-    azimuthConfig.Slot0.kP = SwerveConstants.AZIMUTH_kP;
-    azimuthConfig.Slot0.kI = SwerveConstants.AZIMUTH_kI;
-    azimuthConfig.Slot0.kD = SwerveConstants.AZIMUTH_kD;
-
-    azimuthMotor.getConfigurator().apply(azimuthConfig);
+    configAzimuth.encoder.positionConversionFactor(SwerveConstants.AZIMUTH_GEAR_RATIO);
+    configAzimuth.encoder.velocityConversionFactor(SwerveConstants.AZIMUTH_GEAR_RATIO);
+    
+    azimuthMotor.configure(configAzimuth,
+    ResetMode.kResetSafeParameters,
+    PersistMode.kPersistParameters);
   }
 
   private void configureCANCoder() {
@@ -165,8 +143,7 @@ public class SwerveModule {
 
   /** Sync is not needed — CANCoder is the direct feedback sensor for the azimuth TalonFX. */
   public void resetToAbsolute() {
-    // No-op: the TalonFX uses the CANCoder directly via RemoteCANcoder feedback,
-    // so there's no relative encoder to reset.
+    azimuthEncoder.setPosition(canCoder.getPosition().getValueAsDouble());
   }
 
   // ================================================================
@@ -185,19 +162,15 @@ public class SwerveModule {
   /** Get the current angle from the azimuth feedback (CANCoder via TalonFX). */
   public Rotation2d getAngle() {
     // TalonFX position with RemoteCANcoder returns rotations
-    return Rotation2d.fromRotations(azimuthMotor.getPosition().getValueAsDouble());
+    return Rotation2d.fromRotations(azimuthEncoder.getPosition());
   }
 
   public double getVelocity() {
-    return driveMotor.getVelocity().getValueAsDouble()
-        * SwerveConstants.WHEEL_CIRCUMFERENCE
-        / SwerveConstants.DRIVE_GEAR_RATIO;
+    return driveEncoder.getVelocity();
   }
 
   public double getPosition() {
-    return driveMotor.getPosition().getValueAsDouble()
-        * SwerveConstants.WHEEL_CIRCUMFERENCE
-        / SwerveConstants.DRIVE_GEAR_RATIO;
+    return driveEncoder.getPosition();
   }
 
   public SwerveModuleState getState() {
@@ -217,24 +190,20 @@ public class SwerveModule {
 
     // Azimuth — position control in rotations (CANCoder units)
     double targetRotations = desiredState.angle.getRotations();
-    azimuthMotor.setControl(azimuthPositionRequest.withPosition(targetRotations));
+    azimuthMotor.getClosedLoopController().setSetpoint(targetRotations, ControlType.kPosition);
 
     // Drive
     if (openLoop) {
       double percentOutput = desiredState.speedMetersPerSecond / SwerveConstants.MAX_SPEED;
       driveMotor.set(percentOutput);
     } else {
-      double targetRPS = desiredState.speedMetersPerSecond
-          * SwerveConstants.DRIVE_GEAR_RATIO
-          / SwerveConstants.WHEEL_CIRCUMFERENCE;
-      double ffVolts = driveFeedforward.calculate(desiredState.speedMetersPerSecond);
-      driveMotor.setControl(driveVelocityRequest.withVelocity(targetRPS).withFeedForward(ffVolts));
+      driveMotor.getClosedLoopController().setSetpoint(desiredState.speedMetersPerSecond, ControlType.kVelocity);
     }
   }
 
   public void stop() {
-    driveMotor.set(0);
-    azimuthMotor.set(0);
+    driveMotor.stopMotor();
+    azimuthMotor.stopMotor();
   }
 
   public int getModuleNumber() {

@@ -13,10 +13,10 @@ public final class SwerveConstants {
 
   // Hardware
       //From wheel center axle TODO: measure for auto
-  public static final double TRACK_WIDTH = Units.inchesToMeters(18.5); // Left to right 
-  public static final double WHEEL_BASE = Units.inchesToMeters(24.75); // Front to back
+  public static final double TRACK_WIDTH = Units.inchesToMeters(19); // Left to right 
+  public static final double WHEEL_BASE = Units.inchesToMeters(19); // Front to back
 
-  public static final double MAX_SPEED = 4.2; // meters per second
+  public static final double MAX_SPEED = 4.60248; // meters per second
   public static final double MAX_ANGULAR_VELOCITY = 9.547; // rad per second
 
   public static final double WHEEL_DIAMETER = Units.inchesToMeters(4.0);
@@ -70,33 +70,34 @@ public final class SwerveConstants {
   private static final double BR_IRL_Degrees = 0.0 + (0.0 / 180);
  
   // (units: rotations)
-  public static final double FL_ENCODER_OFFSET = 0.0 + 0.140381 + FL_IRL_Degrees;
-  public static final double FR_ENCODER_OFFSET = 0.0 + 0.154297 + FR_IRL_Degrees;
-  public static final double RL_ENCODER_OFFSET = 0.0 - 0.006592 + BL_IRL_Degrees;
-  public static final double RR_ENCODER_OFFSET = 0.0 - 0.361572 + BR_IRL_Degrees;
+  public static final double FL_ENCODER_OFFSET = 0.0 + 0.0 + FL_IRL_Degrees;
+  public static final double FR_ENCODER_OFFSET = 0.0 + 0.0 + FR_IRL_Degrees;
+  public static final double RL_ENCODER_OFFSET = 0.0 + 0.0 + BL_IRL_Degrees;
+  public static final double RR_ENCODER_OFFSET = 0.0 + 0.0 + BR_IRL_Degrees;
 
   // DRIVE MOTOR PID - Tuning for wheel speed control
 
   // These values were found using SysId characterization
-  public static final double DRIVE_kP = 0.064395;
-  public static final double DRIVE_kI = 0.0;
-  public static final double DRIVE_kD = 0.0;
+  public static final double DRIVE_kP = 1.0; // TODO: Tune
+  public static final double DRIVE_kI = 0.0; // TODO: Tune
+  public static final double DRIVE_kD = 0.0; // TODO: Tune
 
-  // Feedforward values (physics-based compensation)
-  public static final double DRIVE_kS = 0.18656; // Static friction
-  public static final double DRIVE_kV = 2.5833; // Velocity factor
-  public static final double DRIVE_kA = 0.40138; // Acceleration factor
+
+  // // Feedforward values (physics-based compensation)
+  // public static final double DRIVE_kS = 0.18656; // Static friction
+  // public static final double DRIVE_kV = 2.5833; // Velocity factor
+  // public static final double DRIVE_kA = 0.40138; // Acceleration factor
 
   // AZIMUTH MOTOR PID - Tuning for wheel angle control
 
-  public static final double AZIMUTH_kP = 50.0; // TalonFX units: volts per rotation error — tune on robot
-  public static final double AZIMUTH_kI = 0.0;
-  public static final double AZIMUTH_kD = 0.0;
+  public static final double AZIMUTH_kP = 10.0; // TODO: Tune
+  public static final double AZIMUTH_kI = 0.0; // TODO: Tune
+  public static final double AZIMUTH_kD = 0.0; // TODO: Tune
 
   // CURRENT LIMITS - Protects motors from overheating
 
-  public static final int DRIVE_STATOR_LIMIT = 70; // Amps stator (was 60 — lowered for breaker safety)
-  public static final int DRIVE_SUPPLY_LIMIT = 50; // Amps from battery
+  public static final int DRIVE_STATOR_LIMIT = 40; // Amps stator (was 60 — lowered for breaker safety)
+  public static final int DRIVE_SUPPLY_LIMIT = 30; // Amps from battery
   public static final boolean DRIVE_STATOR_LIMIT_ENABLE = true;
   public static final boolean DRIVE_SUPPLY_LIMIT_ENABLE = true;
 

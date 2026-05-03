@@ -36,7 +36,8 @@ public class RobotContainer {
   private final XboxDriver driverJoystick;
   // private final XboxOperator operatorJoystick;
   // private final XboxTester testerJoystick;
-  SlewRateLimiter slewlimiter = new SlewRateLimiter(0.5);
+
+  SlewRateLimiter slewlimiter = new SlewRateLimiter(0.2);
   
   // Auto
   // private final SendableChooser<Command> autoChooser;
@@ -57,7 +58,7 @@ public class RobotContainer {
     driverJoystick = new XboxDriver(DrivingConstants.DRIVER_PORT);
     // operatorJoystick = new XboxOperator(DrivingConstants.OPERATOR_PORT);
     // testerJoystick = new XboxTester(DrivingConstants.TEST_PORT);
-private 
+
     // Auto
     // autoChooser = new SendableChooser<>();
     // SmartDashboard.putData("Auto Chooser", autoChooser);
@@ -74,8 +75,49 @@ private
     // Init methods
     setupDrive();
     configureButtonBindings();
+    // setupAuto();
+  }
 
-    RobotConfig config;
+  public Command getAutonomousCommand() {
+    try {
+      // Load the path you want to follow using its name in the GUI
+      PathPlannerPath path = PathPlannerPath.fromPathFile("simple straight");
+
+      // Create a path following command using AutoBuilder. This will also trigger
+      // event markers.
+      return AutoBuilder.followPath(path);
+    } catch (Exception e) {
+      DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
+      return Commands.none();
+    }
+  }
+
+  // On container init
+  private void setupDrive() {
+    // Drive command
+    Command teleopDriveCommand = swerve.teleopCommand(
+        () -> applySpeedCurve(slewlimiter.calculate(driverJoystick.forward())),
+        () -> applySpeedCurve(slewlimiter.calculate(driverJoystick.strafe())),
+        () -> applySpeedCurve(slewlimiter.calculate(driverJoystick.turn())));
+    swerve.setDefaultCommand(teleopDriveCommand);
+
+    // Gyro
+    swerve.getH().setYaw(new Rotation2d());
+    swerve.zeroHeading();
+    // turret.zeroTurretYaw();
+    // .setYaw(Rotation2d.fromDegrees(
+    // (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) ==
+    // DriverStation.Alliance.Red)
+    // ? 180
+    // : 0));
+
+    // SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
+    Elastic.sendNotification(new Elastic.Notification(Elastic.NotificationLevel.INFO, "Teleop Setup Complete",
+        "drive controls were set up successfully"));
+  }
+
+  private void setupAuto() {
+        RobotConfig config;
     try {
       config = RobotConfig.fromGUISettings();
 
@@ -112,49 +154,7 @@ private
       );
     } catch (Exception e) {
       // Handle exception as needed
-      e.printStackTrace();
-    }
-
-    // registerAutoRoutines();
-  }
-
-  public Command getAutonomousCommand() {
-    try {
-      // Load the path you want to follow using its name in the GUI
-      PathPlannerPath path = PathPlannerPath.fromPathFile("simple straight");
-
-      // Create a path following command using AutoBuilder. This will also trigger
-      // event markers.
-      return AutoBuilder.followPath(path);
-    } catch (Exception e) {
-      DriverStation.reportError("Big oops: " + e.getMessage(), e.getStackTrace());
-      return Commands.none();
-    }
-  }
-
-  // On container init
-  private void setupDrive() {
-    // Drive command
-    Command teleopDriveCommand = swerve.teleopCommand(
-        () -> applySpeedCurve(slewlimiter.calculate(driverJoystick.forward())),
-        () -> applySpeedCurve(slewlimiter.calculate(driverJoystick.strafe())),
-        () -> applySpeedCurve(slewlimiter.calculate(driverJoystick.turn())));
-    swerve.setDefaultCommand(teleopDriveCommand);
-
-    // Gyro
-    swerve.getH().setYaw(new Rotation2d());
-    swerve.zeroHeading();
-    // turret.zeroTurretYaw();
-
-    // .setYaw(Rotation2d.fromDegrees(
-    // (DriverStation.getAlliance().orElse(DriverStation.Alliance.Blue) ==
-    // DriverStation.Alliance.Red)
-    // ? 180
-    // : 0));
-
-    // SmartDashboard.putData("TeleOp Command", teleopDriveCommand);
-    Elastic.sendNotification(new Elastic.Notification(Elastic.NotificationLevel.INFO, "Teleop Setup Complete",
-        "drive controls were set up successfully"));
+      e.printStackTrace(); }
   }
 
   private double applySpeedCurve(double input) {
@@ -176,7 +176,7 @@ private
     driverJoystick
         .toggleSpeedExponent()
         .onTrue(new InstantCommand(() -> {
-          speedExponent = (speedExponent == 1) ? 2 : 1;
+          speedExponent = (speedExponent == 1) ? 3 : 1;
         }));
 
     driverJoystick.resetGyro().onTrue(new InstantCommand(() -> swerve.zeroGyro()));
